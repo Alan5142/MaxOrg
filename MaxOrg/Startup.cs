@@ -42,12 +42,11 @@ namespace MaxOrg
 				s.Url = "http://localhost:8529";
 
 				// you can set other settings if you need
-				s.Credential = new NetworkCredential("root", "Alan23253");
-				s.SystemDatabaseCredential = new NetworkCredential("root", "Alan23253");
+				s.Credential = new NetworkCredential("MaxOrg_admin", "MaxOrg123");
+				s.SystemDatabaseCredential = new NetworkCredential("MaxOrg_admin", "MaxOrg123");
 				s.WaitForSync = true;
 				s.ClusterMode = true;
 			});
-			var db = ArangoDatabase.CreateWithSetting();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,6 +1,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import {HttpClient} from '@angular/common/http';
+import {Router} from '@angular/router';
 
 
 export interface DialogData {
@@ -9,7 +10,7 @@ export interface DialogData {
 }
 
 @Component({
-  selector: 'app-navbar',
+  selector: 'app-start-page-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
@@ -25,7 +26,7 @@ export class NavbarComponent implements OnInit {
   ngOnInit() {
   }
 
-  cargarInicioSesion() {
+  displayLoginDialog(): void {
     const dialogRef = this.dialog.open(NavbarDialogComponent, {
       minWidth: '300px',
       data: {username: this.username, password: this.password}
@@ -47,18 +48,20 @@ export class NavbarDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<NavbarDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    private http: HttpClient) {
+    private http: HttpClient,
+    private router: Router) {
   }
 
   login(): void {
     console.log(this.data);
-
-    this.http.post('https://localhost:44384/api/login', {username: this.data.username, password: this.data.password})
+    this.router.navigate(['/start/index']);
+    /*this.http.post('https://localhost:44384/api/login', {username: this.data.username, password: this.data.password})
       .toPromise().then(object => {
       alert(object);
     }).catch(o => console.log(o));
-
+*/
     this.dialogRef.close();
+
   }
 
 }
