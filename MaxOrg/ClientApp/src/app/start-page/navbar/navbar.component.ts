@@ -20,7 +20,7 @@ export class NavbarComponent implements OnInit {
   notifications: number[];
 
   constructor(private dialog: MatDialog, private auth: AuthService) {
-    this.notifications = Array(3).fill(4);
+    this.notifications = Array(10).fill(4);
   }
 
   username: string;

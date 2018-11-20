@@ -7,7 +7,7 @@ import {
   MatDialogModule,
   MatFormFieldModule,
   MatIconModule,
-  MatInputModule, MatListModule, MatMenuModule,
+  MatInputModule, MatListModule, MatMenuModule, MatOptionModule, MatRadioModule, MatSelectModule,
   MatToolbarModule
 } from '@angular/material';
 import {HttpClientModule} from '@angular/common/http';
@@ -56,6 +56,9 @@ import {MyAccountComponent, MyAccountPickImageComponent} from './my-account/my-a
     MatIconModule,
     MatMenuModule,
     MatListModule,
+    MatOptionModule,
+    MatSelectModule,
+    MatRadioModule,
     StartPageRoutingModule
   ],
   bootstrap: [StartPageComponent]
