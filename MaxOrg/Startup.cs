@@ -5,7 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using ArangoDB.Client;
+using System.Net;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 namespace MaxOrg
 {
 	public class Startup
@@ -20,19 +23,40 @@ namespace MaxOrg
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddCors();
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
 			// In production, the Angular files will be served from this directory
 			services.AddSpaStaticFiles(configuration =>
 			{
 				configuration.RootPath = "ClientApp/dist";
 			});
+
+			// Configure ArangoDB settings, to instantiate an object to communicate with Arango
+			// we use: var db = ArangoDatabase.CreateWithSetting();
+			ArangoDatabase.ChangeSetting(s =>
+			{
+				s.Database = "MaxOrg_db";
+				s.Url = "http://localhost:8529";
+
+				// you can set other settings if you need
+				s.Credential = new NetworkCredential("MaxOrg_admin", "MaxOrg123");
+				s.SystemDatabaseCredential = new NetworkCredential("MaxOrg_admin", "MaxOrg123");
+				s.WaitForSync = true;
+				s.ClusterMode = true;
+			});
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
-			if (env.IsDevelopment())
+            app.UseCors(builder =>
+                        builder
+                        .WithOrigins("https://localhost:44384", "http://localhost:4200"));
+
+
+            if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
 			}

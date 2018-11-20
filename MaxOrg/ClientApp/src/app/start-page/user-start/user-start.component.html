@@ -1,0 +1,46 @@
+<div fxLayout="column" fxLayoutGap="50px">
+  <h1 fxFlexAlign="center" style="text-align: center;" class="mat-display-1">Bienvenido de nuevo, <br> [usuario]</h1>
+  <div fxLayout="row wrap" fxLayoutAlign="center">
+    <button mat-stroked-button>Crear nuevo proyecto</button>
+  </div>
+
+  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="50px">
+    <div fxFlex="10"></div> <!--Separator-->
+
+    <div fxFlex="25">
+      <mat-card style="min-height: 300px; max-height: 400px; padding: 0; margin: 16px;">
+        <mat-card-header style="background-color: #484848;">
+          <mat-card-title-group style="align-items: center;">
+            <mat-card-title style="color: white; margin: 10px">Proyectos recientes</mat-card-title>
+          </mat-card-title-group>
+        </mat-card-header>
+
+        <mat-divider></mat-divider>
+
+        <mat-card-content style="margin: 16px;">
+          <mat-form-field fxFill>
+            <mat-icon matPrefix>search</mat-icon>
+            <input matInput type="text" placeholder="Buscar...">
+          </mat-form-field>
+
+          <mat-list>
+            <mat-list-item fxFill *ngFor="let project of projects">
+              <mat-icon matPrefix>folder</mat-icon>
+              <button fxFill mat-button>{{project}}</button>
+            </mat-list-item>
+          </mat-list>
+
+        </mat-card-content>
+
+      </mat-card>
+    </div>
+
+    <div fxFlex="50">
+      <mat-card style="min-height: 300px; max-height: 400px; padding: 0; margin: 16px;" ngStyle.lt-md="margin-top: 90px;" ngStyle.gt-sm="margin-top: 16px;">
+        <mat-card-header style="background-color: #484848;">
+          <mat-card-title style="color: white; margin: 10px">Actividad reciente</mat-card-title>
+        </mat-card-header>
+      </mat-card>
+    </div>
+  </div>
+</div>

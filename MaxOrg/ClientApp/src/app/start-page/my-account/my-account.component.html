@@ -1,0 +1,44 @@
+<div fxLayout="column" fxLayoutAlign="center center">
+  <h1>Mi cuenta</h1>
+
+  <div fxLayout="row">
+    <img ngClass="image" ngClass.xs="image-small" src='https://material.angular.io/assets/img/examples/shiba1.jpg'>
+    <button mat-button fxFlexAlign="end" (click)="selectImage()">
+      <mat-icon>edit</mat-icon>
+    </button>
+  </div>
+
+  <mat-divider></mat-divider>
+  <form fxLayout="column">
+    <mat-form-field>
+      <input matInput type="text" placeholder="Nombre de usuario">
+    </mat-form-field>
+    <mat-form-field>
+      <textarea matInput placeholder="Descripción"></textarea>
+    </mat-form-field>
+
+    <mat-form-field>
+      <div fxLayout="row">
+        <input matInput type="password" placeholder="contraseña">
+        <button mat-button (click)="passwordChanged = true">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+    </mat-form-field>
+    <mat-form-field *ngIf="passwordChanged">
+      <div fxLayout="row">
+        <input matInput type="password" placeholder="repetir contraseña">
+      </div>
+    </mat-form-field>
+    <mat-form-field>
+
+      <mat-select placeholder="Sonido de notificaciones">
+        <mat-option value="primary">Todas las prioridades</mat-option>
+        <mat-option value="accent">Media y alta prioridad</mat-option>
+        <mat-option value="warn">Solo alta prioridad</mat-option>
+      </mat-select>
+
+    </mat-form-field>
+    <button mat-stroked-button color="warn">Guardar cambios</button>
+  </form>
+</div>
