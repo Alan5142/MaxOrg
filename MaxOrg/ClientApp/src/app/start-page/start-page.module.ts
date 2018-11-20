@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  MatBadgeModule,
+  MatBadgeModule, MatBottomSheetModule,
   MatButtonModule,
   MatCardModule,
   MatDialogModule,
@@ -19,7 +19,7 @@ import { IndexComponent } from './index/index.component';
 import {StartPageComponent} from './start-page.component';
 import { UserStartComponent } from './user-start/user-start.component';
 import {AuthService} from './auth.service';
-import { MyAccountComponent } from './my-account/my-account.component';
+import {MyAccountComponent, MyAccountPickImageComponent} from './my-account/my-account.component';
 
 @NgModule({
   providers: [
@@ -28,7 +28,8 @@ import { MyAccountComponent } from './my-account/my-account.component';
   entryComponents: [
     NavbarComponent,
     NavbarDialogComponent,
-    StartPageComponent
+    StartPageComponent,
+    MyAccountPickImageComponent
   ],
   declarations: [
     NavbarComponent,
@@ -36,7 +37,8 @@ import { MyAccountComponent } from './my-account/my-account.component';
     IndexComponent,
     StartPageComponent,
     UserStartComponent,
-    MyAccountComponent
+    MyAccountComponent,
+    MyAccountPickImageComponent
   ],
   imports: [
     CommonModule,
@@ -49,6 +51,7 @@ import { MyAccountComponent } from './my-account/my-account.component';
     FlexLayoutModule,
     FormsModule,
     MatBadgeModule,
+    MatBottomSheetModule,
     MatCardModule,
     MatIconModule,
     MatMenuModule,
