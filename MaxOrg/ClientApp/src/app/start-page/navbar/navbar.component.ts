@@ -2,6 +2,7 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
+import {AuthService} from '../auth.service';
 
 
 export interface DialogData {
@@ -16,8 +17,10 @@ export interface DialogData {
 })
 
 export class NavbarComponent implements OnInit {
+  notifications: number[];
 
-  constructor(private dialog: MatDialog) {
+  constructor(private dialog: MatDialog, private auth: AuthService) {
+    this.notifications = Array(3).fill(4);
   }
 
   username: string;
@@ -44,22 +47,19 @@ export class NavbarComponent implements OnInit {
   templateUrl: 'navbar.dialog.html',
 })
 export class NavbarDialogComponent {
-
   constructor(
     public dialogRef: MatDialogRef<NavbarDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private http: HttpClient,
-    private router: Router) {
+    private router: Router,
+    private auth: AuthService) {
   }
 
   login(): void {
     console.log(this.data);
-    this.router.navigate(['/start/index']);
-    /*this.http.post('https://localhost:44384/api/login', {username: this.data.username, password: this.data.password})
-      .toPromise().then(object => {
-      alert(object);
-    }).catch(o => console.log(o));
-*/
+    if (this.auth.authUser(this.data.username, this.data.password)) {
+      this.router.navigate(['/start/index']);
+    }
     this.dialogRef.close();
 
   }

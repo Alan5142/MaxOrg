@@ -32,7 +32,6 @@ namespace MaxOrg
 			{
 				configuration.RootPath = "ClientApp/dist";
 			});
-			services.AddScoped<IArangoDatabase, ArangoDatabase>();
 
 			// Configure ArangoDB settings, to instantiate an object to communicate with Arango
 			// we use: var db = ArangoDatabase.CreateWithSetting();
@@ -53,7 +52,8 @@ namespace MaxOrg
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
             app.UseCors(builder =>
-       builder.WithOrigins("https://localhost:44384", "http://localhost:4200"));
+                        builder
+                        .WithOrigins("https://localhost:44384", "http://localhost:4200"));
 
 
             if (env.IsDevelopment())

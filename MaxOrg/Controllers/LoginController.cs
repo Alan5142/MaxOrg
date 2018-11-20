@@ -24,22 +24,21 @@ namespace MaxOrg.Controllers
         {
         }
 
-        public ActionResult<JsonResult> Post([FromBody] User user)
+        public ActionResult Post([FromBody] User user)
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var query = (from u in db.Query<User>() where u.username == user.username && u.password == user.password
-                            select new User { username = u.username, key = u.key }).ToList();
+                            select new { u.username, u.key }).ToList();
 
                 if (query.Count() == 1)
                 {
                     var u = query.ElementAt(0);
-                    JsonResult jsonResult = new JsonResult(u);
-                    return Ok("Exito");
+                    return Ok(u);
                 }
                 else
                 {
-                    return NotFound("Usuario");
+                    return NotFound(new { message = "Incorrect username or password" });
                 }
             }
         }
