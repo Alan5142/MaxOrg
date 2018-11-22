@@ -1,5 +1,7 @@
+<mat-dialog-content>
+
 <div fxLayout="row" fxLayout.xs="column" fxLayoutGap="30px">
-  <div fxLayout="column wrap">
+  <div fxLayout="column">
     <h1 mat-dialog-title fxLayoutAlign="center">Iniciar sesión</h1>
     <div mat-dialog-content fxLayout="column">
       <mat-form-field>
@@ -12,23 +14,24 @@
         <input matInput [(ngModel)]="data.password" type="password">
       </mat-form-field>
     </div>
-    <div mat-dialog-actions fxLayoutAlign="center center">
-      <button mat-button (click)="login()">Iniciar sesión</button>
-    </div>
-    <h3 fxLayoutAlign="center">¿No dispones de cuenta?</h3>
 
-    <div mat-dialog-actions fxLayoutAlign="center center">
-      <button mat-button>Registrarse</button>
+    <div fxLayoutAlign="center center">
+      <button mat-flat-button color="primary" (click)="login()">Iniciar sesión</button>
+    </div>
+    <h5 fxLayoutAlign="center">¿No dispones de cuenta?</h5>
+
+    <div fxLayoutAlign="center center">
+      <button mat-flat-button color="primary">Registrarse</button>
     </div>
 
   </div>
 
-
-  <div mat-dialog-content fxLayout="column" fxLayoutGap="15px">
+  <div fxLayout="column" fxLayoutGap="15px">
     <h1 mat-dialog-title fxLayoutAlign="center">O utiliza una cuenta</h1>
     <button mat-raised-button>Cuenta de Google</button>
     <button mat-raised-button>Cuenta de Github</button>
   </div>
-
 </div>
+
+</mat-dialog-content>
 

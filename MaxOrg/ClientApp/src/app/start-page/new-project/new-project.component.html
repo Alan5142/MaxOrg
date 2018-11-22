@@ -1,11 +1,13 @@
-<h1 class="center">Nuevo proyecto</h1>
-<mat-form-field class="center half">
-  <input matInput placeholder="Nombre del proyecto" >
-</mat-form-field>
-<br>
-<mat-form-field class="center">
-  <textarea matInput placeholder="Integrantes" ></textarea>
-  <mat-hint ><strong>separados por ;</strong> </mat-hint>
-</mat-form-field>
-<br>
-<button mat-raised-button color="primary" class="center half" (click)="onNoClick()">Crear</button>
+<mat-dialog-content>
+  <h1 class="center">Nuevo proyecto</h1>
+  <mat-form-field class="center half">
+    <input matInput placeholder="Nombre del proyecto">
+  </mat-form-field>
+  <br>
+  <mat-form-field class="center">
+    <textarea matInput placeholder="Integrantes"></textarea>
+    <mat-hint><strong>separados por ;</strong></mat-hint>
+  </mat-form-field>
+  <br>
+  <button mat-raised-button color="primary" class="center half" (click)="onNoClick()">Crear</button>
+</mat-dialog-content>
