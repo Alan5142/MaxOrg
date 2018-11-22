@@ -20,6 +20,7 @@ import {StartPageComponent} from './start-page.component';
 import { UserStartComponent } from './user-start/user-start.component';
 import {AuthService} from './auth.service';
 import {MyAccountComponent, MyAccountPickImageComponent} from './my-account/my-account.component';
+import { NewProjectComponent } from './new-project/new-project.component';
 
 @NgModule({
   providers: [
@@ -29,7 +30,8 @@ import {MyAccountComponent, MyAccountPickImageComponent} from './my-account/my-a
     NavbarComponent,
     NavbarDialogComponent,
     StartPageComponent,
-    MyAccountPickImageComponent
+    MyAccountPickImageComponent,
+    NewProjectComponent
   ],
   declarations: [
     NavbarComponent,
@@ -38,7 +40,8 @@ import {MyAccountComponent, MyAccountPickImageComponent} from './my-account/my-a
     StartPageComponent,
     UserStartComponent,
     MyAccountComponent,
-    MyAccountPickImageComponent
+    MyAccountPickImageComponent,
+    NewProjectComponent
   ],
   imports: [
     CommonModule,

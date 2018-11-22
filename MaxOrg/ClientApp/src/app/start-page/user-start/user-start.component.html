@@ -1,7 +1,7 @@
 <div fxLayout="column" fxLayoutGap="50px">
   <h1 fxFlexAlign="center" style="text-align: center;" class="mat-display-1">Bienvenido de nuevo, <br> [usuario]</h1>
   <div fxLayout="row wrap" fxLayoutAlign="center">
-    <button mat-stroked-button>Crear nuevo proyecto</button>
+    <button mat-stroked-button (click)="openDialog()">Crear nuevo proyecto</button>
   </div>
 
   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="50px">
