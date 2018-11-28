@@ -3,7 +3,7 @@
 
   <div fxLayout="row">
     <img ngClass="image" ngClass.xs="image-small" src='https://material.angular.io/assets/img/examples/shiba1.jpg'>
-    <button mat-button fxFlexAlign="end" (click)="selectImage()">
+    <button mat-icon-button fxFlexAlign="end" (click)="selectImage()">
       <mat-icon>edit</mat-icon>
     </button>
   </div>
@@ -20,7 +20,7 @@
     <mat-form-field>
       <div fxLayout="row">
         <input matInput type="password" placeholder="contraseña">
-        <button mat-button (click)="passwordChanged = true">
+        <button mat-icon-button (click)="passwordChanged = true">
           <mat-icon>edit</mat-icon>
         </button>
       </div>
@@ -39,6 +39,6 @@
       </mat-select>
 
     </mat-form-field>
-    <button mat-stroked-button color="warn">Guardar cambios</button>
+    <button mat-flat-button color="accent">Guardar cambios</button>
   </form>
 </div>

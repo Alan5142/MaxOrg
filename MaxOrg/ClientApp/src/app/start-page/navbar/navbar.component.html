@@ -7,7 +7,7 @@
   <div *ngIf="auth.isUserAuthenticated()">
 
     <mat-menu #accountMenu="matMenu">
-      <button mat-menu-item>Mis pendientes</button>
+      <button mat-menu-item routerLink="todos">Mis pendientes</button>
       <mat-divider></mat-divider>
       <button mat-menu-item routerLink="my_account">Opciones</button>
     </mat-menu>

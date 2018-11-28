@@ -7,13 +7,15 @@ import {UserStartComponent} from './user-start/user-start.component';
 import {AuthService} from './auth.service';
 import {AuthGuard} from './auth.guard';
 import {MyAccountComponent} from './my-account/my-account.component';
+import {TodosComponent} from './todos/todos.component';
 
 const routes: Routes = [
   {
     path: '', component: StartPageComponent, children: [
       {path: '', component: IndexComponent, canActivate: [AuthGuard]},
       {path: 'index', component: UserStartComponent},
-      {path: 'my_account', component: MyAccountComponent}
+      {path: 'my_account', component: MyAccountComponent},
+      {path: 'todos', component: TodosComponent}
     ]
   }
 ];

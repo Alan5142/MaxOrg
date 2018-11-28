@@ -5,7 +5,15 @@
   </mat-form-field>
   <br>
   <mat-form-field class="center">
-    <textarea matInput placeholder="Integrantes"></textarea>
+    <mat-chip-list #chipList>
+      <mat-chip *ngFor="let username of usernames" [selectable]="selectable"
+                [removable]="true" (removed)="remove(username)">
+        {{username}}
+      <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+    </mat-chip-list>
+    <input [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputFor]="chipList" placeholder="Integrantes"
+           (matChipInputTokenEnd)="addUser($event)">
     <mat-hint><strong>separados por ;</strong></mat-hint>
   </mat-form-field>
   <br>
