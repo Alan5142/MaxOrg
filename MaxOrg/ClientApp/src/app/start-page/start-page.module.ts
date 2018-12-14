@@ -8,7 +8,7 @@ import {
   MatFormFieldModule,
   MatIconModule,
   MatInputModule, MatListModule, MatMenuModule, MatOptionModule, MatRadioModule, MatSelectModule,
-  MatToolbarModule
+  MatToolbarModule,MatSidenavModule
 } from '@angular/material';
 import {HttpClientModule} from '@angular/common/http';
 import {FlexLayoutModule} from '@angular/flex-layout';
@@ -22,6 +22,8 @@ import {AuthService} from './auth.service';
 import {MyAccountComponent, MyAccountPickImageComponent} from './my-account/my-account.component';
 import { NewProjectComponent } from './new-project/new-project.component';
 import { TodosComponent } from './todos/todos.component';
+import { ProjectComponent } from './project/project.component';
+import { DescriptionComponent } from './project/description/description.component';
 
 @NgModule({
   providers: [
@@ -43,7 +45,9 @@ import { TodosComponent } from './todos/todos.component';
     MyAccountComponent,
     MyAccountPickImageComponent,
     NewProjectComponent,
-    TodosComponent
+    TodosComponent,
+    ProjectComponent,
+    DescriptionComponent
   ],
   imports: [
     CommonModule,
@@ -66,7 +70,8 @@ import { TodosComponent } from './todos/todos.component';
     MatRadioModule,
     StartPageRoutingModule,
     MatExpansionModule,
-    MatChipsModule
+    MatChipsModule,
+    MatSidenavModule
   ],
   bootstrap: [StartPageComponent]
 })
