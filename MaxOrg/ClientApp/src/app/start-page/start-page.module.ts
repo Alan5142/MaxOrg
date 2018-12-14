@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import {
   MatBadgeModule, MatBottomSheetModule,
   MatButtonModule,
-  MatCardModule,
-  MatDialogModule,
+  MatCardModule, MatChipsModule,
+  MatDialogModule, MatExpansionModule,
   MatFormFieldModule,
   MatIconModule,
   MatInputModule, MatListModule, MatMenuModule, MatOptionModule, MatRadioModule, MatSelectModule,
@@ -21,6 +21,7 @@ import { UserStartComponent } from './user-start/user-start.component';
 import {AuthService} from './auth.service';
 import {MyAccountComponent, MyAccountPickImageComponent} from './my-account/my-account.component';
 import { NewProjectComponent } from './new-project/new-project.component';
+import { TodosComponent } from './todos/todos.component';
 
 @NgModule({
   providers: [
@@ -41,7 +42,8 @@ import { NewProjectComponent } from './new-project/new-project.component';
     UserStartComponent,
     MyAccountComponent,
     MyAccountPickImageComponent,
-    NewProjectComponent
+    NewProjectComponent,
+    TodosComponent
   ],
   imports: [
     CommonModule,
@@ -62,7 +64,9 @@ import { NewProjectComponent } from './new-project/new-project.component';
     MatOptionModule,
     MatSelectModule,
     MatRadioModule,
-    StartPageRoutingModule
+    StartPageRoutingModule,
+    MatExpansionModule,
+    MatChipsModule
   ],
   bootstrap: [StartPageComponent]
 })
