@@ -1,5 +1,5 @@
 <mat-dialog-content>
-  <h1 class="center">Nuevo proyecto</h1>
+  <h1 class="center" i18n>Nuevo proyecto</h1>
   <mat-form-field class="center half">
     <input matInput placeholder="Nombre del proyecto">
   </mat-form-field>
@@ -14,7 +14,7 @@
     </mat-chip-list>
     <input [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputFor]="chipList" placeholder="Integrantes"
            (matChipInputTokenEnd)="addUser($event)">
-    <mat-hint><strong>separados por ;</strong></mat-hint>
+    <mat-hint><strong i18n>separados por ;</strong></mat-hint>
   </mat-form-field>
   <br>
   <button mat-raised-button color="primary" class="center half" (click)="onNoClick()">Crear</button>

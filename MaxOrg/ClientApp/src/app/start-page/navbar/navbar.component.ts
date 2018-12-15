@@ -18,9 +18,10 @@ export interface DialogData {
 
 export class NavbarComponent implements OnInit {
   notifications: number[];
-
-  constructor(private dialog: MatDialog, private auth: AuthService) {
+  auth: AuthService;
+  constructor(private dialog: MatDialog, auth: AuthService) {
     this.notifications = Array(10).fill(4);
+    this.auth = auth;
   }
 
   username: string;

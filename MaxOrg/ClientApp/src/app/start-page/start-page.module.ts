@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {
   MatBadgeModule, MatBottomSheetModule,
   MatButtonModule,
@@ -8,22 +8,20 @@ import {
   MatFormFieldModule,
   MatIconModule,
   MatInputModule, MatListModule, MatMenuModule, MatOptionModule, MatRadioModule, MatSelectModule,
-  MatToolbarModule,MatSidenavModule
+  MatToolbarModule, MatSidenavModule
 } from '@angular/material';
 import {HttpClientModule} from '@angular/common/http';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {FormsModule} from '@angular/forms';
 import {NavbarComponent, NavbarDialogComponent} from './navbar/navbar.component';
 import {StartPageRoutingModule} from './start-page-routing.module';
-import { IndexComponent } from './index/index.component';
+import {IndexComponent} from './index/index.component';
 import {StartPageComponent} from './start-page.component';
-import { UserStartComponent } from './user-start/user-start.component';
+import {UserStartComponent} from './user-start/user-start.component';
 import {AuthService} from './auth.service';
 import {MyAccountComponent, MyAccountPickImageComponent} from './my-account/my-account.component';
-import { NewProjectComponent } from './new-project/new-project.component';
-import { TodosComponent } from './todos/todos.component';
-import { ProjectComponent } from './project/project.component';
-import { DescriptionComponent } from './project/description/description.component';
+import {NewProjectComponent} from './new-project/new-project.component';
+import {TodosComponent} from './todos/todos.component';
 
 @NgModule({
   providers: [
@@ -45,9 +43,7 @@ import { DescriptionComponent } from './project/description/description.componen
     MyAccountComponent,
     MyAccountPickImageComponent,
     NewProjectComponent,
-    TodosComponent,
-    ProjectComponent,
-    DescriptionComponent
+    TodosComponent
   ],
   imports: [
     CommonModule,
@@ -75,4 +71,5 @@ import { DescriptionComponent } from './project/description/description.componen
   ],
   bootstrap: [StartPageComponent]
 })
-export class StartPageModule { }
+export class StartPageModule {
+}

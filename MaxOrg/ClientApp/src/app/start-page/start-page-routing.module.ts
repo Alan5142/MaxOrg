@@ -8,8 +8,8 @@ import {AuthService} from './auth.service';
 import {AuthGuard} from './auth.guard';
 import {MyAccountComponent} from './my-account/my-account.component';
 import {TodosComponent} from './todos/todos.component';
-import { ProjectComponent } from './project/project.component';
-import { DescriptionComponent } from './project/description/description.component';
+import { ProjectComponent } from '../project/project.component';
+import { DescriptionComponent } from '../project/description/description.component';
 
 const routes: Routes = [
   {
@@ -17,10 +17,7 @@ const routes: Routes = [
       {path: '', component: IndexComponent, canActivate: [AuthGuard]},
       {path: 'index', component: UserStartComponent},
       {path: 'my_account', component: MyAccountComponent},
-      {path: 'todos', component: TodosComponent},
-      {path: 'project', component: ProjectComponent, children:[
-        {path: '', component: DescriptionComponent}
-      ]}
+      {path: 'todos', component: TodosComponent}
     ]
   }
 ];

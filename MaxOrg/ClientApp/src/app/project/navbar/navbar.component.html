@@ -1,0 +1,115 @@
+<mat-toolbar color="primary" fxLayout="row">
+  <button mat-icon-button (click)="sidenav.toggle()">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <button mat-button routerLink="/start"><h1>MaxOrg</h1></button>
+  <div fxFlex></div>
+  <div>
+    <mat-menu #accountMenu="matMenu">
+      <button mat-menu-item routerLink="/start/todos" i18n>Mis pendientes</button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item routerLink="/start/my_account" i18n>Opciones</button>
+    </mat-menu>
+
+    <mat-menu #notificationMenu="matMenu">
+      <div fxLayout="column" style="width: 280px; height: 300px; overflow-x: hidden;">
+        <div *ngFor="let notification of notifications">
+          <div fxLayout="row">
+            <div>
+              <img class="image" src='https://material.angular.io/assets/img/examples/shiba1.jpg'>
+            </div>
+            <button mat-button fxFill>
+              Ha publicado...
+            </button>
+          </div>
+          <mat-divider></mat-divider>
+        </div>
+      </div>
+    </mat-menu>
+
+    <button mat-button [matMenuTriggerFor]="notificationMenu">
+      <mat-icon matBadge="3" matBadgePosition="above after" matBadgeColor="warn">notifications</mat-icon>
+    </button>
+    <button mat-button [matMenuTriggerFor]="accountMenu">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+    <div fxFlex="1" fxFlex.gt-md="5"></div>
+  </div>
+</mat-toolbar>
+
+
+<mat-sidenav-container id="container">
+  <mat-sidenav [mode]="mobileQuery.matches ? 'over' : 'side'" [opened]="!mobileQuery.matches" #sidenav>
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Proyecto
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <button mat-button>Descripción</button>
+        <br>
+        <button mat-button>Integrantes</button>
+        <br>
+        <button mat-button>Subgrupos</button>
+        <br>
+        <button mat-button>Calendario</button>
+        <br>
+        <button mat-button>Requerimientos</button>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Trabajo
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <button mat-button>Tablero</button>
+        <br>
+        <button mat-button>Asignación de trabajos</button>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Codigo
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <button mat-button>Archivos</button>
+        <br>
+        <button mat-button>Commits</button>
+        <br>
+        <button mat-button>Push</button>
+        <br>
+        <button mat-button>Ramas</button>
+        <br>
+        <button mat-button>Pull request</button>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Tests
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <button mat-button>Estadísticas</button>
+        <br>
+        <button mat-button>Crear test</button>
+        <br>
+        <button mat-button>Test realizados</button>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Mensajes
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <button mat-button>Grupal</button>
+        <br>
+        <button mat-button>Personal</button>
+        <br>
+        <button mat-button>Con administrador</button>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

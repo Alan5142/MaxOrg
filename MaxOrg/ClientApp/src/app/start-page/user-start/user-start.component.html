@@ -1,7 +1,7 @@
 <div fxLayout="column" fxLayoutGap="50px">
-  <h1 fxFlexAlign="center" style="text-align: center;" class="mat-display-1">Bienvenido de nuevo, <br> [usuario]</h1>
+  <h1 fxFlexAlign="center" style="text-align: center;" class="mat-display-1" i18n>Bienvenido de nuevo, <br> [usuario]</h1>
   <div fxLayout="row wrap" fxLayoutAlign="center">
-    <button mat-stroked-button (click)="openDialog()">Crear nuevo proyecto</button>
+    <button mat-stroked-button (click)="openDialog()" i18n>Crear nuevo proyecto</button>
   </div>
 
   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="50px">
@@ -11,7 +11,7 @@
       <mat-card style="min-height: 300px; max-height: 400px; padding: 0; margin: 16px;">
         <mat-card-header style="background-color: #484848;">
           <mat-card-title-group style="align-items: center;">
-            <mat-card-title style="color: white; margin: 10px">Proyectos recientes</mat-card-title>
+            <mat-card-title style="color: white; margin: 10px" i18n>Proyectos recientes</mat-card-title>
           </mat-card-title-group>
         </mat-card-header>
 
@@ -38,7 +38,7 @@
     <div fxFlex="50">
       <mat-card style="min-height: 300px; max-height: 400px; padding: 0; margin: 16px;" ngStyle.lt-md="margin-top: 90px;" ngStyle.gt-sm="margin-top: 16px;">
         <mat-card-header style="background-color: #484848;">
-          <mat-card-title style="color: white; margin: 10px">Actividad reciente</mat-card-title>
+          <mat-card-title style="color: white; margin: 10px" i18n>Actividad reciente</mat-card-title>
         </mat-card-header>
       </mat-card>
     </div>
