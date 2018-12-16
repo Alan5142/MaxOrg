@@ -1,0 +1,15 @@
+<div>
+  <mat-toolbar color="accent" fxLayout="row">
+    <button mat-button [routerLink]="['/project', route.snapshot.paramMap.get('id'), 'board']"><h1>Tablero</h1></button>
+    <div fxLayoutAlign="end end" fxFlex>
+      <!-- TODO mostrar este icono solo si esta en un grupo de tarjetas-->
+      <button mat-icon-button>
+        <mat-icon>person_add</mat-icon>
+      </button>
+    </div>
+  </mat-toolbar>
+
+  <div style="overflow-x: auto; height: 100%" fxLayout="row" cdkDropListGroup>
+    <app-group *ngFor="let group of kanbanBoard.cardGroups" [kanbanGroup]="group" [otherGroupIds]="getOtherGroupIds()"></app-group>
+  </div>
+</div>

@@ -1,0 +1,23 @@
+<div style="margin: 25px;">
+  <mat-card style="min-height: 300px; min-width: 300px; padding: 0;">
+    <mat-card-header style="background-color: #484848;">
+      <mat-card-title-group>
+        <mat-card-title class="text-center" style="color: white; margin: 10px" fxFlexAlign="stretch">
+          {{kanbanGroup.name}}
+        </mat-card-title>
+      </mat-card-title-group>
+    </mat-card-header>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content style="margin: 16px; min-height: 200px; min-width: 200px;" fxLayout="column"
+                      fxLayoutAlign="stretch">
+      <div [id]="'kanban-group-' + kanbanGroup.id" [cdkDropListConnectedTo]="otherGroupIds" cdkDropList
+           (cdkDropListDropped)="drop($event)" [cdkDropListData]="kanbanGroup.cards">
+        <app-card cdkDrag [cdkDragData]="card" *ngFor="let card of kanbanGroup.cards" [kanbanCard]="card">Boton
+        </app-card>
+        <div *ngIf="kanbanGroup.cards.length === 0" style="height: 50px; width: 100%;"></div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

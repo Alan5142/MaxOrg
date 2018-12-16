@@ -1,10 +1,12 @@
 <mat-toolbar color="primary" fxLayout="row">
-  <button mat-icon-button (click)="sidenav.toggle()">
-    <mat-icon>menu</mat-icon>
-  </button>
-  <button mat-button routerLink="/start"><h1>MaxOrg</h1></button>
-  <div fxFlex></div>
-  <div>
+  <div fxFlex="33">
+    <button mat-icon-button (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <button mat-button routerLink="/start"><h1>MaxOrg</h1></button>
+  </div>
+
+  <div fxFlex fxLayout="row" fxLayoutAlign="end end">
     <mat-menu #accountMenu="matMenu">
       <button mat-menu-item routerLink="/start/todos" i18n>Mis pendientes</button>
       <mat-divider></mat-divider>
@@ -27,10 +29,11 @@
       </div>
     </mat-menu>
 
-    <button mat-button [matMenuTriggerFor]="notificationMenu">
+    <button mat-icon-button [matMenuTriggerFor]="notificationMenu">
       <mat-icon matBadge="3" matBadgePosition="above after" matBadgeColor="warn">notifications</mat-icon>
     </button>
-    <button mat-button [matMenuTriggerFor]="accountMenu">
+    <div fxFlex="5" fxFlex.gt-md="1"></div>
+    <button mat-icon-button [matMenuTriggerFor]="accountMenu">
       <mat-icon>account_circle</mat-icon>
     </button>
     <div fxFlex="1" fxFlex.gt-md="5"></div>
@@ -41,6 +44,8 @@
 <mat-sidenav-container id="container">
   <mat-sidenav [mode]="mobileQuery.matches ? 'over' : 'side'" [opened]="!mobileQuery.matches" #sidenav>
     <mat-accordion>
+      <h4 class="text-center" routerLink="/project/{{route.snapshot.paramMap.get('id')}}">[Nombre de proyecto]</h4>
+      <mat-divider></mat-divider>
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
@@ -63,7 +68,7 @@
             Trabajo
           </mat-panel-title>
         </mat-expansion-panel-header>
-        <button mat-button>Tablero</button>
+        <button mat-button routerLink="board" (click)="sidenav.toggle(!mobileQuery.matches)">Tablero</button>
         <br>
         <button mat-button>Asignación de trabajos</button>
       </mat-expansion-panel>

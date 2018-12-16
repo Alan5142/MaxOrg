@@ -2,9 +2,9 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ProjectComponent} from './project.component';
 import {
-  MatButtonModule,
+  MatButtonModule, MatCardModule,
   MatDividerModule,
-  MatExpansionModule,
+  MatExpansionModule, MatFormFieldModule,
   MatIconModule,
   MatMenuModule,
   MatSidenavModule,
@@ -14,6 +14,11 @@ import {ProjectRoutingModule} from './project-routing.module';
 import {DescriptionComponent} from './description/description.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import {FlexLayoutModule} from '@angular/flex-layout';
+import { KanbanBoardComponent } from './kanban-board/kanban-board.component';
+import { GroupComponent } from './kanban-board/group/group.component';
+import { CardComponent } from './kanban-board/group/card/card.component';
+import {DragDropModule} from '@angular/cdk/drag-drop';
+import {ServicesModule} from '../services/services.module';
 
 @NgModule({
   entryComponents: [
@@ -29,12 +34,19 @@ import {FlexLayoutModule} from '@angular/flex-layout';
     MatMenuModule,
     MatDividerModule,
     MatToolbarModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    MatCardModule,
+    MatFormFieldModule,
+    DragDropModule,
+    ServicesModule
   ],
   declarations: [
     ProjectComponent,
     DescriptionComponent,
-    NavbarComponent
+    NavbarComponent,
+    KanbanBoardComponent,
+    GroupComponent,
+    CardComponent
   ],
   bootstrap: [
     ProjectComponent

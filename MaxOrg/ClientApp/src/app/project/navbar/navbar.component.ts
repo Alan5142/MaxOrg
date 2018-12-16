@@ -1,19 +1,23 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {MediaMatcher} from '@angular/cdk/layout';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-project-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   notifications: number[];
 
   mobileQuery: MediaQueryList;
 
   private _mobileQueryListener: () => void;
 
-  constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher) {
+  route: ActivatedRoute;
+
+  constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, route: ActivatedRoute) {
+    this.route = route;
     this.notifications = Array(10).fill(4);
     this.mobileQuery = media.matchMedia('(max-width: 960px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
@@ -23,7 +27,7 @@ export class NavbarComponent implements OnInit {
   ngOnInit() {
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy() {
     this.mobileQuery.removeListener(this._mobileQueryListener);
   }
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {MatSidenavModule} from '@angular/material/sidenav';
+import {ActivatedRoute} from '@angular/router';
+
 @Component({
   selector: 'app-project',
   templateUrl: './project.component.html',
@@ -7,7 +8,8 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 })
 export class ProjectComponent implements OnInit {
 
-  constructor() { }
+  constructor(route: ActivatedRoute) {
+  }
 
   ngOnInit() {
   }

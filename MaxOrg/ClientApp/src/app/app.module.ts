@@ -11,6 +11,7 @@ import {MatFormFieldModule} from '@angular/material';
 import {HttpClientModule} from '@angular/common/http';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {FormsModule} from '@angular/forms';
+import {ServicesModule} from './services/services.module';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import {FormsModule} from '@angular/forms';
     MatInputModule,
     HttpClientModule,
     FlexLayoutModule,
-    FormsModule
+    FormsModule,
+    ServicesModule
   ],
   providers: [],
   bootstrap: [AppComponent]
