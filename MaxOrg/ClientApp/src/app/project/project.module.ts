@@ -14,6 +14,8 @@ import {ProjectRoutingModule} from './project-routing.module';
 import {DescriptionComponent} from './description/description.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import {FlexLayoutModule} from '@angular/flex-layout';
+import { OrgChartComponent } from './org-chart/org-chart.component';
+import { TreeComponent } from './org-chart/tree/tree.component';
 
 @NgModule({
   entryComponents: [
@@ -34,7 +36,9 @@ import {FlexLayoutModule} from '@angular/flex-layout';
   declarations: [
     ProjectComponent,
     DescriptionComponent,
-    NavbarComponent
+    NavbarComponent,
+    OrgChartComponent,
+    TreeComponent
   ],
   bootstrap: [
     ProjectComponent

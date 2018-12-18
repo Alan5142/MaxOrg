@@ -1,0 +1,10 @@
+<div id="center">
+  <div class="tree">
+    <ul>
+      <li *ngFor="let node of treeData">
+        <button mat-raised-button>{{node.name}}</button>
+        <app-tree [treeData]="node.subnodes"></app-tree>
+      </li>
+    </ul>
+  </div>
+</div>
