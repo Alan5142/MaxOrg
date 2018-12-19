@@ -10,7 +10,7 @@ import {MatDialogModule} from '@angular/material';
 import {MatFormFieldModule} from '@angular/material';
 import {HttpClientModule} from '@angular/common/http';
 import {FlexLayoutModule} from '@angular/flex-layout';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ServicesModule} from './services/services.module';
 
 @NgModule({
@@ -28,8 +28,9 @@ import {ServicesModule} from './services/services.module';
     MatInputModule,
     HttpClientModule,
     FlexLayoutModule,
+    ServicesModule,
     FormsModule,
-    ServicesModule
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

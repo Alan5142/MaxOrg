@@ -3,19 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ArangoDB.Client;
+using MaxOrg.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MaxOrg.Controllers
 {
-    public class User
-    {
-        [DocumentProperty(Identifier = IdentifierType.Key)]
-        public string key { get; set; }
-        public string username { get; set; }
-        public string password { get; set; }
-    }
-
     [Route("api/[Controller]")]
     [ApiController]
     public class LoginController : ControllerBase

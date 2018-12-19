@@ -37,12 +37,12 @@ namespace MaxOrg
 			// we use: var db = ArangoDatabase.CreateWithSetting();
 			ArangoDatabase.ChangeSetting(s =>
 			{
-				s.Database = "MaxOrg_db";
+				s.Database = "maxorg_db";
 				s.Url = "http://localhost:8529";
 
 				// you can set other settings if you need
-				s.Credential = new NetworkCredential("MaxOrg_admin", "MaxOrg123");
-				s.SystemDatabaseCredential = new NetworkCredential("MaxOrg_admin", "MaxOrg123");
+				s.Credential = new NetworkCredential("Maxorg_admin", "MaxOrg123");
+				s.SystemDatabaseCredential = new NetworkCredential("Maxorg_admin", "MaxOrg123");
 				s.WaitForSync = true;
 				s.ClusterMode = true;
 			});
@@ -53,7 +53,7 @@ namespace MaxOrg
 		{
             app.UseCors(builder =>
                         builder
-                        .WithOrigins("https://localhost:44384", "http://localhost:4200"));
+                        .WithOrigins("https://localhost:44384", "http://localhost:4200").AllowAnyOrigin());
 
 
             if (env.IsDevelopment())

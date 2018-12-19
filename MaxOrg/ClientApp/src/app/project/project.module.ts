@@ -19,6 +19,7 @@ import { GroupComponent } from './kanban-board/group/group.component';
 import { CardComponent } from './kanban-board/group/card/card.component';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {ServicesModule} from '../services/services.module';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
   entryComponents: [
@@ -38,7 +39,9 @@ import {ServicesModule} from '../services/services.module';
     MatCardModule,
     MatFormFieldModule,
     DragDropModule,
-    ServicesModule
+    ServicesModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   declarations: [
     ProjectComponent,

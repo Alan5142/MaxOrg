@@ -35,10 +35,6 @@ export class NavbarComponent implements OnInit {
       minWidth: '330px',
       data: {username: this.username, password: this.password}
     });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-    });
   }
 
 }
@@ -57,12 +53,15 @@ export class NavbarDialogComponent {
   }
 
   login(): void {
-    console.log(this.data);
     if (this.auth.authUser(this.data.username, this.data.password)) {
       this.router.navigate(['/start/index']);
     }
     this.dialogRef.close();
+  }
 
+  goToRegister(): void {
+    this.router.navigate(['/start/register']);
+    this.dialogRef.close();
   }
 
 }

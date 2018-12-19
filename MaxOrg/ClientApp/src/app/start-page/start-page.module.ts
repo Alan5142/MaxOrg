@@ -8,11 +8,11 @@ import {
   MatFormFieldModule,
   MatIconModule,
   MatInputModule, MatListModule, MatMenuModule, MatOptionModule, MatRadioModule, MatSelectModule,
-  MatToolbarModule, MatSidenavModule
+  MatToolbarModule, MatSidenavModule, MatStepperModule, MatDatepickerModule, MatNativeDateModule, MatProgressSpinnerModule
 } from '@angular/material';
 import {HttpClientModule} from '@angular/common/http';
 import {FlexLayoutModule} from '@angular/flex-layout';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NavbarComponent, NavbarDialogComponent} from './navbar/navbar.component';
 import {StartPageRoutingModule} from './start-page-routing.module';
 import {IndexComponent} from './index/index.component';
@@ -22,6 +22,7 @@ import {AuthService} from './auth.service';
 import {MyAccountComponent, MyAccountPickImageComponent} from './my-account/my-account.component';
 import {NewProjectComponent} from './new-project/new-project.component';
 import {TodosComponent} from './todos/todos.component';
+import { RegisterComponent } from './register/register.component';
 
 @NgModule({
   providers: [
@@ -43,7 +44,8 @@ import {TodosComponent} from './todos/todos.component';
     MyAccountComponent,
     MyAccountPickImageComponent,
     NewProjectComponent,
-    TodosComponent
+    TodosComponent,
+    RegisterComponent
   ],
   imports: [
     CommonModule,
@@ -67,7 +69,13 @@ import {TodosComponent} from './todos/todos.component';
     StartPageRoutingModule,
     MatExpansionModule,
     MatChipsModule,
-    MatSidenavModule
+    MatSidenavModule,
+    MatStepperModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatProgressSpinnerModule
   ],
   bootstrap: [StartPageComponent]
 })
