@@ -43,4 +43,9 @@ export class UserService {
     const response = await this.http.get<User[]>(environment.apiUrl + 'users?name=' + username).toPromise();
     return response.length !== 0;
   }
+
+  async existsEmail(email: string): Promise<boolean> {
+    const response = await this.http.get<User[]>(environment.apiUrl + 'users?email=' + email).toPromise();
+    return response.length !== 0;
+  }
 }

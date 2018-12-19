@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {UserService} from '../../services/user.service';
 import {AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
-import {MediaChange, MediaObserver} from '@angular/flex-layout';
-import {Observable} from 'rxjs';
+import {MediaObserver} from '@angular/flex-layout';
 
 @Component({
   selector: 'app-register',
@@ -15,14 +14,19 @@ export class RegisterComponent implements OnInit {
   userService: UserService;
   controlValuesEqual(otherControl: AbstractControl): ValidatorFn {
     return (control: AbstractControl): {[key: string]: any} | null => {
-      console.log(this.requiredInformation);
       return otherControl.value !== control.value ? {'controlValueEquals': {value: true}} : null;
     };
   }
 
   usernameExists(userService: UserService): AsyncValidatorFn {
-    return async (control: AbstractControl): Observable<ValidationErrors | null> |  null => {
+    return async (control: AbstractControl): Promise<ValidationErrors> => {
       return await userService.existsUser(control.value) ? {'usernameexists': {value: true}} : null;
+    };
+  }
+
+  emailExists(userService: UserService): AsyncValidatorFn {
+    return async (control: AbstractControl): Promise<ValidationErrors> => {
+      return await userService.existsEmail(control.value) ? {'emailexists': {value: true}} : null;
     };
   }
 
@@ -38,12 +42,23 @@ export class RegisterComponent implements OnInit {
       repeat_password: ['', [Validators.required]]
     });
     this.requiredInformation.get('repeat_password').setValidators(this.controlValuesEqual(this.requiredInformation.get('password')));
-    this.requiredInformation.get('username').setAsyncValidators(this.usernameExists(this.userService))
+    this.requiredInformation.get('username').setAsyncValidators(this.usernameExists(this.userService));
+    this.requiredInformation.get('email').setAsyncValidators(this.emailExists(this.userService));
     this.optionalInformation = this._formBuilder.group( {
       realName: [''],
       birthday: [''],
       description: [''],
       occupation: ['']
     });
+  }
+
+  triggerPasswordValidation () {
+    const password = this.requiredInformation.get('password');
+    const repeatPassword = this.requiredInformation.get('repeat_password');
+    if (repeatPassword.value !== password.value) {
+      repeatPassword.setErrors({'controlValueEquals': {value: true}});
+    } else {
+      repeatPassword.setErrors(null);
+    }
   }
 }

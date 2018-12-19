@@ -2,7 +2,6 @@
 using MaxOrg.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace MaxOrg.Controllers
 {
@@ -11,6 +10,8 @@ namespace MaxOrg.Controllers
         public string name { get; set; }
         public bool? sorted { get; set; }
         public int? limit { get; set; }
+        public int? page { get; set; }
+        public string email { get; set; }
     }
 
     [Route("api/[controller]")]
@@ -34,11 +35,17 @@ namespace MaxOrg.Controllers
                                              u.email,
                                              u.description,
                                              u.occupation,
-                                             u.birthday
+                                             birthday = AQL.DateFormat(u.birthday, "%dd/%mm/%yyyy")
                                          };
                 if (options.name != null)
                 {
-                    query = query.Where(u => AQL.Contains(u.username, options.name));
+                    query = query.Where(u => AQL.Contains(AQL.Lower(u.username), AQL.Lower(options.name)));
+                }
+                if (options.email != null)
+                {
+                    query = from u in query
+                            where AQL.Lower(u.email) == AQL.Lower(options.email)
+                            select u;
                 }
                 if (options.limit.HasValue)
                 {
@@ -48,7 +55,11 @@ namespace MaxOrg.Controllers
                 {
                     query.OrderBy(user => user.username);
                 }
-
+                if (query.Count() >= 250 || options.page.HasValue)
+                {
+                    int skipValue = (options.page.HasValue ? options.page.Value : 0) * 250;
+                    query = query.Skip(skipValue).Take(250).Select(u => u);
+                }
                 return Ok(query);
             }
         }

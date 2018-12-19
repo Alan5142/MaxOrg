@@ -19,9 +19,10 @@
             <mat-error *ngIf="requiredInformation.controls.username.errors?.minlength && !requiredInformation.controls.username.errors?.required">
               El nombre de usuario debe tener una longitud minima de 7 letras
             </mat-error>
-            <mat-error *ngIf="requiredInformation.controls.username.errors?.usernameexists">El usuario ya existe</mat-error>
+            <mat-error *ngIf="requiredInformation.controls.username.errors?.usernameexists">El usuario ya existe
+            </mat-error>
             <mat-icon matSuffix *ngIf="requiredInformation.controls.username.valid">done</mat-icon>
-            <mat-spinner matSuffix [diameter]="20" *ngIf="requiredInformation.get('username').pending">done</mat-spinner>
+            <mat-spinner matSuffix [diameter]="20" *ngIf="requiredInformation.get('username').pending"></mat-spinner>
           </mat-form-field>
           
           <mat-form-field>
@@ -33,6 +34,9 @@
             <mat-error *ngIf="requiredInformation.controls.email.errors?.pattern">Correo electronico invalido
             </mat-error>
             <mat-error *ngIf="requiredInformation.controls.email.errors?.required">No puede estar vacio</mat-error>
+            <mat-error *ngIf="requiredInformation.controls.email.errors?.emailexists">El email ya existe</mat-error>
+            <mat-spinner matSuffix [diameter]="20" *ngIf="requiredInformation.get('email').pending"></mat-spinner>
+            <mat-icon matSuffix *ngIf="requiredInformation.controls.email.valid">done</mat-icon>
           </mat-form-field>
           
           <mat-form-field>
@@ -41,7 +45,8 @@
                    type="password"
                    placeholder="Contraseña"
                    formControlName="password"
-                   i18n-placeholder>
+                   i18n-placeholder
+                   (keyup)="triggerPasswordValidation()">
             <mat-error *ngIf="requiredInformation.controls.password.errors?.required">No puede estar vacio</mat-error>
             <mat-error *ngIf="requiredInformation.controls.password.errors?.minlength &&
                               !requiredInformation.controls.password.errors?.required">Debe tener una
@@ -59,9 +64,8 @@
                    i18n-placeholder>
             <mat-error *ngIf="requiredInformation.controls.repeat_password.errors?.required">No puede estar vacio
             </mat-error>
-            <mat-error *ngIf="requiredInformation.controls.repeat_password.errors?.controlValueEquals && !requiredInformation.controls.repeat_password.errors?.required">Las contraseñas
-              no
-              coinciden
+            <mat-error *ngIf="requiredInformation.controls.repeat_password.errors?.controlValueEquals">Las contraseñas
+              no coinciden
             </mat-error>
           </mat-form-field>
           
