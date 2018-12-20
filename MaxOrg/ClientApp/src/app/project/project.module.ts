@@ -5,8 +5,8 @@ import {
   MatButtonModule, MatCardModule,
   MatDividerModule,
   MatExpansionModule, MatFormFieldModule,
-  MatIconModule,
-  MatMenuModule,
+  MatIconModule, MatListModule,
+  MatMenuModule, MatRippleModule,
   MatSidenavModule,
   MatToolbarModule
 } from '@angular/material';
@@ -20,6 +20,7 @@ import { CardComponent } from './kanban-board/group/card/card.component';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {ServicesModule} from '../services/services.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { MessagesComponent } from './messages/messages.component';
 
 @NgModule({
   entryComponents: [
@@ -41,7 +42,9 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     DragDropModule,
     ServicesModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatListModule,
+    MatRippleModule
   ],
   declarations: [
     ProjectComponent,
@@ -49,7 +52,8 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     NavbarComponent,
     KanbanBoardComponent,
     GroupComponent,
-    CardComponent
+    CardComponent,
+    MessagesComponent
   ],
   bootstrap: [
     ProjectComponent

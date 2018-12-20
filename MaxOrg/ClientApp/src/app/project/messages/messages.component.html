@@ -1,0 +1,17 @@
+<!--Mobile view-->
+<div *ngIf="mediaObserver.isActive('lt-sm')">
+  <h3 class="text-center">Conversaciones</h3>
+  <mat-list fxLayout="column" fxFill>
+    <mat-list-item matRipple>
+      <!-- TODO change image to user image -->
+      <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
+      <h5 class="text-bold" mat-line>Nombre de la persona</h5>
+      <p mat-line>Ultimo mensaje</p>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+  </mat-list>
+</div>
+
+<div *ngIf="mediaObserver.isActive('gt-sm')">
+
+</div>
