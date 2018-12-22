@@ -1,37 +1,44 @@
 <mat-dialog-content>
 
-<div fxLayout="row" fxLayout.xs="column" fxLayoutGap="30px">
-  <div fxLayout="column">
-    <h1 mat-dialog-title fxLayoutAlign="center">Iniciar sesión</h1>
-    <div mat-dialog-content fxLayout="column">
-      <mat-form-field>
-        <mat-label i18n>Usuario</mat-label>
-        <input matInput [(ngModel)]="data.username">
-      </mat-form-field>
+  <div fxLayout="row" fxLayout.xs="column" fxLayoutGap="30px">
+    <div fxLayout="column">
+      <h1 mat-dialog-title fxLayoutAlign="center">Iniciar sesión</h1>
+      <div mat-dialog-content fxLayout="column">
+        <mat-form-field>
+          <mat-label i18n>Usuario</mat-label>
+          <input matInput [(ngModel)]="data.username">
+        </mat-form-field>
 
-      <mat-form-field>
-        <mat-label i18n>Contraseña</mat-label>
-        <input matInput [(ngModel)]="data.password" type="password">
-      </mat-form-field>
+        <mat-form-field>
+          <mat-label i18n>Contraseña</mat-label>
+          <input matInput [(ngModel)]="data.password" type="password">
+        </mat-form-field>
+      </div>
+
+      <div fxLayoutAlign="center center">
+        <button mat-flat-button color="primary" (click)="login()">Iniciar sesión</button>
+      </div>
+      <h5 fxLayoutAlign="center" i18n>¿No dispones de cuenta?</h5>
+
+      <div fxLayoutAlign="center center">
+        <button mat-flat-button color="primary" i18n (click)="goToRegister()">Registrarse</button>
+      </div>
+
     </div>
 
-    <div fxLayoutAlign="center center">
-      <button mat-flat-button color="primary" (click)="login()">Iniciar sesión</button>
+    <div fxLayout="column" fxLayoutGap="15px">
+      <h1 mat-dialog-title fxLayoutAlign="center" i18n>O utiliza una cuenta</h1>
+      <button mat-raised-button i18n>
+        <img class="social-logo-img"
+             src="http://demo.appcarvers.com/junite/media/com_easysocial/photos/1606/4686/google-logo-icon-png-transparent-background_thumbnail.png">
+        Cuenta de Google
+      </button>
+      <button class="github-logo-button" mat-raised-button i18n><img class="social-logo-img"
+                                                                     src="/images/logos/GitHub-Mark-Light-64px.png">
+        Cuenta de Github
+      </button>
     </div>
-    <h5 fxLayoutAlign="center" i18n>¿No dispones de cuenta?</h5>
-
-    <div fxLayoutAlign="center center">
-      <button mat-flat-button color="primary" i18n (click)="goToRegister()">Registrarse</button>
-    </div>
-
   </div>
-
-  <div fxLayout="column" fxLayoutGap="15px">
-    <h1 mat-dialog-title fxLayoutAlign="center" i18n>O utiliza una cuenta</h1>
-    <button mat-raised-button i18n>Cuenta de Google</button>
-    <button mat-raised-button i18n>Cuenta de Github</button>
-  </div>
-</div>
 
 </mat-dialog-content>
 

@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {MatIconRegistry, MatDialog} from '@angular/material';
-import {DomSanitizer} from '@angular/platform-browser';
+import {MatDialog} from '@angular/material';
 import {NewProjectComponent} from '../new-project/new-project.component';
-import {FlexAlignDirective} from '@angular/flex-layout';
+import {MediaObserver} from '@angular/flex-layout';
+import {User, UserService} from '../../services/user.service';
 
 @Component({
   selector: 'app-user-start',
@@ -10,14 +10,17 @@ import {FlexAlignDirective} from '@angular/flex-layout';
   styleUrls: ['./user-start.component.scss']
 })
 export class UserStartComponent implements OnInit {
-
+  currentUser: User | null = null;
   projects = [
     'Usuario/Proyecto1',
     'Usuario/Proyecto2',
     'Usuario2/Proyecto3'
   ];
 
-  constructor(public dialog: MatDialog) {
+  constructor(public dialog: MatDialog, public mediaObserver: MediaObserver, public userService: UserService) {
+    userService.getCurrentUser().subscribe(user => {
+      this.currentUser = user;
+    });
   }
 
   openDialog(): void {
@@ -27,7 +30,6 @@ export class UserStartComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(() => {
-      console.log('The dialog was closed');
     });
   }
 

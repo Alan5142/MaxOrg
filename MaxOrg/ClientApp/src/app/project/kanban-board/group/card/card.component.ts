@@ -16,6 +16,5 @@ export class CardComponent implements OnInit {
   }
 
   cardClicked() {
-    console.log(':D');
   }
 }

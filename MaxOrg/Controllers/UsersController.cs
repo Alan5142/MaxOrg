@@ -1,7 +1,10 @@
 ﻿using ArangoDB.Client;
 using MaxOrg.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MaxOrg.Controllers
 {
@@ -12,12 +15,20 @@ namespace MaxOrg.Controllers
         public int? limit { get; set; }
         public int? page { get; set; }
         public string email { get; set; }
+        public int? maxElements { get; set; }
     }
 
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private PasswordHasher<User> m_passwordHasher;
+
+        public UsersController()
+        {
+            m_passwordHasher = new PasswordHasher<User>();
+        }
+
         /// <summary>
         /// Get a list of users, optionally filtered by name and sorted
         /// </summary>
@@ -28,15 +39,15 @@ namespace MaxOrg.Controllers
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var query = from u in db.Query<User>()
-                                         select new
-                                         {
-                                             u.key,
-                                             u.username,
-                                             u.email,
-                                             u.description,
-                                             u.occupation,
-                                             birthday = AQL.DateFormat(u.birthday, "%dd/%mm/%yyyy")
-                                         };
+                            select new
+                            {
+                                u.key,
+                                u.username,
+                                u.email,
+                                u.description,
+                                u.occupation,
+                                birthday = AQL.DateFormat(u.birthday, "%dd/%mm/%yyyy")
+                            };
                 if (options.name != null)
                 {
                     query = query.Where(u => AQL.Contains(AQL.Lower(u.username), AQL.Lower(options.name)));
@@ -60,63 +71,80 @@ namespace MaxOrg.Controllers
                     int skipValue = (options.page.HasValue ? options.page.Value : 0) * 250;
                     query = query.Skip(skipValue).Take(250).Select(u => u);
                 }
+                if(options.maxElements.HasValue && options.maxElements.Value > 0)
+                {
+                    query = query.Take(options.maxElements.Value);
+                }
                 return Ok(query);
             }
         }
 
+        /// <summary>
+        /// Create a new user
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         [HttpPost]
-        public ActionResult Post([FromBody] User user)
+        public ActionResult Post([FromBody] UserForm user)
         {
             if (string.IsNullOrEmpty(user.username) || string.IsNullOrEmpty(user.password) ||
                         string.IsNullOrEmpty(user.email))
             {
-                return BadRequest(new { reason = "username, password or email are empty" });
+                return BadRequest(new { message = "username, password or email are empty" });
             }
             using (var db = ArangoDatabase.CreateWithSetting())
             {
-                var query = (from u in db.Query<User>()
-                             where u.username == user.username
-                             select new { u.username, u.key }).ToList();
+                var query = from u in db.Query<User>()
+                            where u.username == user.username
+                            select u;
 
-                if (query.Count() == 1)
+                if (query.Count() > 0)
                 {
-                    return Conflict(new { reason = "Username already exists" });
+                    return Conflict(new { message = $"Username {user.username} already exists" });
                 }
-                var createdUser = db.Insert<User>(user);
-                return Created("api/user/" + createdUser.Key, new { user.username, user.email });
+                query = db.Query<User>().Where(u => u.email == user.email);
+                if (query.Count() > 0)
+                {
+                    return Conflict(new { message = $"Email {user.email} already exists" });
+                }
+                var userToInsert = new User(user);
+                userToInsert.password = m_passwordHasher.HashPassword(userToInsert, user.password);
+                userToInsert.key = userToInsert.username;
+
+                var createdUser = db.Insert<User>(userToInsert);
+                return Created("api/users/" + createdUser.Key, new
+                {
+                    message = "Please, go to 'api/login' to obtain a token",
+                    user.username,
+                    user.email
+                });
             }
         }
+
 
         [HttpGet("{userId}")]
-        public ActionResult Get(int userId)
+        public async Task<ActionResult> Get(string userId)
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
-                var query = (from u in db.Query<User>()
-                             where u.key == userId.ToString()
-                             select new { u.username, u.email, u.description, u.birthday, u.occupation });
-                if (query.Count() != 1)
+                var user = await (from u in db.Query<User>()
+                             where u.key == userId
+                             select new { u.username, u.realName, u.email, u.description, u.birthday, u.occupation })
+                             .FirstOrDefaultAsync();
+                if (user == null)
                 {
                     return NotFound();
                 }
-                return Ok(query.First());
+                return Ok(user);
             }
         }
 
-        [HttpGet("{username}")]
-        public ActionResult Get(string username)
+        [Authorize]
+        [HttpGet("projects")]
+        public ActionResult Projects()
         {
-            using (var db = ArangoDatabase.CreateWithSetting())
-            {
-                var getUser = from u in db.Query<User>()
-                              where u.username == username
-                              select new { u.username, u.email, u.description, u.birthday, u.occupation };
-                if (getUser.Count() != 1)
-                {
-                    return NotFound();
-                }
-                return Ok(getUser.First());
-            }
+            var claim = HttpContext.User.Claims.FirstOrDefault();
+            return Ok(new { projects = new string[] { "hello", "world" }, claim = claim.Value });
         }
     }
 }

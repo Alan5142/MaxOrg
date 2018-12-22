@@ -6,15 +6,19 @@
   <br>
   <mat-form-field class="center">
     <mat-chip-list #chipList>
-      <mat-chip *ngFor="let username of usernames" [selectable]="selectable"
-                [removable]="true" (removed)="remove(username)">
-        {{username}}
-      <mat-icon matChipRemove>cancel</mat-icon>
+      <mat-chip *ngFor="let user of selectedUsers" [selectable]="selectable"
+                [removable]="true" (removed)="remove(user)">
+        {{user}}
+        <mat-icon matChipRemove>cancel</mat-icon>
       </mat-chip>
     </mat-chip-list>
-    <input [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputFor]="chipList" placeholder="Integrantes"
-           (matChipInputTokenEnd)="addUser($event)">
-    <mat-hint><strong i18n>separados por ;</strong></mat-hint>
+    <input #userInput [matChipInputFor]="chipList"
+           placeholder="Integrantes" [matAutocomplete]="userLists" (input)="valueChanged(userInput.value)">
+    <mat-autocomplete #userLists="matAutocomplete" (optionSelected)="userOption($event, userInput)">
+      <mat-option *ngFor="let user of autocompleteUsers" [value]="user">
+        {{user.username}}
+      </mat-option>
+    </mat-autocomplete>
   </mat-form-field>
   <br>
   <button mat-raised-button color="primary" class="center half" (click)="onNoClick()">Crear</button>

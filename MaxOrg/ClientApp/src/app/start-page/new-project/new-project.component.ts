@@ -1,7 +1,8 @@
 import {Component} from '@angular/core';
-import {MatChipInputEvent, MatDialogRef} from '@angular/material';
+import {MatAutocompleteSelectedEvent, MatChipInputEvent, MatDialogRef} from '@angular/material';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import {User, UserService} from '../../services/user.service';
 
 
 @Component({
@@ -11,37 +12,48 @@ import {COMMA, ENTER} from '@angular/cdk/keycodes';
 })
 export class NewProjectComponent {
 
-  readonly separatorKeysCodes: number[] = [ENTER, COMMA];
+  selectedUsers: string[];
+  autocompleteUsers: User[];
 
-  usernames: string[];
-
-  constructor(public dialogRef: MatDialogRef<NewProjectComponent>) {
-    this.usernames = [];
+  constructor(public dialogRef: MatDialogRef<NewProjectComponent>, private userService: UserService) {
+    this.selectedUsers = [];
+    this.autocompleteUsers = [];
   }
 
   onNoClick(): void {
     this.dialogRef.close();
   }
 
-  addUser(event: MatChipInputEvent): void {
-    const input = event.input;
-    const value = event.value;
+  remove(username: string): void {
+    const index = this.selectedUsers.indexOf(username);
 
-    if ((value || '').trim()) {
-      this.usernames.push(value.trim());
-    }
-
-    // Reset the input value
-    if (input) {
-      input.value = '';
+    if (index >= 0) {
+      this.selectedUsers.splice(index, 1);
     }
   }
 
-  remove(username: string): void {
-    const index = this.usernames.indexOf(username);
-
-    if (index >= 0) {
-      this.usernames.splice(index, 1);
+  valueChanged(value: string) {
+    if (value.length > 2) {
+      this.userService.getUsersByName(value, 7).subscribe(users => {
+        this.autocompleteUsers = users;
+        const index = this.autocompleteUsers.findIndex(user => user.username === localStorage.getItem('userId'));
+        if (index >= 0) {
+          this.autocompleteUsers.splice(index, 1);
+        }
+      });
+    } else {
+      this.autocompleteUsers = [];
     }
+  }
+
+  userOption(event: MatAutocompleteSelectedEvent, userInput: HTMLInputElement) {
+    const username: string = event.option.value.username;
+
+    if (this.selectedUsers.indexOf(username) >= 0) {
+      return;
+    }
+
+    this.selectedUsers.push(username);
+    userInput.value = '';
   }
 }

@@ -2,7 +2,7 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
-import {AuthService} from '../auth.service';
+import {UserService} from '../../services/user.service';
 
 
 export interface DialogData {
@@ -18,10 +18,8 @@ export interface DialogData {
 
 export class NavbarComponent implements OnInit {
   notifications: number[];
-  auth: AuthService;
-  constructor(private dialog: MatDialog, auth: AuthService) {
+  constructor(private dialog: MatDialog, public userService: UserService) {
     this.notifications = Array(10).fill(4);
-    this.auth = auth;
   }
 
   username: string;
@@ -36,7 +34,6 @@ export class NavbarComponent implements OnInit {
       data: {username: this.username, password: this.password}
     });
   }
-
 }
 
 @Component({
@@ -49,14 +46,16 @@ export class NavbarDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private http: HttpClient,
     private router: Router,
-    private auth: AuthService) {
+    private userService: UserService) {
   }
 
   login(): void {
-    if (this.auth.authUser(this.data.username, this.data.password)) {
-      this.router.navigate(['/start/index']);
-    }
-    this.dialogRef.close();
+    this.userService.login({username: this.data.username, password: this.data.password}).subscribe(loginSucceed => {
+        this.router.navigate(['/start/index']);
+        this.dialogRef.close();
+    }, error => {
+      alert('No se pudo iniciar sesión');
+    });
   }
 
   goToRegister(): void {

@@ -23,11 +23,9 @@ export class KanbanBoardComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<KanbanGroup[]>) {
-    console.log(event);
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
-      console.log(':O');
       transferArrayItem(event.previousContainer.data,
         event.container.data,
         event.previousIndex,

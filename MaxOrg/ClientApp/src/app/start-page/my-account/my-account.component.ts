@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {MatBottomSheet} from '@angular/material';
 import {MatBottomSheetRef} from '@angular/material';
+import {User, UserService} from '../../services/user.service';
 
 @Component({
   selector: 'app-my-account',
@@ -10,8 +11,12 @@ import {MatBottomSheetRef} from '@angular/material';
 export class MyAccountComponent implements OnInit {
 
   passwordChanged = false;
+  currentUser: User | null = null;
 
-  constructor(private bottomSheet: MatBottomSheet) {
+  constructor(private bottomSheet: MatBottomSheet, private userService: UserService) {
+    userService.getCurrentUser().subscribe(user => {
+      this.currentUser = user;
+    });
   }
 
   ngOnInit() {

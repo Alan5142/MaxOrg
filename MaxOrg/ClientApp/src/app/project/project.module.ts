@@ -5,7 +5,7 @@ import {
   MatButtonModule, MatCardModule,
   MatDividerModule,
   MatExpansionModule, MatFormFieldModule,
-  MatIconModule, MatListModule,
+  MatIconModule, MatInputModule, MatListModule,
   MatMenuModule, MatRippleModule,
   MatSidenavModule,
   MatToolbarModule
@@ -21,6 +21,7 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
 import {ServicesModule} from '../services/services.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { MessagesComponent } from './messages/messages.component';
+import { ChatComponent } from './messages/chat/chat.component';
 
 @NgModule({
   entryComponents: [
@@ -44,7 +45,8 @@ import { MessagesComponent } from './messages/messages.component';
     FormsModule,
     ReactiveFormsModule,
     MatListModule,
-    MatRippleModule
+    MatRippleModule,
+    MatInputModule
   ],
   declarations: [
     ProjectComponent,
@@ -53,7 +55,8 @@ import { MessagesComponent } from './messages/messages.component';
     KanbanBoardComponent,
     GroupComponent,
     CardComponent,
-    MessagesComponent
+    MessagesComponent,
+    ChatComponent
   ],
   bootstrap: [
     ProjectComponent

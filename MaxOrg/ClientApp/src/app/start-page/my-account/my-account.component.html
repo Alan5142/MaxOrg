@@ -11,10 +11,11 @@
   <mat-divider></mat-divider>
   <form fxLayout="column">
     <mat-form-field>
-      <input matInput type="text" placeholder="Nombre de usuario" i18n-placeholder>
+      <input matInput type="text" placeholder="Nombre de usuario" i18n-placeholder
+             [value]="currentUser === null ? '' : currentUser.username">
     </mat-form-field>
     <mat-form-field>
-      <textarea matInput placeholder="Descripción" i18n-placeholder></textarea>
+      <textarea matInput placeholder="Descripción" i18n-placeholder [value]="currentUser !== null ? currentUser.description : ''"></textarea>
     </mat-form-field>
 
     <mat-form-field>
