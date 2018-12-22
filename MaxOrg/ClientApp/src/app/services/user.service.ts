@@ -2,9 +2,9 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {Observable} from 'rxjs';
-import {RegisterResponse, User} from './user.service';
+import {LoginResponse, RegisterResponse, User} from './user.service';
 import {map} from 'rxjs/operators';
-import {Router} from "@angular/router";
+import {Router} from '@angular/router';
 
 export interface User {
   key: string;
@@ -94,14 +94,29 @@ export class UserService {
     return response.length !== 0;
   }
 
-  login(data: LoginInformation): Observable<Boolean> {
-    return this.http.post<LoginResponse>(environment.apiUrl + 'login', data).pipe(map<LoginResponse, Boolean>(value => {
+  login(data: LoginInformation): Observable<boolean> {
+    return this.http.post<LoginResponse>(environment.apiUrl + 'login', data).pipe(map<LoginResponse, boolean>(value => {
       if (value.token !== undefined) {
         this.getUser(value.userId).subscribe(user => {
           this.userLoggedIn = user;
         });
         localStorage.setItem('token', value.token);
         localStorage.setItem('userId', value.userId);
+        return true;
+      } else {
+        return false;
+      }
+    }));
+  }
+
+  githubLogin(accessToken: string): Observable<boolean> {
+    const headers = new HttpHeaders();
+    headers.append('Content-Type', 'application/json');
+    return this.http.post<LoginResponse>(environment.apiUrl + 'login/github',
+      {accessToken: accessToken},
+      {headers: headers}).pipe(map<LoginResponse, boolean>(response => {
+      if (response.token !== undefined) {
+        localStorage.setItem('token', response.token);
         return true;
       } else {
         return false;

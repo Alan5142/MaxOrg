@@ -1,14 +1,21 @@
 ﻿using ArangoDB.Client;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text;
 
 namespace MaxOrg
@@ -39,12 +46,15 @@ namespace MaxOrg
                 auth.DefaultPolicy = auth.GetPolicy(JwtBearerDefaults.AuthenticationScheme);
             });
 
+
             var key = Encoding.ASCII.GetBytes(Configuration["AppSettings:Secret"]);
 
             services.AddAuthentication(x =>
             {
+                x.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = "GitHub";
             })
             .AddJwtBearer(x =>
             {
@@ -72,9 +82,11 @@ namespace MaxOrg
                 s.Database = "maxorg_db";
                 s.Url = "http://localhost:8529";
 
-                // you can set other settings if you need
-                s.Credential = new NetworkCredential("Maxorg_admin", "MaxOrg123");
-                s.SystemDatabaseCredential = new NetworkCredential("Maxorg_admin", "MaxOrg123");
+                string dbUsername = Configuration["AppSettings:Database:Username"];
+                string dbPassword = Configuration["AppSettings:Database:Password"];
+                // 
+                s.Credential = new NetworkCredential(dbUsername, dbPassword);
+                s.SystemDatabaseCredential = new NetworkCredential(dbUsername, dbPassword);
                 s.WaitForSync = true;
                 s.ClusterMode = true;
             });

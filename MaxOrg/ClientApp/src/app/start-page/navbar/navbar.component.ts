@@ -3,6 +3,7 @@ import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {UserService} from '../../services/user.service';
+import {environment} from '../../../environments/environment';
 
 
 export interface DialogData {
@@ -18,6 +19,7 @@ export interface DialogData {
 
 export class NavbarComponent implements OnInit {
   notifications: number[];
+
   constructor(private dialog: MatDialog, public userService: UserService) {
     this.notifications = Array(10).fill(4);
   }
@@ -41,6 +43,7 @@ export class NavbarComponent implements OnInit {
   templateUrl: 'navbar.dialog.html',
 })
 export class NavbarDialogComponent {
+
   constructor(
     public dialogRef: MatDialogRef<NavbarDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
@@ -51,8 +54,8 @@ export class NavbarDialogComponent {
 
   login(): void {
     this.userService.login({username: this.data.username, password: this.data.password}).subscribe(loginSucceed => {
-        this.router.navigate(['/start/index']);
-        this.dialogRef.close();
+      this.router.navigate(['/start/index']);
+      this.dialogRef.close();
     }, error => {
       alert('No se pudo iniciar sesión');
     });
@@ -63,4 +66,7 @@ export class NavbarDialogComponent {
     this.dialogRef.close();
   }
 
+  githubLogin(): void {
+    window.location.href = 'https://github.com/login/oauth/authorize?client_id=' + environment.githubAuth.clientId;
+  }
 }

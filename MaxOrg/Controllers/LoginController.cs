@@ -1,16 +1,22 @@
 ﻿using ArangoDB.Client;
 using MaxOrg.Models;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace MaxOrg.Controllers
 {
@@ -20,6 +26,7 @@ namespace MaxOrg.Controllers
     {
         public IConfiguration Configuration { get; }
         private PasswordHasher<User> m_passwordHasher;
+        private static HttpClient client = new HttpClient();
 
         public LoginController(IConfiguration configuration)
         {
@@ -27,6 +34,7 @@ namespace MaxOrg.Controllers
             m_passwordHasher = new PasswordHasher<User>();
         }
 
+        [HttpPost]
         [AllowAnonymous]
         public async Task<ActionResult> Post([FromBody] Login userLoginData)
         {
@@ -76,6 +84,26 @@ namespace MaxOrg.Controllers
                     return NotFound(new { message = "Incorrect username or password" });
                 }
             }
+        }
+
+        [HttpPost("github")]
+        public async Task<IActionResult> Github([FromBody] GitHubLogin loginParameters)
+        {
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            string clientId = Configuration["AppSettings:GitHub:ClientID"];
+            string clientSecret = Configuration["AppSettings:GitHub:ClientSecret"];
+            string code = Configuration["AppSettings:GitHub:ClientID"];
+
+            var httpResult = await client.PostAsJsonAsync("https://github.com/login/oauth/access_token", new
+            {
+                client_id = Configuration["AppSettings:GitHub:ClientID"],
+                client_secret = Configuration["AppSettings:GitHub:ClientSecret"],
+                code = loginParameters.AccessToken
+            });
+            var content = await httpResult.Content.ReadAsStringAsync();
+            var token = JsonConvert.DeserializeObject<GitHubTokenResponse>(content);
+            return Ok();
         }
     }
 }

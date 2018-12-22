@@ -109,7 +109,6 @@ namespace MaxOrg.Controllers
                 }
                 var userToInsert = new User(user);
                 userToInsert.password = m_passwordHasher.HashPassword(userToInsert, user.password);
-                userToInsert.key = userToInsert.username;
 
                 var createdUser = db.Insert<User>(userToInsert);
                 return Created("api/users/" + createdUser.Key, new
