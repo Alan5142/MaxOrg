@@ -12,11 +12,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MaxOrg
 {
@@ -49,23 +51,38 @@ namespace MaxOrg
 
             var key = Encoding.ASCII.GetBytes(Configuration["AppSettings:Secret"]);
 
-            services.AddAuthentication(x =>
+            services.AddAuthentication(options =>
             {
-                x.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = "GitHub";
+                options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = "GitHub";
             })
-            .AddJwtBearer(x =>
+            .AddJwtBearer(options =>
             {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = Configuration["AppSettings:DefaultURL"],
+                    ClockSkew = TimeSpan.Zero
+                };
+                options.Audience = Configuration["AppSettings:Jwt:Audience"];
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                        {
+                            context.Response.Headers.Add("Token-Expired", "true");
+                        }
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
@@ -76,19 +93,18 @@ namespace MaxOrg
             });
 
             // Configure ArangoDB settings, to instantiate an object to communicate with Arango
-            // we use: var db = ArangoDatabase.CreateWithSetting();
-            ArangoDatabase.ChangeSetting(s =>
+            ArangoDatabase.ChangeSetting(settings =>
             {
-                s.Database = "maxorg_db";
-                s.Url = "http://localhost:8529";
+                settings.Database = "maxorg_db";
+                settings.Url = "http://localhost:8529";
 
-                string dbUsername = Configuration["AppSettings:Database:Username"];
+                string dbUsername = Configuration["AppSettings:Database:User"];
                 string dbPassword = Configuration["AppSettings:Database:Password"];
-                // 
-                s.Credential = new NetworkCredential(dbUsername, dbPassword);
-                s.SystemDatabaseCredential = new NetworkCredential(dbUsername, dbPassword);
-                s.WaitForSync = true;
-                s.ClusterMode = true;
+
+                settings.Credential = new NetworkCredential(dbUsername, dbPassword);
+                settings.SystemDatabaseCredential = new NetworkCredential(dbUsername, dbPassword);
+                settings.WaitForSync = true;
+                settings.ClusterMode = true;
             });
         }
 

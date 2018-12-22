@@ -33,6 +33,7 @@ namespace MaxOrg.Models
         public string description { get; set; }
         public string occupation { get; set; }
         public DateTime birthday { get; set; }
+        public string githubToken { get; set; }
     }
 
     public class UserForm

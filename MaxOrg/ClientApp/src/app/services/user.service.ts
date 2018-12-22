@@ -117,6 +117,7 @@ export class UserService {
       {headers: headers}).pipe(map<LoginResponse, boolean>(response => {
       if (response.token !== undefined) {
         localStorage.setItem('token', response.token);
+        localStorage.setItem('userId', response.userId);
         return true;
       } else {
         return false;

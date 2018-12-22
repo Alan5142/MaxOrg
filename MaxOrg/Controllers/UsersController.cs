@@ -85,7 +85,7 @@ namespace MaxOrg.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult Post([FromBody] UserForm user)
+        public async Task<ActionResult> PostAsync([FromBody] UserForm user)
         {
             if (string.IsNullOrEmpty(user.username) || string.IsNullOrEmpty(user.password) ||
                         string.IsNullOrEmpty(user.email))
@@ -110,7 +110,7 @@ namespace MaxOrg.Controllers
                 var userToInsert = new User(user);
                 userToInsert.password = m_passwordHasher.HashPassword(userToInsert, user.password);
 
-                var createdUser = db.Insert<User>(userToInsert);
+                var createdUser = await db.InsertAsync<User>(userToInsert);
                 return Created("api/users/" + createdUser.Key, new
                 {
                     message = "Please, go to 'api/login' to obtain a token",
