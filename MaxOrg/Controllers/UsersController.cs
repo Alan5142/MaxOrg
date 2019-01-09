@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace MaxOrg.Controllers
@@ -43,6 +44,7 @@ namespace MaxOrg.Controllers
                             {
                                 u.key,
                                 u.username,
+                                u.realName,
                                 u.email,
                                 u.description,
                                 u.occupation,
@@ -68,7 +70,7 @@ namespace MaxOrg.Controllers
                 }
                 if (query.Count() >= 250 || options.page.HasValue)
                 {
-                    int skipValue = (options.page.HasValue ? options.page.Value : 0) * 250;
+                    int skipValue = (options.page ?? 0) * 250;
                     query = query.Skip(skipValue).Take(250).Select(u => u);
                 }
                 if(options.maxElements.HasValue && options.maxElements.Value > 0)
@@ -135,6 +137,39 @@ namespace MaxOrg.Controllers
                     return NotFound();
                 }
                 return Ok(user);
+            }
+        }
+
+        [Authorize]
+        [HttpPatch("{userId}")]
+        public async Task<ActionResult> ChangeUserInformation(string userId, [FromBody] UserUpdateInfo userData)
+        {
+            if(userId != HttpContext.User.Claims.FirstOrDefault().Value)
+            {
+                return Unauthorized();
+            }
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                var user = await (from u in db.Query<User>()
+                           where u.key == userId
+                           select u).FirstOrDefaultAsync();
+
+                // no user exists
+                if(user == null)
+                {
+                    return NotFound();
+                }
+
+                user.password = userData.password != null ? m_passwordHasher.HashPassword(user, userData.password) : user.password;
+                user.username = userData.username ?? user.username;
+                user.email = userData.email ?? userData.email;
+                user.realName = userData.realName ?? user.realName;
+                user.description = userData.description ?? user.description;
+                user.birthday = userData.birthday ?? user.birthday;
+
+                await db.UpdateByIdAsync<User>(userId, user);
+
+                return Ok();
             }
         }
 

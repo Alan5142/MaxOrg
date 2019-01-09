@@ -1,4 +1,5 @@
 ﻿using ArangoDB.Client;
+using MaxOrg.Services.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -105,6 +106,12 @@ namespace MaxOrg
                 settings.SystemDatabaseCredential = new NetworkCredential(dbUsername, dbPassword);
                 settings.WaitForSync = true;
                 settings.ClusterMode = true;
+            });
+
+            services.AddSingleton<IScheduledTask, RemoveExpiredTokens>();
+            services.AddScheduler((sender, args) =>
+            {
+                args.SetObserved();
             });
         }
 

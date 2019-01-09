@@ -82,7 +82,7 @@ namespace MaxOrg.Controllers
 
                 var expirationDate = userTokenPair.token.expires;
                 // refresh token is not valid :(
-                if (expirationDate < dateNow)
+                if (expirationDate <= dateNow)
                 {
                     return BadRequest(new { message = "Token expired" });
                 }
@@ -174,8 +174,8 @@ namespace MaxOrg.Controllers
                 var token = await GenerateRefreshAndJwtToken(userToAuth);
                 var response = new LoginResponse
                 {
-                    userId = userWithSameEmail.key,
-                    userResourceLocation = "users/" + userWithSameEmail.key,
+                    userId = userToAuth.key,
+                    userResourceLocation = "users/" + userToAuth.key,
                     token = token.token,
                     refreshToken = token.refreshToken.token
                 };
@@ -240,7 +240,7 @@ namespace MaxOrg.Controllers
             {
                 token = Guid.NewGuid().ToString("N"),
                 issuedAt = nowDate,
-                expires = nowDate.AddDays(1),
+                expires = nowDate.AddSeconds(30),
                 userKey = user.key
             };
 
