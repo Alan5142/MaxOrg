@@ -3,8 +3,10 @@ using MaxOrg.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace MaxOrg.Controllers
@@ -68,6 +70,8 @@ namespace MaxOrg.Controllers
                 {
                     query.OrderBy(user => user.username);
                 }
+                var defaultValue = query.FirstOrDefault();
+                var queryCount = query.Count();
                 if (query.Count() >= 250 || options.page.HasValue)
                 {
                     int skipValue = (options.page ?? 0) * 250;
@@ -109,8 +113,14 @@ namespace MaxOrg.Controllers
                 {
                     return Conflict(new { message = $"Email {user.email} already exists" });
                 }
+                var random = new RNGCryptoServiceProvider();
+                var salt = new byte[32];
+                random.GetBytes(salt);
+                var saltAsString = Convert.ToBase64String(salt);
+
                 var userToInsert = new User(user);
-                userToInsert.password = m_passwordHasher.HashPassword(userToInsert, user.password);
+                userToInsert.password = m_passwordHasher.HashPassword(userToInsert, saltAsString + user.password);
+                userToInsert.salt = saltAsString;
 
                 var createdUser = await db.InsertAsync<User>(userToInsert);
                 return Created("api/users/" + createdUser.Key, new

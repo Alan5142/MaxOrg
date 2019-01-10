@@ -37,6 +37,7 @@ import {NewProjectComponent} from './new-project/new-project.component';
 import {TodosComponent} from './todos/todos.component';
 import { RegisterComponent } from './register/register.component';
 import {ServicesModule} from "../services/services.module";
+import { GithubLoginComponent } from './github-login/github-login.component';
 
 @NgModule({
   providers: [
@@ -58,7 +59,8 @@ import {ServicesModule} from "../services/services.module";
     MyAccountPickImageComponent,
     NewProjectComponent,
     TodosComponent,
-    RegisterComponent
+    RegisterComponent,
+    GithubLoginComponent
   ],
   imports: [
     CommonModule,

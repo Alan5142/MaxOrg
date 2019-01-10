@@ -10,8 +10,8 @@ import {
   Validators
 } from '@angular/forms';
 import {MediaObserver} from '@angular/flex-layout';
-import {Router} from "@angular/router";
-import {log} from "util";
+import {Router} from '@angular/router';
+import {log} from 'util';
 
 @Component({
   selector: 'app-register',

@@ -12,8 +12,6 @@
                    placeholder="Nombre de usuario"
                    formControlName="username"
                    i18n-placeholder>
-            <!-- TODO mostrar icono de usuario valido -->
-            <!-- <mat-spinner matSuffix [diameter]="20"></mat-spinner> -->
             <mat-hint *ngIf="username.value === ''" i18n>Debe ser unico</mat-hint>
             <mat-error *ngIf="requiredInformation.controls.username.errors?.required">No puede estar vacio</mat-error>
             <mat-error *ngIf="requiredInformation.controls.username.errors?.minlength && !requiredInformation.controls.username.errors?.required">

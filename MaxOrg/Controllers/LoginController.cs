@@ -48,7 +48,7 @@ namespace MaxOrg.Controllers
                                   select u).FirstOrDefaultAsync();
                 if (user != null)
                 {
-                    if (m_passwordHasher.VerifyHashedPassword(user, user.password, userLoginData.password) != PasswordVerificationResult.Success)
+                    if (m_passwordHasher.VerifyHashedPassword(user, user.password, user.salt + userLoginData.password) != PasswordVerificationResult.Success)
                     {
                         return BadRequest(new { message = "Username or password are incorrect" });
                     }
@@ -106,6 +106,7 @@ namespace MaxOrg.Controllers
 
             using (var db = ArangoDatabase.CreateWithSetting())
             {
+                bool hasPassword = true;
                 Models.User userToAuth;
 
                 // MaxOrg is using the API
@@ -118,56 +119,70 @@ namespace MaxOrg.Controllers
                 // get user email
                 var githubUser = await githubClient.User.Current();
 
-                // we can't register accounts without public email :(
-                // but we can link those accounts with existing accounts :)
-                if (githubUser.Email == null)
+                var userWithSameId = await (from u in db.Query<Models.User>()
+                                            where u.githubId == githubUser.Id
+                                            select u).FirstOrDefaultAsync();
+                
+                // the account is linked
+                if (userWithSameId != null)
                 {
-                    BadRequest(new { message = "Github user doesn't have a published email" });
-                }
-
-                var userWithSameEmail = await (from u in db.Query<Models.User>()
-                                               where u.email == githubUser.Email
-                                               select u).FirstOrDefaultAsync();
-
-                if (userWithSameEmail != null)
-                {
-                    // user exists
-
-                    // first github login
-                    if (userWithSameEmail.githubToken == null)
-                    {
-                        // well, user needs to link his account from account settings
-                        return
-                            BadRequest(new { message = "Email already exists, link your account from 'Account settings'" });
-                    }
-                    userToAuth = userWithSameEmail;
+                    userToAuth = userWithSameId;
+                    hasPassword = userToAuth.password != null;
                 }
                 else
                 {
-                    userToAuth = new Models.User
+                    // we can't register accounts without public email :(
+                    // but we can link those accounts with existing accounts :)
+                    if (githubUser.Email == null)
                     {
-                        description = githubUser.Bio,
-                        realName = githubUser.Name,
-                        email = githubUser.Email,
-                        githubToken = tokenResponse.AccessToken
-                    };
-
-                    var usernameExists = await (from u in db.Query<Models.User>()
-                                                where u.username == githubUser.Login
-                                                select u).FirstOrDefaultAsync();
-                    string username = githubUser.Login;
-
-                    // concat a random number to username if the username exists
-                    if (usernameExists != null)
-                    {
-                        username = githubUser.Location + new Random(DateTime.Now.Millisecond).Next(100, 10000);
+                        return BadRequest(new { message = "Github user doesn't have a published email" });
                     }
 
-                    userToAuth.username = username;
+                    var userWithSameEmail = await (from u in db.Query<Models.User>()
+                                                   where u.email == githubUser.Email
+                                                   select u).FirstOrDefaultAsync();
+                    if (userWithSameEmail != null)
+                    {
+                        // Email is already registered
 
-                    // insert the user
-                    var insertedUser = await db.InsertAsync<Models.User>(userToAuth);
-                    userToAuth.key = insertedUser.Key;
+                        // first github login
+                        if (userWithSameEmail.githubId == null)
+                        {
+                            // well, user needs to link his account from account settings
+                            return
+                                BadRequest(new { message = "Email already exists, link your account from 'Account settings'" });
+                        }
+                        userToAuth = userWithSameEmail;
+                        hasPassword = false;
+                    }
+                    else
+                    {
+                        userToAuth = new Models.User
+                        {
+                            description = githubUser.Bio,
+                            realName = githubUser.Name,
+                            email = githubUser.Email,
+                            githubToken = tokenResponse.AccessToken,
+                            githubId = githubUser.Id
+                        };
+
+                        var usernameExists = await (from u in db.Query<Models.User>()
+                                                    where u.username == githubUser.Login
+                                                    select u).FirstOrDefaultAsync();
+                        string username = githubUser.Login;
+
+                        // concat a random number to username if the username exists
+                        if (usernameExists != null)
+                        {
+                            username = githubUser.Location + new Random(DateTime.Now.Millisecond).Next(100, 10000);
+                        }
+
+                        userToAuth.username = username;
+
+                        // insert the user
+                        var insertedUser = await db.InsertAsync<Models.User>(userToAuth);
+                        userToAuth.key = insertedUser.Key;
+                    }
                 }
 
                 // generate a token :D
@@ -179,6 +194,10 @@ namespace MaxOrg.Controllers
                     token = token.token,
                     refreshToken = token.refreshToken.token
                 };
+                if (hasPassword)
+                {
+                    HttpContext.Response.Headers.Add("HasPassword", "true");
+                }
                 return Ok(response);
             }
         }

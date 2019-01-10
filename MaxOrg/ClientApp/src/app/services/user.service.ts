@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {Observable} from 'rxjs';
 import {LoginResponse, RegisterResponse, User} from './user.service';
@@ -33,6 +33,11 @@ export interface LoginResponse {
   userResourceLocation: string | undefined;
   token: string | undefined;
   userId: string | undefined;
+}
+
+export interface GitHubLogin {
+  valid: boolean;
+  firstLogin: boolean;
 }
 
 @Injectable({
@@ -109,18 +114,24 @@ export class UserService {
     }));
   }
 
-  githubLogin(accessToken: string): Observable<boolean> {
+  githubLogin(accessToken: string): Observable<GitHubLogin> {
     const headers = new HttpHeaders();
     headers.append('Content-Type', 'application/json');
-    return this.http.post<LoginResponse>(environment.apiUrl + 'login/github',
+    return this.http.post(environment.apiUrl + 'login/github',
       {accessToken: accessToken},
-      {headers: headers}).pipe(map<LoginResponse, boolean>(response => {
-      if (response.token !== undefined) {
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('userId', response.userId);
-        return true;
+      {headers: headers, observe: 'response'}).pipe(map<HttpResponse<LoginResponse>, GitHubLogin>(response => {
+      if (response.body.token !== undefined) {
+        localStorage.setItem('token', response.body.token);
+        localStorage.setItem('userId', response.body.userId);
+        return {
+          valid: true,
+          firstLogin: response.headers.get('HasPassword') === null
+        };
       } else {
-        return false;
+        return {
+          valid: false,
+          firstLogin: false
+        };
       }
     }));
   }

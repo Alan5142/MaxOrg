@@ -1,23 +1,16 @@
 ﻿using ArangoDB.Client;
 using MaxOrg.Services.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -96,8 +89,8 @@ namespace MaxOrg
             // Configure ArangoDB settings, to instantiate an object to communicate with Arango
             ArangoDatabase.ChangeSetting(settings =>
             {
-                settings.Database = "maxorg_db";
-                settings.Url = "http://localhost:8529";
+                settings.Database = Configuration["AppSettings:Database:Name"];
+                settings.Url = Configuration["AppSettings:Database:Host"];
 
                 string dbUsername = Configuration["AppSettings:Database:User"];
                 string dbPassword = Configuration["AppSettings:Database:Password"];

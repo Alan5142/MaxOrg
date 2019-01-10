@@ -21,7 +21,7 @@ namespace MaxOrg.Models
             realName = userModel.realName;
             description = userModel.description;
             occupation = userModel.occupation;
-            birthday = userModel.birthday;
+            birthday = userModel.birthday ?? DateTime.MinValue;
         }
 
         [DocumentProperty(Identifier = IdentifierType.Key)]
@@ -29,10 +29,12 @@ namespace MaxOrg.Models
         public string username { get; set; }
         public string email { get; set; }
         public string password { get; set; }
+        public string salt { get; set; }
         public string realName { get; set; }
         public string description { get; set; }
         public string occupation { get; set; }
-        public DateTime birthday { get; set; }
+        public DateTime birthday { get; set; } = DateTime.MinValue;
+        public int? githubId { get; set; }
         public string githubToken { get; set; }
     }
 
@@ -50,7 +52,7 @@ namespace MaxOrg.Models
         public string realName { get; set; }
         public string description { get; set; }
         public string occupation { get; set; }
-        public DateTime birthday { get; set; }
+        public DateTime? birthday { get; set; }
     }
 
     public class UserUpdateInfo

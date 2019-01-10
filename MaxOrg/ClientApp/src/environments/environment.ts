@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://192.168.100.6:5001/api/',
+  apiUrl: 'https://192.168.100.3:5001/api/',
   githubAuth: {
     clientId: '69a05969e2390923914f'
   }
