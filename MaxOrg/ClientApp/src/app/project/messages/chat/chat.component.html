@@ -1,13 +1,29 @@
-<mat-toolbar>
-  <button *ngIf="mediaObserver.isActive('lt-md')" fxFlexAlign="center" mat-icon-button (click)="location.back()">
-    <mat-icon>arrow_back</mat-icon>
-  </button>
-  <div fxFlex fxLayout="column" fxLayoutAlign="center stretch">
-    <h3 class="text-center">Nombre</h3>
+<div fxLayout="column" fxLayoutAlign="end stretch" class="height-100">
+  <div>
+    <mat-toolbar>
+      <button *ngIf="mediaObserver.isActive('lt-md')" fxFlexAlign="center" mat-icon-button (click)="location.back()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div fxFlex fxLayout="column" fxLayoutAlign="center stretch">
+        <h3 class="text-center">Nombre</h3>
+      </div>
+      <button fxFlexAlign="center" mat-icon-button>
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <div fxFlex="3"></div>
+    </mat-toolbar>
   </div>
-  <button fxFlexAlign="center" mat-icon-button>
-    <mat-icon>more_vert</mat-icon>
-  </button>
-  <div fxFlex="3"></div>
-</mat-toolbar>
-<mat-divider></mat-divider>
+
+  <mat-divider></mat-divider>
+
+  <cdk-virtual-scroll-viewport fxLayout="column-reverse" #scrollViewPort itemSize="19" class="height-100">
+      <div *cdkVirtualFor="let item of items" class="width-100">{{item}}</div>
+  </cdk-virtual-scroll-viewport>
+
+  <mat-form-field fxFlexAlign="end" appearance="outline" class="width-100">
+    <textarea matInput cdkTextareaAutosize placeholder="mensaje"></textarea>
+    <button matSuffix mat-icon-button fxFlexAlign="end" (click)="scrollViewPort.setScrollIndex()">
+      <mat-icon>message</mat-icon>
+    </button>
+  </mat-form-field>
+</div>

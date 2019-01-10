@@ -45,15 +45,15 @@ body {
 }
 
 .width-100 {
-  width: 100%;
+  width: 100% !important;
 }
 
 .height-100 {
-  height: 100%;
+  height: 100% !important;
 }
 
 .no-select {
-  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+  user-select: none;
 }
 
 .social-logo-img {

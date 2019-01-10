@@ -202,6 +202,11 @@ namespace MaxOrg.Controllers
             }
         }
 
+        /// <summary>
+        /// Obtiene un token de acceso a GitHub
+        /// </summary>
+        /// <param name="code">Código que servirá para generar el token (vease la documentación de GitHub respecto a OAuth)</param>
+        /// <returns>Un response con el token de acceso, el tipo y el alcance</returns>
         private async Task<GitHubTokenResponse> GetGitHubAccessToken(string code)
         {
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -216,6 +221,11 @@ namespace MaxOrg.Controllers
             return JsonConvert.DeserializeObject<GitHubTokenResponse>(await httpResult.Content.ReadAsStringAsync());
         }
 
+        /// <summary>
+        /// Implementación para generar un token JWT
+        /// </summary>
+        /// <param name="user">Usuario para el que se generará el token</param>
+        /// <returns>Token como cadena de texto</returns>
         private string GenerateJwtToken(Models.User user)
         {
             var key = Encoding.ASCII.GetBytes(Configuration["AppSettings:Secret"]);
@@ -268,6 +278,10 @@ namespace MaxOrg.Controllers
             return (token, refreshToken);
         }
 
+        /// <summary>
+        /// Genera un token de refresco que servirá para pedir un token de acceso, los token de refresco tienen una vida util mayor
+        /// </summary>
+        /// <returns>Token generado</returns>
         private string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];

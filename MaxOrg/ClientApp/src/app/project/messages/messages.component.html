@@ -1,13 +1,23 @@
 <!-- Contextual menus -->
 <mat-menu #messages="matMenu">
-  <button mat-menu-item><mat-icon>group</mat-icon>Nuevo grupo</button>
-  <button mat-menu-item><mat-icon>message</mat-icon>Nuevo mensaje</button>
+  <button mat-menu-item>
+    <mat-icon>group</mat-icon>
+    Nuevo grupo
+  </button>
+  <button mat-menu-item>
+    <mat-icon>message</mat-icon>
+    Nuevo mensaje
+  </button>
 </mat-menu>
 
 <!--Mobile view-->
-<div *ngIf="mediaObserver.isActive('lt-md')">
-  <div *ngIf="chatId !== null">
-    <app-chat></app-chat>
+<div *ngIf="mediaObserver.isActive('lt-md')" class=" height-100">
+  <div *ngIf="chatId !== null" class="height-100">
+    <div fxFlexFill fxLayout="column">
+      <mat-sidenav-content>
+        <app-chat></app-chat>
+      </mat-sidenav-content>
+    </div>
   </div>
   <div *ngIf="chatId === null">
     <div fxLayout="row" class="width-100">

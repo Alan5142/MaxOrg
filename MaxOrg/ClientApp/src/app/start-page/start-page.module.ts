@@ -22,7 +22,7 @@ import {
   MatDatepickerModule,
   MatNativeDateModule,
   MatProgressSpinnerModule,
-  MatAutocompleteModule
+  MatAutocompleteModule, MatProgressBarModule
 } from '@angular/material';
 import {HttpClientModule} from '@angular/common/http';
 import {FlexLayoutModule} from '@angular/flex-layout';
@@ -92,7 +92,8 @@ import { GithubLoginComponent } from './github-login/github-login.component';
     ReactiveFormsModule,
     MatProgressSpinnerModule,
     MatAutocompleteModule,
-    ServicesModule
+    ServicesModule,
+    MatProgressBarModule
   ],
   bootstrap: [StartPageComponent]
 })

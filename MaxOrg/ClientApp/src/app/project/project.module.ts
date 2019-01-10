@@ -12,16 +12,17 @@ import {
 } from '@angular/material';
 import {ProjectRoutingModule} from './project-routing.module';
 import {DescriptionComponent} from './description/description.component';
-import { NavbarComponent } from './navbar/navbar.component';
+import {NavbarComponent} from './navbar/navbar.component';
 import {FlexLayoutModule} from '@angular/flex-layout';
-import { KanbanBoardComponent } from './kanban-board/kanban-board.component';
-import { GroupComponent } from './kanban-board/group/group.component';
-import { CardComponent } from './kanban-board/group/card/card.component';
+import {KanbanBoardComponent} from './kanban-board/kanban-board.component';
+import {GroupComponent} from './kanban-board/group/group.component';
+import {CardComponent} from './kanban-board/group/card/card.component';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {ServicesModule} from '../services/services.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import { MessagesComponent } from './messages/messages.component';
-import { ChatComponent } from './messages/chat/chat.component';
+import {MessagesComponent} from './messages/messages.component';
+import {ChatComponent} from './messages/chat/chat.component';
+import {ScrollingModule} from '@angular/cdk/scrolling';
 
 @NgModule({
   entryComponents: [
@@ -46,7 +47,8 @@ import { ChatComponent } from './messages/chat/chat.component';
     ReactiveFormsModule,
     MatListModule,
     MatRippleModule,
-    MatInputModule
+    MatInputModule,
+    ScrollingModule
   ],
   declarations: [
     ProjectComponent,
