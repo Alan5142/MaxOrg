@@ -8,8 +8,9 @@ import { Component, OnInit,Input } from '@angular/core';
 export class TreeComponent implements OnInit {
 
   constructor() { }
-
   ngOnInit() {
   }
   @Input() treeData:[];
+  @Input() admin:boolean;
+  user: any={admin:"true",memberOf:"MaxOrg"};
 }
