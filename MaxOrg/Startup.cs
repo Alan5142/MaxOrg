@@ -1,4 +1,5 @@
 ﻿using ArangoDB.Client;
+using MaxOrg.Hubs;
 using MaxOrg.Services.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -99,6 +100,7 @@ namespace MaxOrg
                 settings.SystemDatabaseCredential = new NetworkCredential(dbUsername, dbPassword);
                 settings.WaitForSync = true;
                 settings.ClusterMode = true;
+                settings.Serialization.SerializeEnumAsInteger = false;
             });
 
             services.AddSingleton<IScheduledTask, RemoveExpiredTokens>();
@@ -106,6 +108,7 @@ namespace MaxOrg
             {
                 args.SetObserved();
             });
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -150,6 +153,11 @@ namespace MaxOrg
                 {
                     spa.UseAngularCliServer(npmScript: "start");
                 }
+            });
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<NotificationHub>("/notificationHub");
             });
         }
     }

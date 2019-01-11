@@ -20,7 +20,7 @@ namespace MaxOrg.Services.Tasks
                 {
                     var dateTimeNow = DateTime.Now;
                     db.Query<RefreshToken>()
-                                    .Where(t => t.expires <= dateTimeNow)
+                                    .Where(t => t.Expires <= dateTimeNow)
                                     .Remove()
                                     .Execute();
                 }

@@ -76,6 +76,10 @@ export class UserService {
     return localStorage.getItem('token') !== null;
   }
 
+  getUserToken(): string {
+    return localStorage.getItem('token');
+  }
+
   getUsersByName(username: string, maxElements: number = -1): Observable<User[]> {
     return this.http.get<User[]>(environment.apiUrl + 'users?name=' + username + '&maxElements=' + maxElements);
   }

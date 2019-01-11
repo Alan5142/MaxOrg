@@ -44,21 +44,21 @@ namespace MaxOrg.Controllers
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var user = await (from u in db.Query<Models.User>()
-                                  where u.username == userLoginData.username
+                                  where u.Username == userLoginData.username
                                   select u).FirstOrDefaultAsync();
                 if (user != null)
                 {
-                    if (m_passwordHasher.VerifyHashedPassword(user, user.password, user.salt + userLoginData.password) != PasswordVerificationResult.Success)
+                    if (m_passwordHasher.VerifyHashedPassword(user, user.Password, user.Salt + userLoginData.password) != PasswordVerificationResult.Success)
                     {
                         return BadRequest(new { message = "Username or password are incorrect" });
                     }
                     var token = await GenerateRefreshAndJwtToken(user);
                     var response = new LoginResponse
                     {
-                        userId = user.key,
-                        userResourceLocation = "users/" + user.key,
+                        userId = user.Key,
+                        userResourceLocation = "users/" + user.Key,
                         token = token.token,
-                        refreshToken = token.refreshToken.token
+                        refreshToken = token.refreshToken.Token
                     };
                     return Ok(response);
                 }
@@ -76,11 +76,11 @@ namespace MaxOrg.Controllers
             {
                 var dateNow = DateTime.Now;
                 var userTokenPair = await (from t in db.Query<RefreshToken>()
-                             from u in db.Query<Models.User>()
-                             where t.userKey == u.key
-                             select new { token = t, user = u}).FirstOrDefaultAsync();
+                                           from u in db.Query<Models.User>()
+                                           where t.UserKey == u.Key
+                                           select new { token = t, user = u }).FirstOrDefaultAsync();
 
-                var expirationDate = userTokenPair.token.expires;
+                var expirationDate = userTokenPair.token.Expires;
                 // refresh token is not valid :(
                 if (expirationDate <= dateNow)
                 {
@@ -92,7 +92,7 @@ namespace MaxOrg.Controllers
                 return Ok(new RefreshTokenResponse
                 {
                     token = newToken,
-                    userId = userTokenPair.user.key,
+                    userId = userTokenPair.user.Key,
                     message = $"Successfull created token"
                 });
             }
@@ -113,21 +113,30 @@ namespace MaxOrg.Controllers
                 var githubClient = new GitHubClient(new Octokit.ProductHeaderValue("MaxOrg"));
 
                 // github credentials
-                var tokenAuth = new Credentials(tokenResponse.AccessToken);
+                Credentials tokenAuth;
+                try
+                {
+                    tokenAuth = new Credentials(tokenResponse.AccessToken);
+
+                }
+                catch (Exception e)
+                {
+                    return StatusCode(500, e);
+                }
                 githubClient.Credentials = tokenAuth;
 
                 // get user email
                 var githubUser = await githubClient.User.Current();
 
                 var userWithSameId = await (from u in db.Query<Models.User>()
-                                            where u.githubId == githubUser.Id
+                                            where u.GithubId == githubUser.Id
                                             select u).FirstOrDefaultAsync();
-                
+
                 // the account is linked
                 if (userWithSameId != null)
                 {
                     userToAuth = userWithSameId;
-                    hasPassword = userToAuth.password != null;
+                    hasPassword = userToAuth.Password != null;
                 }
                 else
                 {
@@ -139,14 +148,14 @@ namespace MaxOrg.Controllers
                     }
 
                     var userWithSameEmail = await (from u in db.Query<Models.User>()
-                                                   where u.email == githubUser.Email
+                                                   where u.Email == githubUser.Email
                                                    select u).FirstOrDefaultAsync();
                     if (userWithSameEmail != null)
                     {
                         // Email is already registered
 
                         // first github login
-                        if (userWithSameEmail.githubId == null)
+                        if (userWithSameEmail.GithubId == null)
                         {
                             // well, user needs to link his account from account settings
                             return
@@ -159,15 +168,15 @@ namespace MaxOrg.Controllers
                     {
                         userToAuth = new Models.User
                         {
-                            description = githubUser.Bio,
-                            realName = githubUser.Name,
-                            email = githubUser.Email,
-                            githubToken = tokenResponse.AccessToken,
-                            githubId = githubUser.Id
+                            Description = githubUser.Bio,
+                            RealName = githubUser.Name,
+                            Email = githubUser.Email,
+                            GithubToken = tokenResponse.AccessToken,
+                            GithubId = githubUser.Id
                         };
 
                         var usernameExists = await (from u in db.Query<Models.User>()
-                                                    where u.username == githubUser.Login
+                                                    where u.Username == githubUser.Login
                                                     select u).FirstOrDefaultAsync();
                         string username = githubUser.Login;
 
@@ -177,11 +186,12 @@ namespace MaxOrg.Controllers
                             username = githubUser.Location + new Random(DateTime.Now.Millisecond).Next(100, 10000);
                         }
 
-                        userToAuth.username = username;
+                        userToAuth.Username = username;
 
                         // insert the user
                         var insertedUser = await db.InsertAsync<Models.User>(userToAuth);
-                        userToAuth.key = insertedUser.Key;
+                        userToAuth.Key = insertedUser.Key;
+                        hasPassword = false;
                     }
                 }
 
@@ -189,10 +199,10 @@ namespace MaxOrg.Controllers
                 var token = await GenerateRefreshAndJwtToken(userToAuth);
                 var response = new LoginResponse
                 {
-                    userId = userToAuth.key,
-                    userResourceLocation = "users/" + userToAuth.key,
+                    userId = userToAuth.Key,
+                    userResourceLocation = "users/" + userToAuth.Key,
                     token = token.token,
-                    refreshToken = token.refreshToken.token
+                    refreshToken = token.refreshToken.Token
                 };
                 if (hasPassword)
                 {
@@ -218,7 +228,8 @@ namespace MaxOrg.Controllers
                 client_secret = Configuration["AppSettings:GitHub:ClientSecret"],
                 code
             });
-            return JsonConvert.DeserializeObject<GitHubTokenResponse>(await httpResult.Content.ReadAsStringAsync());
+            var data = await httpResult.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<GitHubTokenResponse>(data);
         }
 
         /// <summary>
@@ -237,9 +248,9 @@ namespace MaxOrg.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                         {
-                            new Claim(ClaimTypes.Name, user.key.ToString()),
-                            new Claim(ClaimTypes.Email, user.email),
-                            new Claim(ClaimTypes.Surname, user.username)
+                            new Claim(ClaimTypes.Name, user.Key.ToString()),
+                            new Claim(ClaimTypes.Email, user.Email),
+                            new Claim(ClaimTypes.Surname, user.Username)
                         }),
                 NotBefore = nowDate,
                 Expires = nowDate.AddHours(1),
@@ -267,10 +278,10 @@ namespace MaxOrg.Controllers
             var token = GenerateJwtToken(user);
             var refreshToken = new RefreshToken
             {
-                token = Guid.NewGuid().ToString("N"),
-                issuedAt = nowDate,
-                expires = nowDate.AddSeconds(30),
-                userKey = user.key
+                Token = Guid.NewGuid().ToString("N"),
+                IssuedAt = nowDate,
+                Expires = nowDate.AddSeconds(30),
+                UserKey = user.Key
             };
 
             await WriteRefreshTokenToDb(refreshToken);

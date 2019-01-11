@@ -1,7 +1,7 @@
-<div fxLayout="column" fxLayoutAlign="center center">
-  <h1 i18n>Mi cuenta</h1>
+<div ngClass.gt-md='desktop-view' [ngClass.lt-md]="['mobile-view']" fxLayout="column" fxLayoutAlign="center stretch">
+  <h1 i18n class="text-center">Mi cuenta</h1>
 
-  <div fxLayout="row">
+  <div fxLayout="row" fxLayoutAlign="center stretch">
     <img ngClass="image" ngClass.xs="image-small" src='https://material.angular.io/assets/img/examples/shiba1.jpg'>
     <button mat-icon-button fxFlexAlign="end" (click)="selectImage()">
       <mat-icon>edit</mat-icon>
@@ -15,7 +15,7 @@
              [value]="currentUser === null ? '' : currentUser.username">
     </mat-form-field>
     <mat-form-field>
-      <textarea matInput placeholder="Descripción" i18n-placeholder [value]="currentUser !== null ? currentUser.description : ''"></textarea>
+      <textarea cdkTextareaAutosize matInput placeholder="Descripción" i18n-placeholder [value]="currentUser !== null ? currentUser.description : ''"></textarea>
     </mat-form-field>
 
     <mat-form-field>

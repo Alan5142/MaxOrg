@@ -20,14 +20,14 @@ namespace MaxOrg.Models
         public string refreshToken;
     }
 
+    [CollectionProperty(Naming = NamingConvention.ToCamelCase)]
     public class RefreshToken
     {
-        [DocumentProperty(Identifier = IdentifierType.Key)]
-        public string key;
-        public string token;
-        public DateTime issuedAt;
-        public DateTime expires;
-        public string userKey;
+        public string Key;
+        public string Token;
+        public DateTime IssuedAt;
+        public DateTime Expires;
+        public string UserKey;
     }
 
     public class RefreshTokenRequest

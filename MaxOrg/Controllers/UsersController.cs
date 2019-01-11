@@ -44,22 +44,22 @@ namespace MaxOrg.Controllers
                 var query = from u in db.Query<User>()
                             select new
                             {
-                                u.key,
-                                u.username,
-                                u.realName,
-                                u.email,
-                                u.description,
-                                u.occupation,
-                                birthday = AQL.DateFormat(u.birthday, "%dd/%mm/%yyyy")
+                                u.Key,
+                                u.Username,
+                                u.RealName,
+                                u.Email,
+                                u.Description,
+                                u.Occupation,
+                                birthday = AQL.DateFormat(u.Birthday, "%dd/%mm/%yyyy")
                             };
                 if (options.name != null)
                 {
-                    query = query.Where(u => AQL.Contains(AQL.Lower(u.username), AQL.Lower(options.name)));
+                    query = query.Where(u => AQL.Contains(AQL.Lower(u.Username), AQL.Lower(options.name)));
                 }
                 if (options.email != null)
                 {
                     query = from u in query
-                            where AQL.Lower(u.email) == AQL.Lower(options.email)
+                            where AQL.Lower(u.Email) == AQL.Lower(options.email)
                             select u;
                 }
                 if (options.limit.HasValue)
@@ -68,7 +68,7 @@ namespace MaxOrg.Controllers
                 }
                 if (options.sorted.HasValue && options.sorted.Value == true)
                 {
-                    query.OrderBy(user => user.username);
+                    query.OrderBy(user => user.Username);
                 }
                 var defaultValue = query.FirstOrDefault();
                 var queryCount = query.Count();
@@ -93,25 +93,25 @@ namespace MaxOrg.Controllers
         [HttpPost]
         public async Task<ActionResult> PostAsync([FromBody] UserForm user)
         {
-            if (string.IsNullOrEmpty(user.username) || string.IsNullOrEmpty(user.password) ||
-                        string.IsNullOrEmpty(user.email))
+            if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password) ||
+                        string.IsNullOrEmpty(user.Email))
             {
                 return BadRequest(new { message = "username, password or email are empty" });
             }
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var query = from u in db.Query<User>()
-                            where u.username == user.username
+                            where u.Username == user.Username
                             select u;
 
                 if (query.Count() > 0)
                 {
-                    return Conflict(new { message = $"Username {user.username} already exists" });
+                    return Conflict(new { message = $"Username {user.Username} already exists" });
                 }
-                query = db.Query<User>().Where(u => u.email == user.email);
+                query = db.Query<User>().Where(u => u.Email == user.Email);
                 if (query.Count() > 0)
                 {
-                    return Conflict(new { message = $"Email {user.email} already exists" });
+                    return Conflict(new { message = $"Email {user.Email} already exists" });
                 }
                 var random = new RNGCryptoServiceProvider();
                 var salt = new byte[32];
@@ -119,15 +119,15 @@ namespace MaxOrg.Controllers
                 var saltAsString = Convert.ToBase64String(salt);
 
                 var userToInsert = new User(user);
-                userToInsert.password = m_passwordHasher.HashPassword(userToInsert, saltAsString + user.password);
-                userToInsert.salt = saltAsString;
+                userToInsert.Password = m_passwordHasher.HashPassword(userToInsert, saltAsString + user.Password);
+                userToInsert.Salt = saltAsString;
 
                 var createdUser = await db.InsertAsync<User>(userToInsert);
                 return Created("api/users/" + createdUser.Key, new
                 {
                     message = "Please, go to 'api/login' to obtain a token",
-                    user.username,
-                    user.email
+                    user.Username,
+                    user.Email
                 });
             }
         }
@@ -139,8 +139,8 @@ namespace MaxOrg.Controllers
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var user = await (from u in db.Query<User>()
-                             where u.key == userId
-                             select new { u.username, u.realName, u.email, u.description, u.birthday, u.occupation })
+                             where u.Key == userId
+                             select new { u.Username, u.RealName, u.Email, u.Description, u.Birthday, u.Occupation })
                              .FirstOrDefaultAsync();
                 if (user == null)
                 {
@@ -161,7 +161,7 @@ namespace MaxOrg.Controllers
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var user = await (from u in db.Query<User>()
-                           where u.key == userId
+                           where u.Key == userId
                            select u).FirstOrDefaultAsync();
 
                 // no user exists
@@ -170,12 +170,12 @@ namespace MaxOrg.Controllers
                     return NotFound();
                 }
 
-                user.password = userData.password != null ? m_passwordHasher.HashPassword(user, userData.password) : user.password;
-                user.username = userData.username ?? user.username;
-                user.email = userData.email ?? userData.email;
-                user.realName = userData.realName ?? user.realName;
-                user.description = userData.description ?? user.description;
-                user.birthday = userData.birthday ?? user.birthday;
+                user.Password = userData.password != null ? m_passwordHasher.HashPassword(user, userData.password) : user.Password;
+                user.Username = userData.username ?? user.Username;
+                user.Email = userData.email ?? userData.email;
+                user.RealName = userData.realName ?? user.RealName;
+                user.Description = userData.description ?? user.Description;
+                user.Birthday = userData.birthday ?? user.Birthday;
 
                 await db.UpdateByIdAsync<User>(userId, user);
 

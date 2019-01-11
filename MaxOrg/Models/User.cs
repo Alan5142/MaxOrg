@@ -2,11 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MaxOrg.Models
 {
+    [CollectionProperty(Naming = NamingConvention.ToCamelCase)]
     public class User
     {
         public User()
@@ -15,44 +14,50 @@ namespace MaxOrg.Models
 
         public User(UserForm userModel)
         {
-            username = userModel.username;
-            email = userModel.email;
-            password = userModel.password;
-            realName = userModel.realName;
-            description = userModel.description;
-            occupation = userModel.occupation;
-            birthday = userModel.birthday ?? DateTime.MinValue;
+            Username = userModel.Username;
+            Email = userModel.Email;
+            Password = userModel.Password;
+            RealName = userModel.RealName;
+            Description = userModel.Description;
+            Occupation = userModel.Occupation;
+            Birthday = userModel.Birthday ?? DateTime.MinValue;
         }
 
-        [DocumentProperty(Identifier = IdentifierType.Key)]
-        public string key { get; set; }
-        public string username { get; set; }
-        public string email { get; set; }
-        public string password { get; set; }
-        public string salt { get; set; }
-        public string realName { get; set; }
-        public string description { get; set; }
-        public string occupation { get; set; }
-        public DateTime birthday { get; set; } = DateTime.MinValue;
-        public int? githubId { get; set; }
-        public string githubToken { get; set; }
+        [DocumentProperty(Naming = NamingConvention.ToCamelCase)]
+        public string Key { get; set; }
+        
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string Salt { get; set; }
+        public string RealName { get; set; }
+        public string Description { get; set; }
+        public string Occupation { get; set; }
+        public DateTime Birthday { get; set; } = DateTime.MinValue;
+        public int? GithubId { get; set; }
+        public string GithubToken { get; set; }
+
+        /// <summary>
+        /// Notificaciones que le han llegado al usuario, estan ordenadas de forma cronologica
+        /// </summary>
+        public List<Notification> Notifications { get; set; }
     }
 
     public class UserForm
     {
         [StringLength(maximumLength: 20,MinimumLength = 7)]
         [Required]
-        public string username { get; set; }
+        public string Username { get; set; }
         [Required]
         [EmailAddress]
-        public string email { get; set; }
+        public string Email { get; set; }
         [Required]
         [StringLength(maximumLength: 100, MinimumLength = 8)]
-        public string password { get; set; }
-        public string realName { get; set; }
-        public string description { get; set; }
-        public string occupation { get; set; }
-        public DateTime? birthday { get; set; }
+        public string Password { get; set; }
+        public string RealName { get; set; }
+        public string Description { get; set; }
+        public string Occupation { get; set; }
+        public DateTime? Birthday { get; set; }
     }
 
     public class UserUpdateInfo
