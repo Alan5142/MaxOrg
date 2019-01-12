@@ -33,6 +33,7 @@ export interface LoginResponse {
   userResourceLocation: string | undefined;
   token: string | undefined;
   userId: string | undefined;
+  refreshToken: string | undefined;
 }
 
 export interface GitHubLogin {
@@ -109,7 +110,9 @@ export class UserService {
         this.getUser(value.userId).subscribe(user => {
           this.userLoggedIn = user;
         });
+        console.log(value);
         localStorage.setItem('token', value.token);
+        localStorage.setItem('refresh', value.refreshToken);
         localStorage.setItem('userId', value.userId);
         return true;
       } else {
@@ -125,7 +128,9 @@ export class UserService {
       {accessToken: accessToken},
       {headers: headers, observe: 'response'}).pipe(map<HttpResponse<LoginResponse>, GitHubLogin>(response => {
       if (response.body.token !== undefined) {
+        console.log(response);
         localStorage.setItem('token', response.body.token);
+        localStorage.setItem('refresh', response.body.refreshToken);
         localStorage.setItem('userId', response.body.userId);
         return {
           valid: true,

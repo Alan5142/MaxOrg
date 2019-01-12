@@ -23,9 +23,11 @@ namespace MaxOrg.Models
             Birthday = userModel.Birthday ?? DateTime.MinValue;
         }
 
-        [DocumentProperty(Naming = NamingConvention.ToCamelCase)]
+        [DocumentProperty(Identifier = IdentifierType.Key)]
         public string Key { get; set; }
-        
+        [DocumentProperty(Identifier = IdentifierType.Handle)]
+        public string Id { get; set; }
+
         public string Username { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
@@ -34,13 +36,14 @@ namespace MaxOrg.Models
         public string Description { get; set; }
         public string Occupation { get; set; }
         public DateTime Birthday { get; set; } = DateTime.MinValue;
+        [DocumentProperty(IgnoreProperty = true)]
         public int? GithubId { get; set; }
         public string GithubToken { get; set; }
 
         /// <summary>
         /// Notificaciones que le han llegado al usuario, estan ordenadas de forma cronologica
         /// </summary>
-        public List<Notification> Notifications { get; set; }
+        public List<Notification> Notifications { get; set; } = new List<Notification>();
     }
 
     public class UserForm

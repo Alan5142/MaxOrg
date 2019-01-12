@@ -23,14 +23,16 @@ namespace MaxOrg.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
+        private readonly IArangoDatabase m_database;
         public IConfiguration Configuration { get; }
         private PasswordHasher<Models.User> m_passwordHasher;
         private static HttpClient client = new HttpClient();
 
-        public LoginController(IConfiguration configuration)
+        public LoginController(IConfiguration configuration, IArangoDatabase database)
         {
             Configuration = configuration;
             m_passwordHasher = new PasswordHasher<Models.User>();
+            m_database = database;
         }
 
         [HttpPost]
@@ -117,11 +119,10 @@ namespace MaxOrg.Controllers
                 try
                 {
                     tokenAuth = new Credentials(tokenResponse.AccessToken);
-
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    return StatusCode(500, e);
+                    return StatusCode(500);
                 }
                 githubClient.Credentials = tokenAuth;
 
@@ -144,7 +145,7 @@ namespace MaxOrg.Controllers
                     // but we can link those accounts with existing accounts :)
                     if (githubUser.Email == null)
                     {
-                        return BadRequest(new { message = "Github user doesn't have a published email" });
+                        return BadRequest(new { message = "GitHub user doesn't have a published email" });
                     }
 
                     var userWithSameEmail = await (from u in db.Query<Models.User>()

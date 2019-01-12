@@ -31,14 +31,15 @@ namespace MaxOrg.Hubs
                 var chatGroup = await (from chat in db.Query<Chat>()
                                        where chat.Name == groupName
                                        select chat).FirstOrDefaultAsync();
+
                 var messageToAdd = new Message
                 {
                     Remitent = Context.User.Identity.Name,
                     Date = DateTime.Now,
-                    Type = MessageType.Text,
+                    Type = type,
                     Data = message
                 };
-                // if chat doesn't exist a bug has ocurried
+
                 if (chatGroup == null)
                 {
                     m_logger.LogError("Somebody tried to send a message to a non existing chat");

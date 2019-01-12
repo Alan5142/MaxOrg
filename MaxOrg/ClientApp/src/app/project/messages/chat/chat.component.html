@@ -16,13 +16,13 @@
 
   <mat-divider></mat-divider>
 
-  <cdk-virtual-scroll-viewport fxLayout="column-reverse" #scrollViewPort itemSize="19" class="height-100">
-      <div *cdkVirtualFor="let item of items" class="width-100">{{item}}</div>
+  <cdk-virtual-scroll-viewport #scrollViewPort fxLayout="column-reverse" itemSize="19" class="height-100">
+      <div *cdkVirtualFor="let item of items" class="width-100" fxFlexAlign="end">{{item}}</div>
   </cdk-virtual-scroll-viewport>
 
   <mat-form-field fxFlexAlign="end" appearance="outline" class="width-100">
     <textarea matInput cdkTextareaAutosize placeholder="mensaje"></textarea>
-    <button matSuffix mat-icon-button fxFlexAlign="end" (click)="scrollViewPort.setScrollIndex()">
+    <button matSuffix mat-icon-button fxFlexAlign="end" (click)="scrollViewPort.scrollToIndex(500)">
       <mat-icon>message</mat-icon>
     </button>
   </mat-form-field>

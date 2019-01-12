@@ -16,6 +16,9 @@ namespace MaxOrg.Models
         /// </summary>
         [DocumentProperty(Identifier = IdentifierType.Key)]
         public string key;
+        [DocumentProperty(Identifier = IdentifierType.Handle)]
+        public string Id { get; set; }
+
         /// <summary>
         /// Todos los mensajes enviados dentro del chat, considerando la forma en que se van insertando, estan ordenados de forma cronologica
         /// </summary>

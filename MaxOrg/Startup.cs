@@ -102,6 +102,7 @@ namespace MaxOrg
                 settings.ClusterMode = true;
                 settings.Serialization.SerializeEnumAsInteger = false;
             });
+            services.AddSingleton(ArangoDatabase.CreateWithSetting());
 
             services.AddSingleton<IScheduledTask, RemoveExpiredTokens>();
             services.AddScheduler((sender, args) =>
@@ -114,10 +115,12 @@ namespace MaxOrg
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            //app.UseCors(builder =>
+            //            builder
+            //            .WithOrigins("https://localhost:44384", "http://localhost:4200").AllowAnyOrigin());
             app.UseCors(builder =>
                         builder
-                        .WithOrigins("https://localhost:44384", "http://localhost:4200").AllowAnyOrigin());
-
+                        .AllowAnyOrigin());
 
             if (env.IsDevelopment())
             {
