@@ -41,7 +41,9 @@
 </mat-toolbar>
 
 <mat-sidenav-container id="container">
-  <mat-sidenav [mode]="mobileQuery.matches ? 'over' : 'side'" [opened]="!mobileQuery.matches" #sidenav>
+  <mat-sidenav #sideNav
+               [mode]="mobileQuery.matches ? 'over' : 'side'"
+               [opened]="!mobileQuery.matches" #sidenav>
     <mat-accordion>
       <h4 class="text-center" routerLink="/project/{{route.snapshot.paramMap.get('id')}}">[Nombre de proyecto]</h4>
       <mat-divider></mat-divider>
@@ -69,7 +71,7 @@
         </mat-expansion-panel-header>
         <button mat-button routerLink="board" (click)="sidenav.toggle(!mobileQuery.matches)">Tablero</button>
         <br>
-        <button mat-button>Asignación de trabajos</button>
+        <button mat-button routerLink="./assignedWork">Asignación de trabajos</button>
       </mat-expansion-panel>
       <mat-expansion-panel>
         <mat-expansion-panel-header>

@@ -16,7 +16,7 @@
 
   <mat-divider></mat-divider>
 
-  <cdk-virtual-scroll-viewport #scrollViewPort fxLayout="column-reverse" itemSize="19" class="height-100">
+  <cdk-virtual-scroll-viewport #scrollViewPort fxLayout="column-reverse" itemSize="19" class="height-100" fxlayout="column" fxLayoutAlign="end center">
       <div *cdkVirtualFor="let item of items" class="width-100" fxFlexAlign="end">{{item}}</div>
   </cdk-virtual-scroll-viewport>
 

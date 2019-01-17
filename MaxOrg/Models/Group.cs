@@ -14,11 +14,13 @@ namespace MaxOrg.Models
         public string Key { get; set; }
         [DocumentProperty(Identifier = IdentifierType.Handle)]
         public string Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string GroupOwner { get; set; }
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string GroupOwner { get; set; } = "";
         public bool IsRoot { get; set; }
         public DateTime CreationDate { get; set; }
+
+        public List<KanbanBoard> KanbanBoards { get; set; } = new List<KanbanBoard>();
     }
 
     public class CreateGroupRequest
@@ -34,6 +36,12 @@ namespace MaxOrg.Models
         public string SubgroupAdminId { get; set; }
     }
 
+    public class UserGroupView
+    {
+        public string Id { get; set; }
+        public string Username { get; set; }
+    }
+
     public class GroupHierarchy
     {
         public string Id { get; set; }
@@ -42,5 +50,6 @@ namespace MaxOrg.Models
         public string GroupOwner { get; set; }
         public DateTime CreationDate { get; set; }
         public GroupHierarchy[] Subgroups { get; set; } = Array.Empty<GroupHierarchy>();
+        public UserGroupView[] Users { get; set; }
     }
 }

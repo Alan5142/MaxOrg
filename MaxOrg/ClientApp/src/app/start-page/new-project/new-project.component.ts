@@ -1,8 +1,10 @@
 import {Component} from '@angular/core';
-import {MatAutocompleteSelectedEvent, MatChipInputEvent, MatDialogRef} from '@angular/material';
+import {MatAutocompleteSelectedEvent, MatChipInputEvent, MatDialogRef, MatSnackBar} from '@angular/material';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {User, UserService} from '../../services/user.service';
+import {ProjectsService} from '../../services/projects.service';
+import {FormGroup} from '@angular/forms';
 
 
 @Component({
@@ -11,16 +13,25 @@ import {User, UserService} from '../../services/user.service';
   styleUrls: ['./new-project.component.scss']
 })
 export class NewProjectComponent {
-
+  projectName: string;
   selectedUsers: string[];
   autocompleteUsers: User[];
 
-  constructor(public dialogRef: MatDialogRef<NewProjectComponent>, private userService: UserService) {
+  constructor(public dialogRef: MatDialogRef<NewProjectComponent>,
+              private userService: UserService,
+              private projectService: ProjectsService,
+              private snackBar: MatSnackBar) {
     this.selectedUsers = [];
     this.autocompleteUsers = [];
   }
 
-  onNoClick(): void {
+  createProject(): void {
+    this.projectService.createProject({name: this.projectName, members: this.selectedUsers}).subscribe(result => {
+      this.snackBar.open('Creado con exito', 'Ok', {duration: 1000});
+    }, error => {
+      console.log(error);
+      this.snackBar.open('No se pudo crear :(', 'Ok', {duration: 1000});
+    });
     this.dialogRef.close();
   }
 
@@ -36,7 +47,7 @@ export class NewProjectComponent {
     if (value.length > 2) {
       this.userService.getUsersByName(value, 7).subscribe(users => {
         this.autocompleteUsers = users;
-        const index = this.autocompleteUsers.findIndex(user => user.username === localStorage.getItem('userId'));
+        const index = this.autocompleteUsers.findIndex(user => user.key === localStorage.getItem('userId'));
         if (index >= 0) {
           this.autocompleteUsers.splice(index, 1);
         }

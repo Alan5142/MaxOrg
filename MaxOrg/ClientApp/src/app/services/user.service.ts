@@ -10,11 +10,11 @@ export interface User {
   key: string;
   username: string;
   realName: string;
-  password: string | null;
+  password?: string;
   email: string;
-  description: string;
-  occupation: string;
-  birthday: Date;
+  description?: string;
+  occupation?: string;
+  birthday?: Date;
 }
 
 export interface RegisterResponse {
@@ -110,7 +110,6 @@ export class UserService {
         this.getUser(value.userId).subscribe(user => {
           this.userLoggedIn = user;
         });
-        console.log(value);
         localStorage.setItem('token', value.token);
         localStorage.setItem('refresh', value.refreshToken);
         localStorage.setItem('userId', value.userId);

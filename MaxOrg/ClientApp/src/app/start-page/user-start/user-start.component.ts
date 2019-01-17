@@ -3,6 +3,10 @@ import {MatDialog} from '@angular/material';
 import {NewProjectComponent} from '../new-project/new-project.component';
 import {MediaObserver} from '@angular/flex-layout';
 import {User, UserService} from '../../services/user.service';
+import {Project, ProjectsService} from '../../services/projects.service';
+import {Observable} from 'rxjs';
+import {Router} from '@angular/router';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-start',
@@ -11,15 +15,18 @@ import {User, UserService} from '../../services/user.service';
 })
 export class UserStartComponent implements OnInit {
   currentUser: User | null = null;
-  projects = [
-    'Usuario/Proyecto1',
-    'Usuario/Proyecto2',
-    'Usuario2/Proyecto3'
-  ];
+  projectsView: Observable<Project[]>;
+  projects: Observable<Project[]>;
 
-  constructor(public dialog: MatDialog, public mediaObserver: MediaObserver, public userService: UserService) {
+  constructor(public dialog: MatDialog,
+              public mediaObserver: MediaObserver,
+              public userService: UserService,
+              private projectsService: ProjectsService,
+              private router: Router) {
     userService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
+      this.projects = this.projectsService.getProjects();
+      this.projectsView = this.projects;
     });
   }
 
@@ -29,11 +36,24 @@ export class UserStartComponent implements OnInit {
       minWidth: '300px'
     });
 
-    dialogRef.afterClosed().subscribe(() => {
+    dialogRef.afterClosed().subscribe(result => {
+      this.projects = this.projectsService.getProjects();
+      this.projectsView = this.projects;
     });
   }
 
   ngOnInit() {
   }
 
+  goToProject(id: string) {
+    this.router.navigate(['/project/', id]);
+  }
+
+  searchContent(content: string) {
+    this.projectsView = this.projects.pipe(map<Project[], Project[]>(projects => {
+      return projects.filter((value, index, array) => {
+        return value.name.toLowerCase().includes(content.toLowerCase());
+      });
+    }));
+  }
 }

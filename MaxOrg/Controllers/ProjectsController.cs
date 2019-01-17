@@ -22,6 +22,28 @@ namespace MaxOrg.Controllers
             m_database = database;
         }
 
+        [HttpGet]
+        public IActionResult GetUserProjects()
+        {
+            var traversal = m_database.Traverse<Group, UsersInGroup>(new TraversalConfig
+            {
+                StartVertex = "User/" + HttpContext.User.Identity.Name,
+                GraphName = "GroupUsersGraph",
+                Direction = EdgeDirection.Outbound,
+                MinDepth = 1
+            });
+            var projects = from g in traversal.Visited.Vertices
+                           from u in m_database.Query<User>()
+                          where g.IsRoot && g.GroupOwner == u.Key
+                          select new
+                          {
+                              g.Name,
+                              Id = g.Key,
+                              ProjectOwner = u.Username
+                          };
+            return Ok(new { projects });
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateProject([FromBody] ProjectCreationData data)
         {
@@ -48,13 +70,24 @@ namespace MaxOrg.Controllers
                 return BadRequest(new { message = "Some users are invalid" });
             }
 
+            // En caso de que el usuario haya puesto su nombre de usuario, lo eliminamos, el se añade aparte puesto que será administrador
+            usersToAdd = from u in usersToAdd
+                         where u.Key != currentUser.Key
+                         select u;
+
             var projectGroup = new Group
             {
                 CreationDate = currentDate,
                 Name = data.Name,
                 GroupOwner = HttpContext.User.Identity.Name,
-                IsRoot = true
+                IsRoot = true,
             };
+
+            // Default kanban creation
+            projectGroup.KanbanBoards = new List<KanbanBoard> { new KanbanBoard(data.Name) };
+            projectGroup.KanbanBoards[0].Members = await usersToAdd.Select(u => u.Key).ToListAsync();
+            projectGroup.KanbanBoards[0].Members.Add(currentUser.Key);
+
             var createdGroup = await m_database.InsertAsync<Group>(projectGroup); ;
 
             var admin = new UsersInGroup
@@ -63,7 +96,7 @@ namespace MaxOrg.Controllers
                 JoinDate = currentDate,
                 Group = createdGroup.Id,
                 User = "User/" + currentUser.Key,
-                AddedBy = currentUser.Username
+                AddedBy = currentUser.Key
             };
             // create a relation between root group and the creator
             await groupGraph.InsertEdgeAsync<UsersInGroup>(admin);
@@ -76,7 +109,7 @@ namespace MaxOrg.Controllers
                     JoinDate = currentDate,
                     Group = createdGroup.Id,
                     User = "User/" + user.Key,
-                    AddedBy = currentUser.Username
+                    AddedBy = currentUser.Key
                 };
                 await groupGraph.InsertEdgeAsync<UsersInGroup>(userToAdd);
             }
@@ -123,7 +156,7 @@ namespace MaxOrg.Controllers
 
             var returnMessage = new
             {
-                project.Key,
+                Id = project.Key,
                 project.Name,
                 project.Description,
                 project.GroupOwner,
@@ -141,8 +174,28 @@ namespace MaxOrg.Controllers
             foreach (var subgroup in subgroups)
             {
                 subgroup.Subgroups = GetSubgroupHierarchy(subgroup.Id);
+                subgroup.Users = GetGroupMembers(subgroup.Id);
             }
             return subgroups;
+        }
+
+        private UserGroupView[] GetGroupMembers(string projectId)
+        {
+            var traversal = m_database.Traverse<User, UsersInGroup>(new TraversalConfig
+            {
+                StartVertex = "Group/" + projectId,
+                GraphName = "GroupUsersGraph",
+                Direction = EdgeDirection.Inbound,
+                MinDepth = 1,
+                MaxDepth = 1
+            });
+            var members = from u in traversal.Visited.Vertices
+                          select new UserGroupView
+                          {
+                              Id = u.Key,
+                              Username = u.Username
+                          };
+            return members.ToArray();
         }
 
         private GroupHierarchy[] GetSubgroups(string groupId)

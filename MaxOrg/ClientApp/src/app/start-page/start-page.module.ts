@@ -22,7 +22,7 @@ import {
   MatDatepickerModule,
   MatNativeDateModule,
   MatProgressSpinnerModule,
-  MatAutocompleteModule, MatProgressBarModule
+  MatAutocompleteModule, MatProgressBarModule, MatSnackBarModule
 } from '@angular/material';
 import {HttpClientModule} from '@angular/common/http';
 import {FlexLayoutModule} from '@angular/flex-layout';
@@ -36,7 +36,7 @@ import {MyAccountComponent, MyAccountPickImageComponent} from './my-account/my-a
 import {NewProjectComponent} from './new-project/new-project.component';
 import {TodosComponent} from './todos/todos.component';
 import { RegisterComponent } from './register/register.component';
-import {ServicesModule} from "../services/services.module";
+import {ServicesModule} from '../services/services.module';
 import { GithubLoginComponent } from './github-login/github-login.component';
 
 @NgModule({
@@ -93,7 +93,8 @@ import { GithubLoginComponent } from './github-login/github-login.component';
     MatProgressSpinnerModule,
     MatAutocompleteModule,
     ServicesModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatSnackBarModule
   ],
   bootstrap: [StartPageComponent]
 })

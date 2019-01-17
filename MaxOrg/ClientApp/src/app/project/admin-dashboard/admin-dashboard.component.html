@@ -1,0 +1,17 @@
+<div class="grid-container">
+  <h1 class="mat-h1">Panel de administrador</h1>
+  <mat-grid-list cols="3" rowHeight="350px">
+    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 2" [rowspan]="1">
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>
+            Titulo
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+          <div>Card Content Here</div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+</div>

@@ -1,5 +1,6 @@
 <div fxLayout="column" fxLayoutGap="50px">
-  <h1 fxFlexAlign="center" style="text-align: center;" class="mat-display-1" i18n>Bienvenido de nuevo {{ currentUser === null ? '' : currentUser.username}}</h1>
+  <h1 fxFlexAlign="center" style="text-align: center;" class="mat-display-1" i18n>Bienvenido de nuevo {{ currentUser ===
+    null ? '' : currentUser.username}}</h1>
   <div fxLayout="row wrap" fxLayoutAlign="center">
     <button mat-stroked-button (click)="openDialog()" i18n>Crear nuevo proyecto</button>
   </div>
@@ -19,15 +20,18 @@
 
         <mat-card-content style="margin: 16px;">
           <mat-form-field fxFill>
-            <mat-icon matPrefix>search</mat-icon>
-            <input matInput type="text" placeholder="Buscar...">
+            <mat-icon matPrefix class="no-select">search</mat-icon>
+            <input #searchBar matInput type="text" placeholder="Buscar..." (keyup)="searchContent(searchBar.value)">
           </mat-form-field>
 
           <mat-list>
-            <mat-list-item fxFill *ngFor="let project of projects">
-              <mat-icon matPrefix>folder</mat-icon>
-              <button fxFill mat-button>{{project}}</button>
-            </mat-list-item>
+            <div *ngFor="let project of projectsView | async">
+              <mat-list-item fxFill>
+                <mat-icon matPrefix class="no-select">folder</mat-icon>
+                <button fxFill mat-button (click)="goToProject(project.id)">{{project.projectOwner}}/{{project.name}}</button>
+              </mat-list-item>
+              <mat-divider></mat-divider>
+            </div>
           </mat-list>
 
         </mat-card-content>
@@ -36,7 +40,8 @@
     </div>
 
     <div fxFlex="50">
-      <mat-card style="min-height: 300px; max-height: 400px; padding: 0; margin: 16px;" ngStyle.lt-md="margin-top: 90px;" ngStyle.gt-sm="margin-top: 16px;">
+      <mat-card style="min-height: 300px; max-height: 400px; padding: 0; margin: 16px;"
+                ngStyle.lt-md="margin-top: 90px;" ngStyle.gt-sm="margin-top: 16px;">
         <mat-card-header style="background-color: #484848;">
           <mat-card-title style="color: white; margin: 10px" i18n>Actividad reciente</mat-card-title>
         </mat-card-header>

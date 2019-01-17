@@ -1,21 +1,30 @@
 import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {environment} from '../../environments/environment';
+import {map} from 'rxjs/operators';
 
 export interface KanbanCard {
-  id: number;
   title: string;
   description: string;
+  creationDate: Date;
 }
 
 export interface KanbanGroup {
-  id: number;
   name: string;
   cards: KanbanCard[];
+  color?: string;
+}
+
+export interface KanbanGroupMember {
+  username: string;
+  id: string;
 }
 
 export interface KanbanBoard {
-  id: number;
-  groupName: string;
-  cardGroups: KanbanGroup[];
+  name: string;
+  members: KanbanCardsService[];
+  kanbanGroups: KanbanGroup[];
 }
 
 @Injectable({
@@ -23,25 +32,20 @@ export interface KanbanBoard {
 })
 export class KanbanCardsService {
 
-  boards: KanbanBoard[];
+  boards: Observable<KanbanBoard[]>;
 
-  constructor() {
-    this.boards = [];
-    this.boards.push({id: 0, groupName: Math.random().toString(36).substring(7), cardGroups: []});
-
-    let cards: KanbanCard[] = [{id: 0, title: 'Titulo', description: Math.random().toString(36).substring(7)},
-      {id: 1, title: 'Titulo', description: Math.random().toString(36).substring(7)}];
-
-    this.boards[0].cardGroups.push({id: 0, name: Math.random().toString(36).substring(7), cards: cards});
-
-    cards = [{id: 2, title: 'Titulo', description: Math.random().toString(36).substring(7)},
-      {id: 3, title: 'Titulo', description: Math.random().toString(36).substring(7)}];
-
-    this.boards[0].cardGroups.push({id: 1, name: Math.random().toString(36).substring(7), cards: cards});
+  constructor(private http: HttpClient) {
   }
 
-  getKanbanBoardById(id: number): KanbanBoard {
-    return this.boards[id];
+  getBoardsOfGroup(groupId: string): Observable<KanbanBoard[]> {
+    const headers = new HttpHeaders().append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+    this.boards =
+      this.http.get(environment.apiUrl + 'groups/' + groupId + '/boards', {headers: headers}).pipe(map<any, KanbanBoard[]>(result => {
+        return result.boards;
+      }));
+    this.boards.subscribe(result => {
+      console.log(result);
+    });
+    return this.boards;
   }
-
 }
