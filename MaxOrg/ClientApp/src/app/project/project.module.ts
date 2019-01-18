@@ -8,7 +8,7 @@ import {
   MatIconModule, MatInputModule, MatListModule,
   MatMenuModule, MatPaginatorModule, MatProgressBarModule, MatRippleModule,
   MatSidenavModule, MatSortModule, MatTableModule, MatTabsModule,
-  MatToolbarModule, MatGridListModule
+  MatToolbarModule, MatGridListModule, MatProgressSpinnerModule, MatSlideToggleModule
 } from '@angular/material';
 import {ProjectRoutingModule} from './project-routing.module';
 import {DescriptionComponent} from './description/description.component';
@@ -30,6 +30,7 @@ import { DeleteTaskDialogComponent } from './assigned-work/create-task/delete-ta
 import { EditTaskComponent } from './assigned-work/create-task/edit-task/edit-task.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { LayoutModule } from '@angular/cdk/layout';
+import {Ng2GoogleChartsModule} from 'ng2-google-charts';
 
 @NgModule({
   entryComponents: [
@@ -68,7 +69,10 @@ import { LayoutModule } from '@angular/cdk/layout';
     MatTableModule,
     MatSortModule,
     MatGridListModule,
-    LayoutModule
+    LayoutModule,
+    Ng2GoogleChartsModule,
+    MatProgressSpinnerModule,
+    MatSlideToggleModule
   ],
   declarations: [
     ProjectComponent,
@@ -83,7 +87,7 @@ import { LayoutModule } from '@angular/cdk/layout';
     CreateDialogComponent,
     DeleteTaskDialogComponent,
     EditTaskComponent,
-    AdminDashboardComponent
+    AdminDashboardComponent,
   ],
   bootstrap: [
     ProjectComponent

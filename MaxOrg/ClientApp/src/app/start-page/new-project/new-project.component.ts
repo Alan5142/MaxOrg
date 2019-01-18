@@ -27,10 +27,10 @@ export class NewProjectComponent {
 
   createProject(): void {
     this.projectService.createProject({name: this.projectName, members: this.selectedUsers}).subscribe(result => {
-      this.snackBar.open('Creado con exito', 'Ok', {duration: 1000});
+      this.snackBar.open('Creado con exito', 'Ok', {duration: 2500});
     }, error => {
       console.log(error);
-      this.snackBar.open('No se pudo crear :(', 'Ok', {duration: 1000});
+      this.snackBar.open('No se pudo crear :(', 'Ok', {duration: 2500});
     });
     this.dialogRef.close();
   }

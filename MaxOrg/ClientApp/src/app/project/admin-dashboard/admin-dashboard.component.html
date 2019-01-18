@@ -1,17 +1,137 @@
 <div class="grid-container">
   <h1 class="mat-h1">Panel de administrador</h1>
-  <mat-grid-list cols="3" rowHeight="350px">
-    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 2" [rowspan]="1">
-      <mat-card class="dashboard-card">
+  <mat-grid-list cols="3" rowHeight="175px">
+    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 2" [rowspan]="2">
+      <mat-card class="dashboard-card mat-elevation-z3">
         <mat-card-header>
           <mat-card-title>
-            Titulo
+            Tareas terminadas
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
-          <div>Card Content Here</div>
+          <div fxLayout="column" style="overflow-x: auto; overflow-y: hidden">
+            <google-chart style="min-width: 500px; width: 100%;" [data]="pieChartData"></google-chart>
+          </div>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1"
+                   [rowspan]="mediaObserver.isActive('lt-md') ? 2 : 1">
+      <mat-card class="dashboard-card mat-elevation-z3">
+        <mat-card-header>
+          <mat-card-title>
+            % de tareas terminadas
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+          <div fxLayout="column" fxLayoutAlign="center center" class="height-100 width-100">
+            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50" mode="determinate"
+                                  [value]="50"></mat-progress-spinner>
+            <h2 *ngIf="!mediaObserver.isActive('lt-md')">50%</h2>
+            <h1 *ngIf="mediaObserver.isActive('lt-md')">50%</h1>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
+      <mat-card class="dashboard-card mat-elevation-z3">
+        <mat-card-header>
+          <mat-card-title>
+            Tareas restantes
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+          <div>
+            <h1>57</h1>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
+      <mat-card class="dashboard-card mat-elevation-z3">
+        <mat-card-header>
+          <mat-card-title>
+            Espacio usado
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+          <div>
+            <h1>0/500MB</h1>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
+      <mat-card class="dashboard-card mat-elevation-z3">
+        <mat-card-header>
+          <mat-card-title>
+            Numero de miembros
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+          <div>
+            <h1>5 miembros</h1>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
+      <mat-card class="dashboard-card mat-elevation-z3">
+        <mat-card-header>
+          <mat-card-title>
+            Numero de issues (en github)
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+          <div>
+            <h1>35</h1>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="3" [rowspan]="mediaObserver.isActive('lt-md') ? 4 : 2">
+      <mat-card class="dashboard-card mat-elevation-z3">
+        <mat-card-header>
+          <mat-card-title>
+            Opciones
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+          <mat-grid-list [cols]="mediaObserver.isActive('lt-md') ? 1 : 2" rowHeight="175px">
+
+            <mat-grid-tile [colspan]="1" [rowspan]="2">
+              <form fxLayout="column" class="width-100 height-100">
+                <mat-slide-toggle color="primary">Solo lectura</mat-slide-toggle>
+                <mat-form-field>
+                  <input matInput type="text" maxlength="30" placeholder="Nombre del proyecto">
+                  <mat-hint>Longitud máxima de 30 caracteres</mat-hint>
+                </mat-form-field>
+                <button mat-flat-button color="primary">Guardar cambios</button>
+              </form>
+            </mat-grid-tile>
+
+            <mat-grid-tile [colspan]="1" [rowspan]="mediaObserver.isActive('lt-md') ? 2 : 1">
+              <form fxLayout="column">
+                <h2>Ceder administración a otro usuario</h2>
+                <mat-form-field>
+                  <input matInput type="text" placeholder="Nombre de usuario del nuevo administrador">
+                </mat-form-field>
+                <button mat-flat-button color="warn">Ceder administración</button>
+              </form>
+            </mat-grid-tile>
+          </mat-grid-list>
+
+
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+
   </mat-grid-list>
 </div>
