@@ -1,7 +1,7 @@
 <div class="grid-container">
   <h1 class="mat-h1">Panel de administrador</h1>
   <mat-grid-list cols="3" rowHeight="175px">
-    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 2" [rowspan]="2">
+    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 2" [rowspan]="3">
       <mat-card class="dashboard-card mat-elevation-z3">
         <mat-card-header>
           <mat-card-title>
@@ -9,8 +9,39 @@
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
-          <div fxLayout="column" style="overflow-x: auto; overflow-y: hidden">
-            <google-chart style="min-width: 500px; width: 100%;" [data]="pieChartData"></google-chart>
+          <div fxLayout="column" class="height-100" style="overflow-x: auto; overflow-y: hidden">
+            <google-chart #tasksChart
+                          class="chart-style"
+                          [data]="pieChartData"></google-chart>
+          </div>
+          <div>
+            <div fxLayout="row">
+              <mat-form-field style="width: 40%">
+                <mat-select placeholder="Filtrar" value="days">
+                  <mat-option value="days">
+                    Por días
+                  </mat-option>
+                  <mat-option value="weeks">
+                    Por semanas
+                  </mat-option>
+                  <mat-option value="months">
+                    Por meses
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <button mat-icon-button>
+                <mat-icon>first_page</mat-icon>
+              </button>
+              <button mat-icon-button>
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+              <button mat-icon-button>
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+              <button mat-icon-button>
+                <mat-icon>last_page</mat-icon>
+              </button>
+            </div>
           </div>
         </mat-card-content>
       </mat-card>
@@ -30,6 +61,21 @@
                                   [value]="50"></mat-progress-spinner>
             <h2 *ngIf="!mediaObserver.isActive('lt-md')">50%</h2>
             <h1 *ngIf="mediaObserver.isActive('lt-md')">50%</h1>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
+      <mat-card class="dashboard-card mat-elevation-z3">
+        <mat-card-header>
+          <mat-card-title>
+            Tareas completadas
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+          <div>
+            <h1>57</h1>
           </div>
         </mat-card-content>
       </mat-card>
@@ -95,7 +141,7 @@
       </mat-card>
     </mat-grid-tile>
 
-    <mat-grid-tile [colspan]="3" [rowspan]="mediaObserver.isActive('lt-md') ? 4 : 2">
+    <mat-grid-tile [colspan]="3" [rowspan]="mediaObserver.isActive('lt-md') ? 4 : 3">
       <mat-card class="dashboard-card mat-elevation-z3">
         <mat-card-header>
           <mat-card-title>
@@ -103,31 +149,36 @@
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
-          <mat-grid-list [cols]="mediaObserver.isActive('lt-md') ? 1 : 2" rowHeight="175px">
+          <div fxLayout="row" fxLayout.lt-md="column">
+            <form fxFlex="50" fxLayout="column" class="options-container">
+              <div fxFlexAlign="start">
+                <mat-slide-toggle color="primary" style="width: min-content;">Solo lectura</mat-slide-toggle>
+              </div>
+              <p class="text-left">Cambiar nombre</p>
+              <mat-form-field>
+                <input matInput type="text" maxlength="30" placeholder="Nombre del proyecto">
+                <mat-hint>Longitud máxima de 30 caracteres</mat-hint>
+              </mat-form-field>
+              <p class="text-left">Agregar usuarios</p>
+              <mat-form-field>
+                <textarea matInput cdkTextareaAutosize placeholder="Nombre de usuario"></textarea>
+              </mat-form-field>
+              <p class="text-left">Eliminar usuarios</p>
+              <mat-form-field>
+                <textarea matInput cdkTextareaAutosize placeholder="Nombre de usuario"></textarea>
+              </mat-form-field>
+              <button mat-flat-button color="primary">Guardar cambios</button>
+            </form>
 
-            <mat-grid-tile [colspan]="1" [rowspan]="2">
-              <form fxLayout="column" class="width-100 height-100">
-                <mat-slide-toggle color="primary">Solo lectura</mat-slide-toggle>
-                <mat-form-field>
-                  <input matInput type="text" maxlength="30" placeholder="Nombre del proyecto">
-                  <mat-hint>Longitud máxima de 30 caracteres</mat-hint>
-                </mat-form-field>
-                <button mat-flat-button color="primary">Guardar cambios</button>
-              </form>
-            </mat-grid-tile>
+            <form fxFlex="50" fxLayout="column" class="options-container">
+              <h2>Ceder administración a otro usuario</h2>
+              <mat-form-field>
+                <input matInput type="text" placeholder="Nombre de usuario del nuevo administrador">
+              </mat-form-field>
+              <button mat-flat-button color="warn">Ceder administración</button>
+            </form>
 
-            <mat-grid-tile [colspan]="1" [rowspan]="mediaObserver.isActive('lt-md') ? 2 : 1">
-              <form fxLayout="column">
-                <h2>Ceder administración a otro usuario</h2>
-                <mat-form-field>
-                  <input matInput type="text" placeholder="Nombre de usuario del nuevo administrador">
-                </mat-form-field>
-                <button mat-flat-button color="warn">Ceder administración</button>
-              </form>
-            </mat-grid-tile>
-          </mat-grid-list>
-
-
+          </div>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>

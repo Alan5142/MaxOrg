@@ -254,7 +254,7 @@ namespace MaxOrg.Controllers
                             new Claim(ClaimTypes.Surname, user.Username)
                         }),
                 NotBefore = nowDate,
-                Expires = nowDate.AddHours(1),
+                Expires = nowDate.AddDays(1),
                 Issuer = Configuration["AppSettings:DefaultURL"],
                 Audience = Configuration["AppSettings:Jwt:Audience"],
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -281,7 +281,7 @@ namespace MaxOrg.Controllers
             {
                 Token = Guid.NewGuid().ToString("N"),
                 IssuedAt = nowDate,
-                Expires = nowDate.AddSeconds(30),
+                Expires = nowDate.AddDays(7),
                 UserKey = user.Key
             };
 

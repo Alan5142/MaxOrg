@@ -10,7 +10,7 @@ namespace MaxOrg.Services.Tasks
 {
     public class RemoveExpiredTokens : IScheduledTask
     {
-        public string Schedule => "0 0 * * *";
+        public string Schedule => "0 0 * * 1,3,5,0";
 
         public Task ExecuteAsync(CancellationToken cancellationToken)
         {

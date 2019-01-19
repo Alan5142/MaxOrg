@@ -8,7 +8,7 @@ import {
   MatIconModule, MatInputModule, MatListModule,
   MatMenuModule, MatPaginatorModule, MatProgressBarModule, MatRippleModule,
   MatSidenavModule, MatSortModule, MatTableModule, MatTabsModule,
-  MatToolbarModule, MatGridListModule, MatProgressSpinnerModule, MatSlideToggleModule
+  MatToolbarModule, MatGridListModule, MatProgressSpinnerModule, MatSlideToggleModule, MatSelectModule
 } from '@angular/material';
 import {ProjectRoutingModule} from './project-routing.module';
 import {DescriptionComponent} from './description/description.component';
@@ -72,7 +72,8 @@ import {Ng2GoogleChartsModule} from 'ng2-google-charts';
     LayoutModule,
     Ng2GoogleChartsModule,
     MatProgressSpinnerModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatSelectModule
   ],
   declarations: [
     ProjectComponent,

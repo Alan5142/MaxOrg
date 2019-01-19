@@ -1,23 +1,34 @@
-import { Component } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {MediaObserver} from '@angular/flex-layout';
+import {ChartSelectEvent, GoogleChartComponent} from 'ng2-google-charts';
 
 @Component({
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.scss'],
 })
-export class AdminDashboardComponent {
-  pieChartData =  {
+export class AdminDashboardComponent implements OnInit {
+
+  @ViewChild('tasksChart') tasksChart: GoogleChartComponent;
+
+  pieChartData = {
     chartType: 'LineChart',
     dataTable: [
       ['Intervalo', 'Tareas'],
-      ['24/12/2018-30/12/2018',  6],
-      ['31/12/2018-06/01/2019',  8],
-      ['07/01/2019-14/01/2019',  3],
-      ['15/01/2019-hoy',  5]
-
+      [new Date(2019, 0, 5), 0],
+      [new Date(2019, 0, 6), 2],
+      [new Date(2019, 0, 7), 5],
+      [new Date(2019, 0, 8), 0],
+      [new Date(2019, 0, 9), 3],
+      [new Date(2019, 0, 10), 2],
+      [new Date(2019, 0, 11), 0]
     ],
-    options: {explorer: {axis: 'horizontal', keepInBounds: true}},
+    options: {explorer: {axis: 'horizontal', keepInBounds: true}, hAxis: {format: ' dd/MM/yyyy'}, height: '1900px'}
   };
-  constructor(public mediaObserver: MediaObserver) {}
+
+  constructor(public mediaObserver: MediaObserver) {
+  }
+
+  ngOnInit() {
+  }
 }
