@@ -31,6 +31,9 @@ import { EditTaskComponent } from './assigned-work/create-task/edit-task/edit-ta
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import {Ng2GoogleChartsModule} from 'ng2-google-charts';
+import { KanbanToolbarComponent } from './kanban-board/kanban-toolbar/kanban-toolbar.component';
+import { BoardComponent } from './kanban-board/board/board.component';
+import { KanbanIndexComponent } from './kanban-board/kanban-index/kanban-index.component';
 
 @NgModule({
   entryComponents: [
@@ -89,6 +92,9 @@ import {Ng2GoogleChartsModule} from 'ng2-google-charts';
     DeleteTaskDialogComponent,
     EditTaskComponent,
     AdminDashboardComponent,
+    KanbanToolbarComponent,
+    BoardComponent,
+    KanbanIndexComponent,
   ],
   bootstrap: [
     ProjectComponent

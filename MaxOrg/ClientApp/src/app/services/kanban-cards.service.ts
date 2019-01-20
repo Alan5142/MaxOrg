@@ -3,14 +3,17 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {map} from 'rxjs/operators';
+import {KanbanBoard, KanbanBoardDescription} from './kanban-cards.service';
 
 export interface KanbanCard {
+  id: string;
   title: string;
   description: string;
   creationDate: Date;
 }
 
 export interface KanbanGroup {
+  id: string;
   name: string;
   cards: KanbanCard[];
   color?: string;
@@ -23,8 +26,13 @@ export interface KanbanGroupMember {
 
 export interface KanbanBoard {
   name: string;
-  members: KanbanCardsService[];
+  members: string[];
   kanbanGroups: KanbanGroup[];
+}
+
+export interface KanbanBoardDescription {
+  id: string;
+  name: string;
 }
 
 @Injectable({
@@ -32,20 +40,19 @@ export interface KanbanBoard {
 })
 export class KanbanCardsService {
 
-  boards: Observable<KanbanBoard[]>;
-
   constructor(private http: HttpClient) {
   }
 
-  getBoardsOfGroup(groupId: string): Observable<KanbanBoard[]> {
+  getBoardsOfGroup(groupId: string): Observable<KanbanBoardDescription[]> {
     const headers = new HttpHeaders().append('Authorization', 'Bearer ' + localStorage.getItem('token'));
-    this.boards =
-      this.http.get(environment.apiUrl + 'groups/' + groupId + '/boards', {headers: headers}).pipe(map<any, KanbanBoard[]>(result => {
-        return result.boards;
-      }));
-    this.boards.subscribe(result => {
-      console.log(result);
-    });
-    return this.boards;
+    return this.http.get(environment.apiUrl + 'groups/' + groupId + '/boards',
+      {headers: headers}).pipe(map<any, KanbanBoardDescription[]>(result => {
+      return result.boards;
+    }));
+  }
+
+  getBoardData(groupId: string, boardId: string): Observable<KanbanBoard> {
+    const headers = new HttpHeaders().append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+    return this.http.get<KanbanBoard>(environment.apiUrl + 'groups/' + groupId + '/boards/' + boardId, {headers: headers});
   }
 }

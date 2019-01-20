@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
 
 namespace MaxOrg.Controllers
@@ -144,7 +143,7 @@ namespace MaxOrg.Controllers
             {
                 return NotFound();
             }
-            // send only names
+            // send only names and ids
 
             return Ok(new
             {
@@ -154,12 +153,18 @@ namespace MaxOrg.Controllers
         }
 
         [HttpGet("{groupId}/boards/{boardId}")]
-        public async Task<IActionResult> GetBoardWithName(string groupId, string boardId)
+        public async Task<IActionResult> GetBoardWithId(string groupId, string boardId)
         {
-            var kanbanBoard = (await (from g in m_database.Query<Group>()
-                                     from kb in g.KanbanBoards
-                                     where g.Key == groupId && kb.Members.Contains(HttpContext.User.Identity.Name) && kb.Id == boardId
-                                     select g).FirstOrDefaultAsync()).KanbanBoards.FirstOrDefault();
+            var boards = await (from g in m_database.Query<Group>()
+                                from kb in g.KanbanBoards
+                                where g.Key == groupId && kb.Members.Contains(HttpContext.User.Identity.Name) && kb.Id == boardId
+                                select g).FirstOrDefaultAsync();
+            if (boards == null)
+            {
+                return NotFound();
+            }
+            var kanbanBoard = boards.KanbanBoards.FirstOrDefault();
+
             if (kanbanBoard == null)
             {
                 return NotFound();
