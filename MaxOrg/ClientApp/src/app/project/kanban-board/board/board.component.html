@@ -1,24 +1,30 @@
-<div cdkDropListGroup class="board">
+<div *ngIf="groups | async;else loading">
+  <div cdkDropListGroup class="board">
 
-  <div class="card-list mat-elevation-z5 card-holder" ngClass="" ngClass.lt-md="card-mobile"
-       *ngFor="let group of groups | async">
 
-    <h2 cdkDragHandle class="mat-h2">{{group.name}}</h2>
+    <div class="card-list mat-elevation-z5 card-holder" ngClass="" ngClass.lt-md="card-mobile"
+         *ngFor="let group of groups | async">
 
-    <div class="card-list-content"
-         cdkDropList
-         [id]="group.id"
-         [cdkDropListData]="group.cards"
-         (cdkDropListDropped)="onTaskDrop($event)" style="background-color: cornflowerblue;">
-      <mat-card style="margin: 2%;" *ngFor="let task of group.cards" cdkDrag>
+      <h2 cdkDragHandle class="mat-h2">{{group.name}}</h2>
 
-        <mat-card-content>
-          <h2>{{task.title}}</h2>
-          {{task.description}}
-        </mat-card-content>
-      </mat-card>
+      <div class="card-list-content"
+           cdkDropList
+           [id]="group.id"
+           [cdkDropListData]="group.cards"
+           (cdkDropListDropped)="onTaskDrop($event)" style="background-color: cornflowerblue;">
+        <mat-card style="margin: 2%;" *ngFor="let task of group.cards" cdkDrag>
+
+          <mat-card-content>
+            <h2>{{task.title}}</h2>
+            {{task.description}}
+          </mat-card-content>
+        </mat-card>
+      </div>
+
     </div>
-
   </div>
-
 </div>
+
+<ng-template #loading>
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</ng-template>
