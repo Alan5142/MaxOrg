@@ -16,13 +16,19 @@
 
   <mat-divider></mat-divider>
 
-  <cdk-virtual-scroll-viewport #scrollViewPort itemSize="19" class="height-100" fxlayout="column" fxLayoutAlign="end center">
-      <div *cdkVirtualFor="let item of items" class="width-100" fxFlexAlign="end">{{item}}</div>
+  <cdk-virtual-scroll-viewport #scrollViewPort itemSize="61" class="height-100">
+    <div class="chat-view">
+      <div fxLayout="column" *cdkVirtualFor="let item of items;
+                                             let odd = odd;" class="width-100">
+        <app-chat-message class="chat-element" [selfMessage]="odd" message="{{item}}"></app-chat-message>
+        <!--<p class="chat-element" fxFlexAlign="end">{{item}}</p>-->
+      </div>
+    </div>
   </cdk-virtual-scroll-viewport>
 
   <mat-form-field fxFlexAlign="end" appearance="outline" class="width-100">
     <textarea matInput cdkTextareaAutosize placeholder="mensaje"></textarea>
-    <button matSuffix mat-fab fxFlexAlign="end" (click)="scrollViewPort.scrollToIndex(500)">
+    <button matSuffix mat-fab fxFlexAlign="top">
       <mat-icon>message</mat-icon>
     </button>
   </mat-form-field>

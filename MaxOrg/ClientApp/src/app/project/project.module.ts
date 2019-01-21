@@ -34,6 +34,7 @@ import {Ng2GoogleChartsModule} from 'ng2-google-charts';
 import { KanbanToolbarComponent } from './kanban-board/kanban-toolbar/kanban-toolbar.component';
 import { BoardComponent } from './kanban-board/board/board.component';
 import { KanbanIndexComponent } from './kanban-board/kanban-index/kanban-index.component';
+import { ChatMessageComponent } from './messages/chat/chat-message/chat-message.component';
 
 @NgModule({
   entryComponents: [
@@ -95,6 +96,7 @@ import { KanbanIndexComponent } from './kanban-board/kanban-index/kanban-index.c
     KanbanToolbarComponent,
     BoardComponent,
     KanbanIndexComponent,
+    ChatMessageComponent,
   ],
   bootstrap: [
     ProjectComponent
