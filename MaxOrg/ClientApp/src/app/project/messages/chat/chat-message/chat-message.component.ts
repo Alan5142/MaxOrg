@@ -8,9 +8,11 @@ import {Component, Input, OnInit} from '@angular/core';
 export class ChatMessageComponent implements OnInit {
   @Input() sender: string;
   @Input() message: string;
-  @Input() selfMessage: boolean;
+  // TODO eliminar
+  @Input() selfMessage: boolean = Math.random() >= 0.5;
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
   }

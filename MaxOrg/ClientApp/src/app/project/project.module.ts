@@ -35,6 +35,7 @@ import { KanbanToolbarComponent } from './kanban-board/kanban-toolbar/kanban-too
 import { BoardComponent } from './kanban-board/board/board.component';
 import { KanbanIndexComponent } from './kanban-board/kanban-index/kanban-index.component';
 import { ChatMessageComponent } from './messages/chat/chat-message/chat-message.component';
+import {VirtualScrollerModule} from 'ngx-virtual-scroller';
 
 @NgModule({
   entryComponents: [
@@ -77,7 +78,8 @@ import { ChatMessageComponent } from './messages/chat/chat-message/chat-message.
     Ng2GoogleChartsModule,
     MatProgressSpinnerModule,
     MatSlideToggleModule,
-    MatSelectModule
+    MatSelectModule,
+    VirtualScrollerModule
   ],
   declarations: [
     ProjectComponent,

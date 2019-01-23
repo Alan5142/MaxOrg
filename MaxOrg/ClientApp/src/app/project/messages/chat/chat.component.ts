@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {MediaObserver} from '@angular/flex-layout';
 import {Location} from '@angular/common';
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
+import {VirtualScrollerComponent} from 'ngx-virtual-scroller';
 
 @Component({
   selector: 'app-chat',
@@ -10,16 +10,16 @@ import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 })
 export class ChatComponent implements OnInit, AfterViewInit {
   @Input() userId: number;
-  @ViewChild('scrollViewPort') scrollViewPort: CdkVirtualScrollViewport;
+  @ViewChild('scroll') virtualScroll: VirtualScrollerComponent;
 
-  public items = Array.from({length: 10000}).map((_, i) => `Item #${i}`);
+  public items = Array.from({length: 100}).map((_, i) => `Item #${i}`);
 
   constructor(public mediaObserver: MediaObserver, public location: Location) {
   }
 
   ngOnInit() {
     setTimeout(() => {
-      this.scrollViewPort.scrollToIndex(this.items.length, 'instant');
+      this.virtualScroll.scrollToIndex(this.items.length - 1, true, 0, 0);
     }, 1);
   }
 
