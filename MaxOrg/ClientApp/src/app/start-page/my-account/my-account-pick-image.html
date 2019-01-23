@@ -7,5 +7,5 @@
     <span mat-line>Del dispositivo</span>
     <span mat-line>Sube una imágen</span>
   </a>
-  <input id="fileToUpload" type="file" hidden="hidden" accept="image/*">
+  <input id="fileToUpload" type="file" hidden="hidden" accept="image/*" (change)="onFileChanged($event)">
 </mat-nav-list>

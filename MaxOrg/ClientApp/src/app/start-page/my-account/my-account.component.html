@@ -2,7 +2,7 @@
   <h1 i18n class="text-center">Mi cuenta</h1>
 
   <div fxLayout="row" fxLayoutAlign="center stretch">
-    <img ngClass="image" ngClass.xs="image-small" src='https://material.angular.io/assets/img/examples/shiba1.jpg'>
+    <img ngClass="image" ngClass.xs="image-small" [src]="fileData == null ? 'https://material.angular.io/assets/img/examples/shiba1.jpg' : fileData">
     <button mat-icon-button fxFlexAlign="end" (click)="selectImage()">
       <mat-icon>edit</mat-icon>
     </button>
