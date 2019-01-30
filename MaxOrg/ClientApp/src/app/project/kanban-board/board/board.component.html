@@ -13,10 +13,9 @@
            [cdkDropListData]="group.cards"
            (cdkDropListDropped)="onTaskDrop($event)" style="background-color: cornflowerblue;">
         <mat-card style="margin: 2%;" *ngFor="let task of group.cards" cdkDrag>
-
           <mat-card-content>
             <h2>{{task.title}}</h2>
-            {{task.description}}
+            <p>{{task.description}}</p>
           </mat-card-content>
         </mat-card>
       </div>
@@ -24,6 +23,10 @@
     </div>
   </div>
 </div>
+
+<app-context-menu #contextMenu>
+  <button mat-button>Hola mundo</button>
+</app-context-menu>
 
 <ng-template #loading>
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>

@@ -37,6 +37,7 @@ import { KanbanIndexComponent } from './kanban-board/kanban-index/kanban-index.c
 import { ChatMessageComponent } from './messages/chat/chat-message/chat-message.component';
 import {VirtualScrollerModule} from 'ngx-virtual-scroller';
 import { CodeComponent } from './code/code.component';
+import {CommonComponentsModule} from '../common-components/common-components.module';
 
 @NgModule({
   entryComponents: [
@@ -82,7 +83,8 @@ import { CodeComponent } from './code/code.component';
     MatSelectModule,
     VirtualScrollerModule,
     MatTreeModule,
-    MatIconModule
+    MatIconModule,
+    CommonComponentsModule
   ],
   declarations: [
     ProjectComponent,
