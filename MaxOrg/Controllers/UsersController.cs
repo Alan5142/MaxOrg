@@ -33,11 +33,15 @@ namespace MaxOrg.Controllers
         }
 
         /// <summary>
-        /// Get a list of users, optionally filtered by name and sorted
+        /// Obtiene una lista de todos los usuarios
         /// </summary>
+        /// <remarks>
+        /// Se puede filtrar por nombres que contengan ciertas letras, pedir los nombres de manera ordenada,
+        /// pedir un limite, paginar con base en un limite, por email y 
+        /// </remarks>
         /// <returns>Ok if </returns>
         [HttpGet]
-        public IActionResult Get([FromQuery] UsersQueryOptions options)
+        public IActionResult GetAllUsers([FromQuery] UsersQueryOptions options)
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
@@ -86,7 +90,7 @@ namespace MaxOrg.Controllers
         }
 
         /// <summary>
-        /// Create a new user
+        /// Crea un nuevo usuario
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>

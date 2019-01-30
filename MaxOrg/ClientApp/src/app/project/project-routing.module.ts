@@ -8,6 +8,7 @@ import {AssignedWorkComponent} from './assigned-work/assigned-work.component';
 import {AdminDashboardComponent} from './admin-dashboard/admin-dashboard.component';
 import {BoardComponent} from './kanban-board/board/board.component';
 import {KanbanIndexComponent} from './kanban-board/kanban-index/kanban-index.component';
+import {CodeComponent} from './code/code.component';
 
 const routes: Routes = [
   {
@@ -21,7 +22,8 @@ const routes: Routes = [
       },
       {path: 'messages', component: MessagesComponent},
       {path: 'assignedWork', component: AssignedWorkComponent},
-      {path: 'dashboard', component: AdminDashboardComponent}
+      {path: 'dashboard', component: AdminDashboardComponent},
+      {path: 'code', component: CodeComponent}
     ]
   }
 ];

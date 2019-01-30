@@ -1,0 +1,20 @@
+<h1>Código</h1>
+<div class="no-select" ngClass="code-container" ngClass.lt-md="code-container-mobile">
+  <mat-card style="min-height: 300px;">
+    <mat-toolbar color="primary">
+      Nombre del repositorio
+    </mat-toolbar>
+    <mat-card-content>
+      <mat-list>
+        <mat-list-item matRipple *ngFor="let item of items">
+          <mat-icon *ngIf="item.isFolder">
+            folder
+          </mat-icon>
+          <mat-icon *ngIf="!item.isFolder" svgIcon="file">
+          </mat-icon>
+          {{item.name}}
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+</div>

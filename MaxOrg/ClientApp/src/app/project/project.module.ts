@@ -8,7 +8,7 @@ import {
   MatIconModule, MatInputModule, MatListModule,
   MatMenuModule, MatPaginatorModule, MatProgressBarModule, MatRippleModule,
   MatSidenavModule, MatSortModule, MatTableModule, MatTabsModule,
-  MatToolbarModule, MatGridListModule, MatProgressSpinnerModule, MatSlideToggleModule, MatSelectModule
+  MatToolbarModule, MatGridListModule, MatProgressSpinnerModule, MatSlideToggleModule, MatSelectModule, GestureConfig, MatTreeModule
 } from '@angular/material';
 import {ProjectRoutingModule} from './project-routing.module';
 import {DescriptionComponent} from './description/description.component';
@@ -36,6 +36,7 @@ import { BoardComponent } from './kanban-board/board/board.component';
 import { KanbanIndexComponent } from './kanban-board/kanban-index/kanban-index.component';
 import { ChatMessageComponent } from './messages/chat/chat-message/chat-message.component';
 import {VirtualScrollerModule} from 'ngx-virtual-scroller';
+import { CodeComponent } from './code/code.component';
 
 @NgModule({
   entryComponents: [
@@ -79,7 +80,9 @@ import {VirtualScrollerModule} from 'ngx-virtual-scroller';
     MatProgressSpinnerModule,
     MatSlideToggleModule,
     MatSelectModule,
-    VirtualScrollerModule
+    VirtualScrollerModule,
+    MatTreeModule,
+    MatIconModule
   ],
   declarations: [
     ProjectComponent,
@@ -99,14 +102,12 @@ import {VirtualScrollerModule} from 'ngx-virtual-scroller';
     BoardComponent,
     KanbanIndexComponent,
     ChatMessageComponent,
+    CodeComponent,
   ],
   bootstrap: [
     ProjectComponent
   ],
-  providers: [{
-    provide: HAMMER_GESTURE_CONFIG,
-    useClass: HammerGestureConfig
-  }
+  providers: [{provide: HAMMER_GESTURE_CONFIG, useClass: GestureConfig}
   ]
 })
 export class ProjectModule {
