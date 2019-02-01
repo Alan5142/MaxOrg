@@ -8,7 +8,8 @@ import {
   MatIconModule,
   MatMenuModule,
   MatSidenavModule,
-  MatToolbarModule
+  MatToolbarModule,
+  MatDialogModule
 } from '@angular/material';
 import {ProjectRoutingModule} from './project-routing.module';
 import {DescriptionComponent} from './description/description.component';
@@ -16,10 +17,12 @@ import { NavbarComponent } from './navbar/navbar.component';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import { OrgChartComponent } from './org-chart/org-chart.component';
 import { TreeComponent } from './org-chart/tree/tree.component';
+import { GroupCardComponent } from './org-chart/group-card/group-card.component';
 
 @NgModule({
   entryComponents: [
-    ProjectComponent
+    ProjectComponent,
+    GroupCardComponent
   ],
   imports: [
     CommonModule,
@@ -31,14 +34,16 @@ import { TreeComponent } from './org-chart/tree/tree.component';
     MatMenuModule,
     MatDividerModule,
     MatToolbarModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    MatDialogModule
   ],
   declarations: [
     ProjectComponent,
     DescriptionComponent,
     NavbarComponent,
     OrgChartComponent,
-    TreeComponent
+    TreeComponent,
+    GroupCardComponent
   ],
   bootstrap: [
     ProjectComponent

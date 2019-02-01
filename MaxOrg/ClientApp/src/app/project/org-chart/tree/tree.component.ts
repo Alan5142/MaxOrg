@@ -1,4 +1,6 @@
 import { Component, OnInit,Input } from '@angular/core';
+import { MatDialog } from '@angular/material';
+import { GroupCardComponent } from '../group-card/group-card.component';
 
 @Component({
   selector: 'app-tree',
@@ -7,10 +9,18 @@ import { Component, OnInit,Input } from '@angular/core';
 })
 export class TreeComponent implements OnInit {
 
-  constructor() { }
+  constructor(public dialog: MatDialog) {}  
   ngOnInit() {
   }
+  openDialog(group): void {
+    const dialogRef = this.dialog.open(GroupCardComponent, {
+      width: '50%',
+      minWidth:'300px',
+      data: {name: group}
+    });
+  }
+ 
   @Input() treeData:[];
   @Input() admin:boolean;
-  user: any={admin:"true",memberOf:"MaxOrg"};
+  user: any={admin:"true",memberOf:"trabajo"};
 }
