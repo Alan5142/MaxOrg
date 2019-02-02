@@ -38,6 +38,9 @@ import { ChatMessageComponent } from './messages/chat/chat-message/chat-message.
 import {VirtualScrollerModule} from 'ngx-virtual-scroller';
 import { CodeComponent } from './code/code.component';
 import {CommonComponentsModule} from '../common-components/common-components.module';
+import { OrgChartComponent } from './org-chart/org-chart.component';
+import { TreeComponent } from './org-chart/tree/tree.component';
+import { GroupCardComponent } from './org-chart/group-card/group-card.component';
 
 @NgModule({
   entryComponents: [
@@ -45,7 +48,8 @@ import {CommonComponentsModule} from '../common-components/common-components.mod
     AssignWorkComponent,
     CreateDialogComponent,
     DeleteTaskDialogComponent,
-    EditTaskComponent
+    EditTaskComponent,
+    GroupCardComponent
   ],
   imports: [
     CommonModule,
@@ -105,6 +109,9 @@ import {CommonComponentsModule} from '../common-components/common-components.mod
     KanbanIndexComponent,
     ChatMessageComponent,
     CodeComponent,
+    OrgChartComponent,
+    TreeComponent,
+    GroupCardComponent
   ],
   bootstrap: [
     ProjectComponent
