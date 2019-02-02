@@ -1,6 +1,7 @@
-import {NgModule} from '@angular/core';
-import {Routes, RouterModule, PreloadAllModules} from '@angular/router';
+import {InjectionToken, NgModule} from '@angular/core';
+import {Routes, RouterModule, PreloadAllModules, ActivatedRouteSnapshot} from '@angular/router';
 import {IsLoggedInGuard} from './services/guards/is-logged-in.guard';
+import {AppComponent} from './app.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'start', pathMatch: 'full'},
@@ -10,7 +11,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, {preloadingStrategy: PreloadAllModules})],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AppRoutingModule {
 }
