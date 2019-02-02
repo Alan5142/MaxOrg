@@ -1,0 +1,52 @@
+.chat-message-common {
+  margin-bottom: 10px;
+}
+
+.other-message {
+  float: left;
+  min-height: 50px;
+  min-width: 100px;
+  max-width: 250px;
+  position: relative;
+  background: #dbdbdb;
+  border-radius: .4em;
+}
+
+.other-message:after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border: 1em solid transparent;
+  border-right-color: #dbdbdb;
+  border-left: 0;
+  border-top: 0;
+  margin-top: -1em;
+  margin-left: -1em;
+}
+
+.self-message {
+  float: right;
+  min-width: 100px;
+  max-width: 250px;
+  position: relative;
+  background: #c9ffbf;
+  border-radius: .4em;
+}
+
+.self-message:after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border: 1em solid transparent;
+  border-left-color: #c9ffbf;
+  border-right: 0;
+  border-top: 0;
+  margin-top: -0.5em;
+  margin-right: -1em;
+}

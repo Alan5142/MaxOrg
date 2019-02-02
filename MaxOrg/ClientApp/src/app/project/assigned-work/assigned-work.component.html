@@ -1,0 +1,63 @@
+<div (swipeleft)="swipe($event.type)" (swiperight)="swipe($event.type)" class="height-100">
+  <mat-tab-group #tabGroup [selectedIndex]="selected">
+    <mat-tab label="Asignación de trabajos">
+      <h4>Grupos</h4>
+      <mat-divider></mat-divider>
+      <div ngClass.gt-md="group-members-container" ngClass="">
+        <mat-accordion>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title class="text-bold">
+                Nombre de grupo
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-accordion class="assigned-task-container">
+              <mat-expansion-panel class="assigned-task">
+                <mat-expansion-panel-header class="text-bold">
+                  Nombre de tarea
+                </mat-expansion-panel-header>
+                <div class="width-100" fxLayout="column" fxLayout.gt-md="row">
+                  <p fxFlex="33">Asignada en: 13/01/2019</p>
+                  <p fxFlex="33">Fecha estimada: 20/01/2019</p>
+                  <p fxFlex="33">
+                    progreso:
+                    <mat-progress-bar mode="determinate" value="40"></mat-progress-bar>
+                    40%
+                  </p>
+                </div>
+              </mat-expansion-panel>
+              <mat-expansion-panel class="assigned-task">
+                <mat-expansion-panel-header class="text-bold">
+                  Nombre de tarea
+                </mat-expansion-panel-header>
+                <div class="width-100" fxLayout="column" fxLayout.gt-md="row">
+                  <p fxFlex="33">Asignada en: 13/01/2019</p>
+                  <p fxFlex="33">Fecha estimada: 20/01/2019</p>
+                  <p fxFlex="33">
+                    progreso:
+                    <mat-checkbox [checked]="true" [disabled]="true"></mat-checkbox>
+                  </p>
+                </div>
+              </mat-expansion-panel>
+            </mat-accordion>
+
+            <div fxLayout="row" fxLayoutAlign="end center" class="width-100">
+              <button mat-icon-button mat-flat-button color="primary" (click)="openAssignTask()">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+
+
+      <h4>Personas</h4>
+      <mat-divider></mat-divider>
+    </mat-tab>
+    <mat-tab label="Lista de trabajos">
+      <app-create-task></app-create-task>
+    </mat-tab>
+  </mat-tab-group>
+
+</div>

@@ -1,0 +1,14 @@
+.code-container {
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
+.code-container-mobile {
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+mat-card > mat-toolbar {
+  margin: -16px 0 0 -16px;
+  width: calc(100% + 32px);
+}

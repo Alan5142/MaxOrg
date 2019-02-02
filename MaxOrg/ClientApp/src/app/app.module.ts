@@ -1,20 +1,25 @@
-import {BrowserModule} from '@angular/platform-browser';
+import {BrowserModule, HAMMER_GESTURE_CONFIG} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {MatInputModule, MatToolbarModule} from '@angular/material';
+import {GestureConfig, MatInputModule, MatToolbarModule} from '@angular/material';
 import {MatButtonModule} from '@angular/material';
 import {MatDialogModule} from '@angular/material';
 import {MatFormFieldModule} from '@angular/material';
 import {HttpClientModule} from '@angular/common/http';
 import {FlexLayoutModule} from '@angular/flex-layout';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {ServicesModule} from './services/services.module';
 
 @NgModule({
   declarations: [
     AppComponent
+    
+  ],
+  entryComponents: [
+    
   ],
   imports: [
     BrowserModule,
@@ -27,9 +32,13 @@ import {FormsModule} from '@angular/forms';
     MatInputModule,
     HttpClientModule,
     FlexLayoutModule,
-    FormsModule
+    ServicesModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
-  providers: [],
+  providers: [
+    {provide: HAMMER_GESTURE_CONFIG, useClass: GestureConfig}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

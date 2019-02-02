@@ -1,0 +1,113 @@
+<div fxLayout="column" fxLayoutAlign="center center">
+  <h1 class="text-center">Registrarse</h1>
+  <h3 class="text-center">Es muy sencillo, solo llena los siguientes campos</h3>
+  <mat-vertical-stepper #stepper [linear]="true">
+    <mat-step [stepControl]="requiredInformation" label="Datos básicos" i18n-label>
+      <form id="requiredInformation" [formGroup]="requiredInformation">
+        <div fxLayout="column" fxLayoutAlign="center center">
+          <mat-form-field>
+            <input #username
+                   matInput
+                   type="text"
+                   placeholder="Nombre de usuario"
+                   formControlName="username"
+                   i18n-placeholder>
+            <mat-hint *ngIf="username.value === ''" i18n>Debe ser unico</mat-hint>
+            <mat-error *ngIf="requiredInformation.controls.username.errors?.required">No puede estar vacio</mat-error>
+            <mat-error *ngIf="requiredInformation.controls.username.errors?.minlength && !requiredInformation.controls.username.errors?.required">
+              El nombre de usuario debe tener una longitud minima de 7 letras
+            </mat-error>
+            <mat-error *ngIf="requiredInformation.controls.username.errors?.usernameexists">El usuario ya existe
+            </mat-error>
+            <mat-icon matSuffix *ngIf="requiredInformation.controls.username.valid">done</mat-icon>
+            <mat-spinner matSuffix [diameter]="20" *ngIf="requiredInformation.get('username').pending"></mat-spinner>
+          </mat-form-field>
+          
+          <mat-form-field>
+            <input id="email"
+                   matInput
+                   type="email"
+                   placeholder="Correo electronico"
+                   formControlName="email">
+            <mat-error *ngIf="requiredInformation.controls.email.errors?.pattern">Correo electronico invalido
+            </mat-error>
+            <mat-error *ngIf="requiredInformation.controls.email.errors?.required">No puede estar vacio</mat-error>
+            <mat-error *ngIf="requiredInformation.controls.email.errors?.emailexists">El email ya existe</mat-error>
+            <mat-spinner matSuffix [diameter]="20" *ngIf="requiredInformation.get('email').pending"></mat-spinner>
+            <mat-icon matSuffix *ngIf="requiredInformation.controls.email.valid">done</mat-icon>
+          </mat-form-field>
+          
+          <mat-form-field>
+            <input #password
+                   matInput
+                   type="password"
+                   placeholder="Contraseña"
+                   formControlName="password"
+                   i18n-placeholder
+                   (keyup)="triggerPasswordValidation()">
+            <mat-error *ngIf="requiredInformation.controls.password.errors?.required">No puede estar vacio</mat-error>
+            <mat-error *ngIf="requiredInformation.controls.password.errors?.minlength &&
+                              !requiredInformation.controls.password.errors?.required">Debe tener una
+              longitud minima de
+              8 letras
+            </mat-error>
+          </mat-form-field>
+          
+          <mat-form-field>
+            <input #repeat_password
+                   matInput
+                   type="password"
+                   placeholder="Repetir contraseña"
+                   formControlName="repeat_password"
+                   i18n-placeholder>
+            <mat-error *ngIf="requiredInformation.controls.repeat_password.errors?.required">No puede estar vacio
+            </mat-error>
+            <mat-error *ngIf="requiredInformation.controls.repeat_password.errors?.controlValueEquals">Las contraseñas
+              no coinciden
+            </mat-error>
+          </mat-form-field>
+          
+          <button [disabled]="!requiredInformation.valid" mat-flat-button color="primary" matStepperNext i18n>
+            Continuar
+          </button>
+        </div>
+      </form>
+    </mat-step>
+    <mat-step [stepControl]="optionalInformation" label="Sobre ti" optional>
+      <h3 class="text-center">Esta información es opcional</h3>
+      <form [formGroup]="optionalInformation">
+        <div fxLayout="column" fxLayoutAlign="center center">
+          <mat-form-field>
+            <input matInput type="text" placeholder="Tu nombre" formControlName="realName">
+          </mat-form-field>
+          
+          <mat-form-field fxShow>
+            <input matInput
+                   [matDatepicker]="picker"
+                   placeholder="Fecha de nacimiento"
+                   formControlName="birthday">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker [touchUi]="mediaObserver.isActive('lt-md')" #picker></mat-datepicker>
+          </mat-form-field>
+          
+          <mat-form-field>
+            <textarea matInput placeholder="Descripción" formControlName="description"></textarea>
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Ocupación" formControlName="occupation">
+          </mat-form-field>
+          <button mat-flat-button color="primary" matStepperNext i18n>
+            Continuar
+          </button>
+        </div>
+      </form>
+    </mat-step>
+    <mat-step label="Terminar">
+      <div fxLayout="column" fxLayoutAlign="center center">
+        <h3 class="text-center" i18n>Verifica que la información sea correcta</h3>
+        <p i18n>Puedes cambiar los datos opcionales en "mi cuenta"</p>
+        <button mat-raised-button color="primary" (click)="submitUserData()">Crear cuenta</button>
+      </div>
+    </mat-step>
+  </mat-vertical-stepper>
+</div>

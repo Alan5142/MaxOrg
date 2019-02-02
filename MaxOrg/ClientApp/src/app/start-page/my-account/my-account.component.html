@@ -1,8 +1,8 @@
-<div fxLayout="column" fxLayoutAlign="center center">
-  <h1>Mi cuenta</h1>
+<div ngClass.gt-md='desktop-view' [ngClass.lt-md]="['mobile-view']" fxLayout="column" fxLayoutAlign="center stretch">
+  <h1 i18n class="text-center">Mi cuenta</h1>
 
-  <div fxLayout="row">
-    <img ngClass="image" ngClass.xs="image-small" src='https://material.angular.io/assets/img/examples/shiba1.jpg'>
+  <div fxLayout="row" fxLayoutAlign="center stretch">
+    <img ngClass="image" ngClass.xs="image-small" [src]="fileData == null ? 'https://material.angular.io/assets/img/examples/shiba1.jpg' : fileData">
     <button mat-icon-button fxFlexAlign="end" (click)="selectImage()">
       <mat-icon>edit</mat-icon>
     </button>
@@ -11,15 +11,16 @@
   <mat-divider></mat-divider>
   <form fxLayout="column">
     <mat-form-field>
-      <input matInput type="text" placeholder="Nombre de usuario">
+      <input matInput type="text" placeholder="Nombre de usuario" i18n-placeholder
+             [value]="currentUser === null ? '' : currentUser.username">
     </mat-form-field>
     <mat-form-field>
-      <textarea matInput placeholder="Descripción"></textarea>
+      <textarea cdkTextareaAutosize matInput placeholder="Descripción" i18n-placeholder [value]="currentUser !== null ? currentUser.description : ''"></textarea>
     </mat-form-field>
 
     <mat-form-field>
       <div fxLayout="row">
-        <input matInput type="password" placeholder="contraseña">
+        <input matInput type="password" placeholder="contraseña" i18n-placeholder>
         <button mat-icon-button (click)="passwordChanged = true">
           <mat-icon>edit</mat-icon>
         </button>
@@ -27,18 +28,18 @@
     </mat-form-field>
     <mat-form-field *ngIf="passwordChanged">
       <div fxLayout="row">
-        <input matInput type="password" placeholder="repetir contraseña">
+        <input matInput type="password" placeholder="repetir contraseña" i18n-placeholder>
       </div>
     </mat-form-field>
     <mat-form-field>
 
-      <mat-select placeholder="Sonido de notificaciones">
-        <mat-option value="primary">Todas las prioridades</mat-option>
-        <mat-option value="accent">Media y alta prioridad</mat-option>
-        <mat-option value="warn">Solo alta prioridad</mat-option>
+      <mat-select placeholder="Sonido de notificaciones" i18n-placeholder>
+        <mat-option value="all" i18n>Todas las prioridades</mat-option>
+        <mat-option value="medium-high" i18n>Media y alta prioridad</mat-option>
+        <mat-option value="high-only" i18n>Solo alta prioridad</mat-option>
       </mat-select>
 
     </mat-form-field>
-    <button mat-flat-button color="accent">Guardar cambios</button>
+    <button mat-flat-button color="accent" i18n>Guardar cambios</button>
   </form>
 </div>

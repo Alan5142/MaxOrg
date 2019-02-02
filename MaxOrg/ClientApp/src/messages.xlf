@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="es-MX" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="178aa14d8ee687d41b9be03758b6983fcf628e4e" datatype="html">
+        <source>Iniciar sesión</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/navbar/navbar.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5a2e204d45cab7649d0bbf62006873652497e460" datatype="html">
+        <source>Mis pendientes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/navbar/navbar.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="04e1e35a6224490b098259dc4e478090f129d70c" datatype="html">
+        <source>Opciones</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/navbar/navbar.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="53a858677d8118bc1e6bdf5907b6d213b7e360b2" datatype="html">
+        <source>¿Qué es MaxOrg?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/index/index.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="05764cdad65f13c9592a87ed5267b8445aa52ff4" datatype="html">
+        <source>Caracteristicas</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/index/index.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b670ce342c379210201ae89e87a5f02e097e6188" datatype="html">
+        <source>Nuevo proyecto</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/new-project/new-project.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c9b06444ae13a9f1c8ae759e6a67cc1eeefda545" datatype="html">
+        <source>separados por ;</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/new-project/new-project.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e49ebd3b158b8e144b1ccf6f117e96051372b171" datatype="html">
+        <source>Bienvenido de nuevo, <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br/&gt;"/> [usuario]</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/user-start/user-start.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c4e134ae44a7347e1606d38a71086549ec8e89f4" datatype="html">
+        <source>Crear nuevo proyecto</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/user-start/user-start.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="708508803ce8eaca14f2e7b921f14857008bf00d" datatype="html">
+        <source>Proyectos recientes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/user-start/user-start.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b61385682435462f7a10d0feb44fd1f7138f340e" datatype="html">
+        <source>Actividad reciente</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/user-start/user-start.component.html</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6c50174ef3bc22ed722c0bf30fe8f282d7ea996a" datatype="html">
+        <source>Mi cuenta</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/my-account/my-account.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8e6c661d78dab5d849d750e987c990219f00e1e2" datatype="html">
+        <source>Nombre de usuario</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/my-account/my-account.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b0e611b2bfac70d1af43295307e558cbf9f48e57" datatype="html">
+        <source>Descripción</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/my-account/my-account.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ac1721be1f23492eab07f66d3166edff75f07586" datatype="html">
+        <source>contraseña</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/my-account/my-account.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7e2509fbbbe7ce2ba769d5469982f7d3909b0aa1" datatype="html">
+        <source>repetir contraseña</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/my-account/my-account.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="64fd8cd8a861ef7d3eff2feca71fc3fc8003ca12" datatype="html">
+        <source>Todas las prioridades</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/my-account/my-account.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="745d5e703d064c08ba0cea18deba4d8a042d42f7" datatype="html">
+        <source>Media y alta prioridad</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/my-account/my-account.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b528bbf176337b7648c628d1e2f9cbfbdc1b23d6" datatype="html">
+        <source>Solo alta prioridad</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/my-account/my-account.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1e852d1e4d362e7113f05d9cb8408ca15a73869d" datatype="html">
+        <source>Sonido de notificaciones</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/my-account/my-account.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a213e86356c37e35f13fa4fb6aea485516696e7d" datatype="html">
+        <source>Guardar cambios</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/my-account/my-account.component.html</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cb8c79e9a0dedfb1268fd3b2720cab186a4c21a2" datatype="html">
+        <source>
+    Por hacer
+  </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/start-page/todos/todos.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

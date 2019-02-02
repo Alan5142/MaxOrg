@@ -1,0 +1,121 @@
+<mat-toolbar color="primary" fxLayout="row">
+  <div fxFlex="33">
+    <button mat-icon-button (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <button mat-button routerLink="/start"><h1>MaxOrg</h1></button>
+  </div>
+
+  <div fxFlex fxLayout="row" fxLayoutAlign="end end">
+    <mat-menu #accountMenu="matMenu">
+      <button mat-menu-item routerLink="/start/todos" i18n>Mis pendientes</button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item routerLink="/start/my_account" i18n>Opciones</button>
+    </mat-menu>
+
+    <mat-menu #notificationMenu="matMenu">
+      <div fxLayout="column" style="width: 280px; height: 300px; overflow-x: hidden;">
+        <div *ngFor="let notification of notifications">
+          <div fxLayout="row">
+            <div>
+              <img class="image" src='https://material.angular.io/assets/img/examples/shiba1.jpg'>
+            </div>
+            <button mat-button fxFill>
+              Ha publicado...
+            </button>
+          </div>
+          <mat-divider></mat-divider>
+        </div>
+      </div>
+    </mat-menu>
+
+    <button mat-icon-button [matMenuTriggerFor]="notificationMenu">
+      <mat-icon matBadge="3" matBadgePosition="above after" matBadgeColor="warn">notifications</mat-icon>
+    </button>
+    <div fxFlex="2" fxFlex.gt-md="1"></div>
+    <button mat-icon-button [matMenuTriggerFor]="accountMenu">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+    <div fxFlex="3" fxFlex.gt-md="6"></div>
+  </div>
+</mat-toolbar>
+
+<mat-sidenav-container id="container">
+  <mat-sidenav #sideNav
+               [mode]="mobileQuery.matches ? 'over' : 'side'"
+               [opened]="!mobileQuery.matches" #sidenav>
+    <mat-accordion>
+      <h4 class="text-center" routerLink="/project/{{route.snapshot.paramMap.get('id')}}">[Nombre de proyecto]</h4>
+      <mat-divider></mat-divider>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Proyecto
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <button mat-button>Descripción</button>
+        <br>
+        <button mat-button>Integrantes</button>
+        <br>
+        <button mat-button>Subgrupos</button>
+        <br>
+        <button mat-button>Calendario</button>
+        <br>
+        <button mat-button>Requerimientos</button>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Trabajo
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <button mat-button routerLink="board" (click)="sidenav.toggle(!mobileQuery.matches)">Tablero</button>
+        <br>
+        <button mat-button routerLink="./assignedWork">Asignación de trabajos</button>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title routerLink="./code">
+            Codigo
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <button mat-button>Archivos</button>
+        <br>
+        <button mat-button>Commits</button>
+        <br>
+        <button mat-button>Push</button>
+        <br>
+        <button mat-button>Ramas</button>
+        <br>
+        <button mat-button>Pull request</button>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Tests
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <button mat-button>Estadísticas</button>
+        <br>
+        <button mat-button>Crear test</button>
+        <br>
+        <button mat-button>Test realizados</button>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title routerLink="/project/{{route.snapshot.paramMap.get('id')}}/messages">
+            Mensajes
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <button mat-button>Grupal</button>
+        <br>
+        <button mat-button>Personal</button>
+        <br>
+        <button mat-button>Con administrador</button>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

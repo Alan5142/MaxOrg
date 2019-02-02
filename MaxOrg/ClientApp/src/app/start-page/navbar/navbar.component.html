@@ -1,15 +1,16 @@
 <mat-toolbar color="primary" fxLayout="row">
   <button mat-button routerLink="/"><h1>MaxOrg</h1></button>
   <div fxFlex></div>
-  <button *ngIf="!auth.isUserAuthenticated()" mat-button (click)="displayLoginDialog()">Iniciar sesión</button>
+  <button *ngIf="!userService.isUserLoggedIn()" mat-button (click)="displayLoginDialog()" i18n>Iniciar sesión</button>
 
 
-  <div *ngIf="auth.isUserAuthenticated()">
+  <div *ngIf="userService.isUserLoggedIn()">
 
     <mat-menu #accountMenu="matMenu">
-      <button mat-menu-item routerLink="todos">Mis pendientes</button>
+      <button mat-menu-item routerLink="todos" i18n>Mis pendientes</button>
+      <button mat-menu-item routerLink="my_account" i18n>Opciones</button>
       <mat-divider></mat-divider>
-      <button mat-menu-item routerLink="my_account">Opciones</button>
+      <button mat-menu-item i18n (click)="userService.closeSession()">Cerrar sesión</button>
     </mat-menu>
 
     <mat-menu #notificationMenu="matMenu">

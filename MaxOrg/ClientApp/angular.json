@@ -32,6 +32,35 @@
             "scripts": []
           },
           "configurations": {
+            "en-US": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ],
+              "outputPath": "dist/ClientApp-en-US",
+              "i18nFile": "src/locale/messages-en-US.xlf",
+              "i18nFormat": "xlf",
+              "i18nLocale": "en-US",
+              "i18nMissingTranslation": "error en-US locale"
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -64,6 +93,9 @@
             "browserTarget": "ClientApp:build"
           },
           "configurations": {
+            "en-US": {
+              "browserTarget": "ClientApp:build:en-US"
+            },
             "production": {
               "browserTarget": "ClientApp:build:production"
             }

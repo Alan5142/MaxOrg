@@ -1,0 +1,134 @@
+<!-- Contextual menus -->
+<mat-menu #messages="matMenu">
+  <button mat-menu-item>
+    <mat-icon>group</mat-icon>
+    Nuevo grupo
+  </button>
+  <button mat-menu-item>
+    <mat-icon>message</mat-icon>
+    Nuevo mensaje
+  </button>
+</mat-menu>
+
+<!--Mobile view-->
+<div *ngIf="mediaObserver.isActive('lt-md')" class=" height-100">
+  <div *ngIf="chatId !== null" class="height-100">
+    <div fxFlexFill fxLayout="column">
+      <mat-sidenav-content>
+        <app-chat></app-chat>
+      </mat-sidenav-content>
+    </div>
+  </div>
+  <div *ngIf="chatId === null">
+    <div fxLayout="row" class="width-100">
+      <div fxFlex="10"></div>
+      <h3 fxFlex>Conversaciones</h3>
+      <button mat-icon-button fxFlexAlign="center">
+        <mat-icon [matMenuTriggerFor]="messages">more_vert</mat-icon>
+      </button>
+    </div>
+    <mat-list>
+      <h3 mat-subheader>Con el administrador</h3>
+      <mat-list-item matRipple routerLink="./" [queryParams]="{chatId: 1}">
+        <!-- TODO change image to user image -->
+        <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
+        <h5 class="no-select" mat-line style="font-weight: bold;">Nombre del admin</h5>
+        <p class="no-select" mat-line>Ultimo mensaje</p>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <!-- TODO display group conversations-->
+      <h3 mat-subheader>Grupos</h3>
+      <div>
+        <mat-list-item matRipple>
+          <!-- TODO change image to user image -->
+          <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
+          <h5 class="no-select" mat-line style="font-weight: bold;">Nombre del grupo</h5>
+          <p class="no-select" mat-line>Usuario: Ultimo mensaje</p>
+        </mat-list-item>
+        <mat-list-item matRipple>
+          <!-- TODO change image to user image -->
+          <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
+          <h5 class="no-select" mat-line style="font-weight: bold;">Nombre del grupo</h5>
+          <p class="no-select" mat-line>Usuario: Ultimo mensaje</p>
+        </mat-list-item>
+      </div>
+      <mat-divider></mat-divider>
+      <h3 mat-subheader>Conversaciones</h3>
+      <div>
+        <mat-list-item matRipple>
+          <!-- TODO change image to user image -->
+          <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
+          <h5 class="no-select" mat-line style="font-weight: bold;">Nombre de usuario</h5>
+          <p class="no-select" mat-line>Ultimo mensaje</p>
+        </mat-list-item>
+        <mat-list-item matRipple>
+          <!-- TODO change image to user image -->
+          <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
+          <h5 class="no-select" mat-line style="font-weight: bold;">Nombre de usuario</h5>
+          <p class="no-select" mat-line>Ultimo mensaje</p>
+        </mat-list-item>
+      </div>
+    </mat-list>
+  </div>
+
+</div>
+
+<!-- Desktop view -->
+<div *ngIf="!mediaObserver.isActive('lt-md')">
+  <mat-sidenav-container id="conversations-container">
+    <mat-sidenav mode="side" [opened]="true">
+      <div fxLayout="row" class="width-100">
+        <div fxFlex="10"></div>
+        <h3 fxFlex>Conversaciones</h3>
+        <button mat-icon-button fxFlexAlign="center" [matMenuTriggerFor]="messages">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+      </div>
+      <mat-list>
+        <h3 mat-subheader>Con el administrador</h3>
+        <mat-list-item matRipple routerLink="./" [queryParams]="{chatId: 1}">
+          <!-- TODO change image to user image -->
+          <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
+          <h5 class="no-select" mat-line style="font-weight: bold;">Nombre del admin</h5>
+          <p class="no-select" mat-line>Ultimo mensaje</p>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+        <!-- TODO display group conversations-->
+        <h3 mat-subheader>Grupos</h3>
+        <div>
+          <mat-list-item matRipple>
+            <!-- TODO change image to user image -->
+            <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
+            <h5 class="no-select" mat-line style="font-weight: bold;">Nombre del grupo</h5>
+            <p class="no-select" mat-line>Usuario: Ultimo mensaje</p>
+          </mat-list-item>
+          <mat-list-item matRipple>
+            <!-- TODO change image to user image -->
+            <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
+            <h5 class="no-select" mat-line style="font-weight: bold;">Nombre del grupo</h5>
+            <p class="no-select" mat-line>Usuario: Ultimo mensaje</p>
+          </mat-list-item>
+        </div>
+        <mat-divider></mat-divider>
+        <h3 mat-subheader>Conversaciones</h3>
+        <div>
+          <mat-list-item matRipple>
+            <!-- TODO change image to user image -->
+            <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
+            <h5 class="no-select" mat-line style="font-weight: bold;">Nombre de usuario</h5>
+            <p class="no-select" mat-line>Ultimo mensaje</p>
+          </mat-list-item>
+          <mat-list-item matRipple>
+            <!-- TODO change image to user image -->
+            <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
+            <h5 class="no-select" mat-line style="font-weight: bold;">Nombre de usuario</h5>
+            <p class="no-select" mat-line>Ultimo mensaje</p>
+          </mat-list-item>
+        </div>
+      </mat-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <app-chat *ngIf="chatId !== null"></app-chat>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

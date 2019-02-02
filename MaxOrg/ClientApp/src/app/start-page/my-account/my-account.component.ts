@@ -1,6 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import {MatBottomSheet} from '@angular/material';
+import {Component, Inject, OnInit} from '@angular/core';
+import {MAT_BOTTOM_SHEET_DATA, MatBottomSheet} from '@angular/material';
 import {MatBottomSheetRef} from '@angular/material';
+import {User, UserService} from '../../services/user.service';
 
 @Component({
   selector: 'app-my-account',
@@ -10,15 +11,24 @@ import {MatBottomSheetRef} from '@angular/material';
 export class MyAccountComponent implements OnInit {
 
   passwordChanged = false;
+  currentUser: User | null = null;
+  fileData: string = null;
 
-  constructor(private bottomSheet: MatBottomSheet) {
+  constructor(private bottomSheet: MatBottomSheet, private userService: UserService) {
+    userService.getCurrentUser().subscribe(user => {
+      this.currentUser = user;
+    });
   }
 
   ngOnInit() {
   }
 
   selectImage() {
-    this.bottomSheet.open(MyAccountPickImageComponent);
+    this.bottomSheet.open(MyAccountPickImageComponent).afterDismissed().subscribe(result => {
+      if (result) {
+        this.fileData = result;
+      }
+    });
   }
 }
 
@@ -37,7 +47,19 @@ export class MyAccountPickImageComponent {
 
   openFile(event: MouseEvent): void {
     document.getElementById('fileToUpload').click();
-    this.bottomSheetRef.dismiss();
     event.preventDefault();
+  }
+
+  onFileChanged(event: any) {
+    if (event.target.files && event.target.files.length > 0) {
+      const reader = new FileReader();
+      const file = event.target.files[0];
+      reader.readAsDataURL(file);
+      reader.onloadend = ev => {
+        this.bottomSheetRef.dismiss(reader.result);
+      };
+      return;
+    }
+    this.bottomSheetRef.dismiss();
   }
 }

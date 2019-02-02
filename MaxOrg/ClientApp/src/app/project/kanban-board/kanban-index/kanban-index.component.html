@@ -1,0 +1,23 @@
+<div class="boards-container" *ngIf="boards | async; else loading">
+  <h1 class="mat-h1">Mis tableros</h1>
+  <mat-grid-list [cols]="mediaObserver.isActive('lt-md') ? 1 : 3" rowHeight="175px">
+      <mat-grid-tile *ngFor="let board of boards | async" class="no-select" [colspan]="1" [rowspan]="1">
+        <mat-card matRipple (click)="goToBoard(board.id)" class="board-card mat-elevation-z3">
+          <mat-card-header>
+            <div mat-card-avatar>
+              <mat-icon>dashboard</mat-icon>
+            </div>
+            <mat-card-title>
+              {{board.name}}
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="dashboard-card-content">
+            Pequeña descripción
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+  </mat-grid-list>
+</div>
+<ng-template #loading>
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</ng-template>

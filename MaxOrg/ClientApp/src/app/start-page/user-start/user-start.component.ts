@@ -1,8 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {MatIconRegistry, MatDialog} from '@angular/material';
-import {DomSanitizer} from '@angular/platform-browser';
+import {MatDialog} from '@angular/material';
 import {NewProjectComponent} from '../new-project/new-project.component';
-import {FlexAlignDirective} from '@angular/flex-layout';
+import {MediaObserver} from '@angular/flex-layout';
+import {User, UserService} from '../../services/user.service';
+import {Project, ProjectsService} from '../../services/projects.service';
+import {Observable} from 'rxjs';
+import {Router} from '@angular/router';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-start',
@@ -10,14 +14,20 @@ import {FlexAlignDirective} from '@angular/flex-layout';
   styleUrls: ['./user-start.component.scss']
 })
 export class UserStartComponent implements OnInit {
+  currentUser: User | null = null;
+  projectsView: Observable<Project[]>;
+  projects: Observable<Project[]>;
 
-  projects = [
-    'Usuario/Proyecto1',
-    'Usuario/Proyecto2',
-    'Usuario2/Proyecto3'
-  ];
-
-  constructor(public dialog: MatDialog) {
+  constructor(public dialog: MatDialog,
+              public mediaObserver: MediaObserver,
+              public userService: UserService,
+              private projectsService: ProjectsService,
+              private router: Router) {
+    userService.getCurrentUser().subscribe(user => {
+      this.currentUser = user;
+      this.projects = this.projectsService.getProjects();
+      this.projectsView = this.projects;
+    });
   }
 
   openDialog(): void {
@@ -26,12 +36,24 @@ export class UserStartComponent implements OnInit {
       minWidth: '300px'
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      console.log('The dialog was closed');
+    dialogRef.afterClosed().subscribe(result => {
+      this.projects = this.projectsService.getProjects();
+      this.projectsView = this.projects;
     });
   }
 
   ngOnInit() {
   }
 
+  goToProject(id: string) {
+    this.router.navigate(['/project/', id]);
+  }
+
+  searchContent(content: string) {
+    this.projectsView = this.projects.pipe(map<Project[], Project[]>(projects => {
+      return projects.filter((value, index, array) => {
+        return value.name.toLowerCase().includes(content.toLowerCase());
+      });
+    }));
+  }
 }

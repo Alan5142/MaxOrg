@@ -1,0 +1,43 @@
+<div fxLayout="column" fxLayoutAlign="end stretch" class="height-100">
+  <div>
+    <mat-toolbar>
+      <button *ngIf="mediaObserver.isActive('lt-md')" fxFlexAlign="center" mat-icon-button (click)="location.back()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div fxFlex fxLayout="column" fxLayoutAlign="center stretch">
+        <h3 class="text-center">Nombre</h3>
+      </div>
+      <button fxFlexAlign="center" mat-icon-button>
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <div fxFlex="3"></div>
+    </mat-toolbar>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <virtual-scroller #scroll [items]="items" class="height-100" [enableUnequalChildrenSizes]="true" [bufferAmount]="100">
+
+    <app-chat-message fxLayout="column" *ngFor="let item of scroll.viewPortItems;" class="chat-element chat-view"
+                      message="{{item}}"></app-chat-message>
+
+
+  </virtual-scroller>
+
+  <!--
+  <cdk-virtual-scroll-viewport #scrollViewPort itemSize="61" class="height-100">
+    <div class="chat-view">
+      <div fxLayout="column" *cdkVirtualFor="let item of items;
+                                             let odd = odd;" class="width-100">
+        <app-chat-message class="chat-element" [selfMessage]="odd" message="{{item}}"></app-chat-message>
+      </div>
+    </div>
+  </cdk-virtual-scroll-viewport>
+-->
+  <mat-form-field fxFlexAlign="end" appearance="outline" class="width-100">
+    <textarea matInput cdkTextareaAutosize placeholder="mensaje"></textarea>
+    <button matSuffix mat-fab fxFlexAlign="top">
+      <mat-icon>message</mat-icon>
+    </button>
+  </mat-form-field>
+</div>
