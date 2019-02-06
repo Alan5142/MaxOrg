@@ -10,6 +10,8 @@ import {BoardComponent} from './kanban-board/board/board.component';
 import {KanbanIndexComponent} from './kanban-board/kanban-index/kanban-index.component';
 import {CodeComponent} from './code/code.component';
 import { OrgChartComponent } from './org-chart/org-chart.component';
+import {RequirementsComponent} from './requirements/requirements.component';
+import {MembersComponent} from './members/members.component';
 
 const routes: Routes = [
   {
@@ -25,7 +27,9 @@ const routes: Routes = [
       {path: 'assignedWork', component: AssignedWorkComponent},
       {path: 'dashboard', component: AdminDashboardComponent},
       {path: 'code', component: CodeComponent},
-      {path: 'org-chart', component: OrgChartComponent}
+      {path: 'org-chart', component: OrgChartComponent},
+      {path: 'requirements', component: RequirementsComponent},
+      {path: 'members', component: MembersComponent}
     ]
   }
 ];

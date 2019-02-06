@@ -56,7 +56,9 @@
       <mat-divider></mat-divider>
     </mat-tab>
     <mat-tab label="Lista de trabajos">
-      <app-create-task></app-create-task>
+      <ng-template matTabContent>
+        <app-create-task></app-create-task>
+      </ng-template>
     </mat-tab>
   </mat-tab-group>
 

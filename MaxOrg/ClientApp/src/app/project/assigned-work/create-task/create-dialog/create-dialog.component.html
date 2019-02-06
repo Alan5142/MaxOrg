@@ -7,9 +7,19 @@
     <mat-form-field>
       <textarea matInput cdkTextareaAutosize placeholder="Descripción"></textarea>
     </mat-form-field>
+    <mat-form-field>
+      <input #reqReference matInput type="number" min="0" placeholder="Referencia a requerimiento No.">
+      <mat-hint>Puede estar vacio</mat-hint>
+    </mat-form-field>
+    <mat-form-field *ngIf="reqReference.value !== ''">
+      <input matInput type="number" min="1" max="100" placeholder="Porcentaje">
+      <mat-hint>Este campo puede estar vacio, se repartirá entre las tareas asignadas a ese requerimiento que no tengan
+        porcentaje asignado
+      </mat-hint>
+    </mat-form-field>
   </form>
 </div>
 <div mat-dialog-actions>
-  <button mat-button >Cancelar</button>
-  <button mat-flat-button color="primary" [mat-dialog-close]="" cdkFocusInitial>Crear</button>
+  <button mat-button>Cancelar</button>
+  <button mat-flat-button type="submit" color="primary" [mat-dialog-close]="" cdkFocusInitial>Crear</button>
 </div>

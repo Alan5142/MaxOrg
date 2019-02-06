@@ -61,7 +61,7 @@
         <mat-icon matListIcon>description</mat-icon>
         Descripción
       </mat-list-item>
-      <mat-list-item>
+      <mat-list-item routerLink="members">
         <mat-icon matListIcon>group</mat-icon>
         Integrantes
       </mat-list-item>
@@ -73,7 +73,7 @@
         <mat-icon matListIcon>calendar_today</mat-icon>
         Calendario
       </mat-list-item>
-      <mat-list-item>
+      <mat-list-item routerLink="requirements">
         <mat-icon matListIcon>format_list_numbered</mat-icon>
         Requerimientos
       </mat-list-item>
@@ -116,80 +116,6 @@
         Mensajes
       </mat-list-item>
     </mat-nav-list>
-
-    <!--
-    <mat-accordion>
-
-      <h4 class="text-center" routerLink="/project/{{route.snapshot.paramMap.get('id')}}">[Nombre de proyecto]</h4>
-      <mat-divider></mat-divider>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            Proyecto
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <button mat-button>Descripción</button>
-        <br>
-        <button mat-button>Integrantes</button>
-        <br>
-        <button mat-button>Subgrupos</button>
-        <br>
-        <button mat-button>Calendario</button>
-        <br>
-        <button mat-button>Requerimientos</button>
-      </mat-expansion-panel>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            Trabajo
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <button mat-button routerLink="board" (click)="sidenav.toggle(!mobileQuery.matches)">Tablero</button>
-        <br>
-        <button mat-button routerLink="./assignedWork">Asignación de trabajos</button>
-      </mat-expansion-panel>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title routerLink="./code">
-            Codigo
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <button mat-button>Archivos</button>
-        <br>
-        <button mat-button>Commits</button>
-        <br>
-        <button mat-button>Push</button>
-        <br>
-        <button mat-button>Ramas</button>
-        <br>
-        <button mat-button>Pull request</button>
-      </mat-expansion-panel>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            Tests
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <button mat-button>Estadísticas</button>
-        <br>
-        <button mat-button>Crear test</button>
-        <br>
-        <button mat-button>Test realizados</button>
-      </mat-expansion-panel>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title routerLink="/project/{{route.snapshot.paramMap.get('id')}}/messages">
-            Mensajes
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <button mat-button>Grupal</button>
-        <br>
-        <button mat-button>Personal</button>
-        <br>
-        <button mat-button>Con administrador</button>
-      </mat-expansion-panel>
-    </mat-accordion>
-    -->
   </mat-sidenav>
   <mat-sidenav-content>
     <router-outlet></router-outlet>

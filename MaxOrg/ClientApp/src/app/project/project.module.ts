@@ -41,6 +41,8 @@ import {CommonComponentsModule} from '../common-components/common-components.mod
 import { OrgChartComponent } from './org-chart/org-chart.component';
 import { TreeComponent } from './org-chart/tree/tree.component';
 import { GroupCardComponent } from './org-chart/group-card/group-card.component';
+import { RequirementsComponent } from './requirements/requirements.component';
+import { MembersComponent } from './members/members.component';
 
 @NgModule({
   entryComponents: [
@@ -111,7 +113,9 @@ import { GroupCardComponent } from './org-chart/group-card/group-card.component'
     CodeComponent,
     OrgChartComponent,
     TreeComponent,
-    GroupCardComponent
+    GroupCardComponent,
+    RequirementsComponent,
+    MembersComponent
   ],
   bootstrap: [
     ProjectComponent

@@ -102,6 +102,16 @@ namespace MaxOrg
                 settings.ClusterMode = true;
                 settings.Serialization.SerializeEnumAsInteger = false;
             });
+
+            // init all :) 
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                CreateCollection(db, "Group");
+                CreateCollection(db, "RefreshToken");
+                CreateCollection(db, "User");
+                CreateCollection(db, "Subgroup", CollectionType.Edge);
+                CreateCollection(db, "UsersInGroup", CollectionType.Edge);
+            }
             services.AddSingleton(ArangoDatabase.CreateWithSetting());
 
             services.AddSingleton<IScheduledTask, RemoveExpiredTokens>();
@@ -162,6 +172,18 @@ namespace MaxOrg
             {
                 routes.MapHub<NotificationHub>("/notificationHub");
             });
+        }
+
+        void CreateCollection(IArangoDatabase db, string collectionName, CollectionType type = CollectionType.Document)
+        {
+            try
+            {
+                db.CreateCollection(collectionName, type: type);
+            }
+            catch (Exception)
+            {
+                // ignore, it already exists
+            }
         }
     }
 }

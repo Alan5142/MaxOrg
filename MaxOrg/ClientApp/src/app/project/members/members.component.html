@@ -1,0 +1,23 @@
+<h1>Integrantes</h1>
+<div class="members-table-container">
+  <table mat-table [dataSource]="members" ngClass="" ngClass.gt-md="table-left" class="mat-elevation-z8 width-100">
+    <ng-container matColumnDef="name">
+
+      <th mat-header-cell *matHeaderCellDef> Nombre de usuario</th>
+      <td mat-cell *matCellDef="let element">
+        <mat-icon class="no-select" *ngIf="element.isAdmin">
+          account_circle
+        </mat-icon>
+        {{element.name}}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="addedSince">
+      <th mat-header-cell *matHeaderCellDef>Añadido</th>
+      <td mat-cell *matCellDef="let element">{{element.addedSince | date: 'dd/MM/yyyy'}}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
