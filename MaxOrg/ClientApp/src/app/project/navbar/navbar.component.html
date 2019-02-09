@@ -41,7 +41,7 @@
 </mat-toolbar>
 
 <mat-sidenav-container id="container">
-  <mat-sidenav #sideNav
+  <mat-sidenav ngClass="sidenav" ngClass.lt-md="sidenav-mobile" #sideNav
                [mode]="mobileQuery.matches ? 'over' : 'side'"
                [opened]="!mobileQuery.matches" #sidenav>
     <mat-nav-list class="no-select" (click)="sidenav.toggle(!mobileQuery.matches)">
@@ -57,7 +57,7 @@
         Panel de administrador
       </mat-list-item>
 
-      <mat-list-item>
+      <mat-list-item routerLink="description">
         <mat-icon matListIcon>description</mat-icon>
         Descripción
       </mat-list-item>

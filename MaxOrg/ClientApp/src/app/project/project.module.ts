@@ -43,6 +43,7 @@ import { TreeComponent } from './org-chart/tree/tree.component';
 import { GroupCardComponent } from './org-chart/group-card/group-card.component';
 import { RequirementsComponent } from './requirements/requirements.component';
 import { MembersComponent } from './members/members.component';
+import { ChangeDescriptionComponent } from './admin-dashboard/change-description/change-description.component';
 
 @NgModule({
   entryComponents: [
@@ -51,7 +52,8 @@ import { MembersComponent } from './members/members.component';
     CreateDialogComponent,
     DeleteTaskDialogComponent,
     EditTaskComponent,
-    GroupCardComponent
+    GroupCardComponent,
+    ChangeDescriptionComponent
   ],
   imports: [
     CommonModule,
@@ -115,7 +117,8 @@ import { MembersComponent } from './members/members.component';
     TreeComponent,
     GroupCardComponent,
     RequirementsComponent,
-    MembersComponent
+    MembersComponent,
+    ChangeDescriptionComponent
   ],
   bootstrap: [
     ProjectComponent

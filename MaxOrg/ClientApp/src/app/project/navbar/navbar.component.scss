@@ -6,6 +6,14 @@
   right: 0;
 }
 
+.sidenav {
+  width: 250px;
+}
+
+.sidenav-mobile {
+  width: 80%;
+}
+
 #toggle {
   min-width: 0;
   position: fixed;

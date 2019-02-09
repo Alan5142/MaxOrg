@@ -29,7 +29,8 @@ const routes: Routes = [
       {path: 'code', component: CodeComponent},
       {path: 'org-chart', component: OrgChartComponent},
       {path: 'requirements', component: RequirementsComponent},
-      {path: 'members', component: MembersComponent}
+      {path: 'members', component: MembersComponent},
+      {path: 'description', component: DescriptionComponent}
     ]
   }
 ];
