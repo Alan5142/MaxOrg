@@ -34,7 +34,6 @@ export class DescriptionComponent implements OnInit {
     this.route.parent.params.subscribe(params => {
       this.group.getGroupDescription(params['id']).subscribe(description => {
         const html = marked(description);
-        console.log(html);
         const cleanHtml = sanitizeHtml(html, {
           allowedTags: [
             'h1',
@@ -96,7 +95,6 @@ export class DescriptionComponent implements OnInit {
             }
           }
         });
-        console.log(cleanHtml);
         this.description = this.sanitizer.bypassSecurityTrustHtml(cleanHtml);
       });
     });
