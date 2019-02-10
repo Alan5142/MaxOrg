@@ -1,11 +1,21 @@
+<app-kanban-toolbar></app-kanban-toolbar>
 <div *ngIf="groups | async;else loading">
   <div cdkDropListGroup class="board">
 
 
     <div class="card-list mat-elevation-z5 card-holder" ngClass="" ngClass.lt-md="card-mobile"
          *ngFor="let group of groups | async">
-
-      <h2 cdkDragHandle class="mat-h2">{{group.name}}</h2>
+      <div cdkDragHandle fxLayout="row">
+        <h2 class="mat-h2">{{group.name}}
+        </h2>
+        <div fxFlex></div>
+        <button style="top: -15px;" mat-icon-button fxFlexAlign="baseline">
+          <mat-icon>add</mat-icon>
+        </button>
+        <button style="top: -15px;" mat-icon-button fxFlexAlign="baseline">
+          <mat-icon>more_horiz</mat-icon>
+        </button>
+      </div>
 
       <div class="card-list-content"
            cdkDropList

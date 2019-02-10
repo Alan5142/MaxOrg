@@ -1,7 +1,9 @@
 import {Component, OnInit, SecurityContext, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {GroupsService} from '../../services/groups.service';
-import {DomSanitizer} from '@angular/platform-browser';
+import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+
+declare var require: any;
 
 const marked = require('marked/marked.min');
 const sanitizeHtml = require('sanitize-html/dist/sanitize-html');
@@ -12,9 +14,7 @@ const sanitizeHtml = require('sanitize-html/dist/sanitize-html');
   styleUrls: ['./description.component.scss']
 })
 export class DescriptionComponent implements OnInit {
-  title = 'MaxOrg';
-  description: any = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.';
-  owner = 'A&M Tech';
+  description: SafeHtml = null;
 
   constructor(public route: ActivatedRoute, public group: GroupsService, private sanitizer: DomSanitizer) {
     marked.setOptions({

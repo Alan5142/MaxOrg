@@ -1,10 +1,6 @@
-<!--
-<div class="center">
-  <h1>{{title}}</h1>
-  <p>{{description}}</p>
-  <p>{{owner}}.</p>
+<div #descriptionContainer id="description-container" [innerHtml]="description" *ngIf="description; else loading">
 </div>
--->
 
-<div id="description-container" [innerHtml]="description">
-</div>
+<ng-template #loading>
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</ng-template>

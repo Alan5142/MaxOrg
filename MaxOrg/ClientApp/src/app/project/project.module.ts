@@ -44,6 +44,8 @@ import { GroupCardComponent } from './org-chart/group-card/group-card.component'
 import { RequirementsComponent } from './requirements/requirements.component';
 import { MembersComponent } from './members/members.component';
 import { ChangeDescriptionComponent } from './admin-dashboard/change-description/change-description.component';
+import { NotFoundComponent } from './not-found/not-found.component';
+import { ProjectIndexComponent } from './project-index/project-index.component';
 
 @NgModule({
   entryComponents: [
@@ -118,7 +120,9 @@ import { ChangeDescriptionComponent } from './admin-dashboard/change-description
     GroupCardComponent,
     RequirementsComponent,
     MembersComponent,
-    ChangeDescriptionComponent
+    ChangeDescriptionComponent,
+    NotFoundComponent,
+    ProjectIndexComponent
   ],
   bootstrap: [
     ProjectComponent
