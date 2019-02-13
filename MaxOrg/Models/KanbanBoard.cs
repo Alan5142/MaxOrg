@@ -50,7 +50,5 @@ namespace MaxOrg.Models
     {
         [Required]
         public string Name { get; set; }
-        [Required]
-        public List<string> Members { get; set; }
     }
 }

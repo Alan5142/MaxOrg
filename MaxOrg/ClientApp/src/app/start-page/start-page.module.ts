@@ -38,6 +38,7 @@ import {TodosComponent} from './todos/todos.component';
 import { RegisterComponent } from './register/register.component';
 import {ServicesModule} from '../services/services.module';
 import { GithubLoginComponent } from './github-login/github-login.component';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 @NgModule({
   providers: [
@@ -60,7 +61,8 @@ import { GithubLoginComponent } from './github-login/github-login.component';
     NewProjectComponent,
     TodosComponent,
     RegisterComponent,
-    GithubLoginComponent
+    GithubLoginComponent,
+    NotFoundComponent
   ],
   imports: [
     CommonModule,

@@ -6,7 +6,8 @@ import {AppComponent} from './app.component';
 const routes: Routes = [
   {path: '', redirectTo: 'start', pathMatch: 'full'},
   {path: 'start', loadChildren: './start-page/start-page.module#StartPageModule'},
-  {path: 'project/:id', loadChildren: './project/project.module#ProjectModule', canActivate: [IsLoggedInGuard]}
+  {path: 'project/:id', loadChildren: './project/project.module#ProjectModule', canActivate: [IsLoggedInGuard]},
+  {path: '**', redirectTo: 'start/not-found'}
 ];
 
 @NgModule({

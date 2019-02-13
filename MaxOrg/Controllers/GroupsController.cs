@@ -180,15 +180,36 @@ namespace MaxOrg.Controllers
             }
         }
 
+        [HttpPost("{groupId}/boards")]
+        public async Task<IActionResult> CreateBoard(string groupId, [FromBody] CreateKanbanBoardRequest request)
+        {
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                var group = await GetGroup(groupId);
+                if (group == null)
+                {
+                    return NotFound();
+                }
+                group.KanbanBoards.Add(new KanbanBoard(request.Name));
+                var createdBoard = group.KanbanBoards.Last();
+                createdBoard.Members.Add(HttpContext.User.Identity.Name);
+                await db.UpdateByIdAsync<Group>(group.Id, group);
+                return CreatedAtAction("api/" + groupId + "boards/" + group.KanbanBoards.Last().Id, createdBoard);
+            }
+        }
+
         [HttpGet("{groupId}/boards")]
         public async Task<IActionResult> GetBoardsOfGroup(string groupId)
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
-                var kanbanBoards = await (from g in db.Query<Group>()
+                IEnumerable<KanbanBoard> kanbanBoards = await (from g in db.Query<Group>()
                                           from kb in g.KanbanBoards
-                                          where g.Key == groupId && kb.Members.Contains(HttpContext.User.Identity.Name)
+                                          where g.Key == groupId
                                           select g.KanbanBoards).FirstOrDefaultAsync();
+                kanbanBoards = from kb in kanbanBoards
+                               where kb.Members.Contains(HttpContext.User.Identity.Name)
+                               select kb;
                 if (kanbanBoards == null)
                 {
                     return NotFound();
