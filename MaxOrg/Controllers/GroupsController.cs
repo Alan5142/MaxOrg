@@ -24,7 +24,6 @@ namespace MaxOrg.Controllers
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
-
                 var currentDate = DateTime.Now;
 
                 // user is not admin
@@ -117,6 +116,52 @@ namespace MaxOrg.Controllers
             }
         }
 
+        /// <summary>
+        /// Cambia la descripción del grupo
+        /// </summary>
+        /// <param name="groupId">Grupo al que se desea cambiar la descripción</param>
+        /// <param name="newDescription">Nueva descripción</param>
+        /// <returns>404 si no se encuentra el recurso, 401 si no es admin, 200 si se cambio con exito</returns>
+        [HttpPost("{groupId}/description")]
+        public async Task<IActionResult> ChangeGroupDescription(string groupId, [FromBody] ChangeGroupDescriptionRequest newDescription)
+        {
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                var group = await GetGroup(groupId);
+                if (group == null)
+                {
+                    return NotFound();
+                }
+                if (!await IsGroupAdmin(groupId, HttpContext.User.Identity.Name))
+                {
+                    return Unauthorized();
+                }
+                // TODO sanitize c:
+                group.Description = newDescription.NewDescription;
+                await db.UpdateByIdAsync<Group>(group.Id, group);
+            }
+            return Ok();
+        }
+
+        [HttpGet("{groupId}/description")]
+        public async Task<IActionResult> GetGroupDescription(string groupId)
+        {
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                var group = await GetGroup(groupId);
+                if (group == null)
+                {
+                    return NotFound();
+                }
+                if (GetGroupMembers(groupId).Find(u => u.Key == HttpContext.User.Identity.Name) == null)
+                {
+                    // the user is not in the group
+                    return Unauthorized();
+                }
+                return Ok(new { group.Description });
+            }
+        }
+
         [HttpGet("{groupId}")]
         public async Task<IActionResult> GetGroupInfo(string groupId)
         {
@@ -135,15 +180,36 @@ namespace MaxOrg.Controllers
             }
         }
 
+        [HttpPost("{groupId}/boards")]
+        public async Task<IActionResult> CreateBoard(string groupId, [FromBody] CreateKanbanBoardRequest request)
+        {
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                var group = await GetGroup(groupId);
+                if (group == null)
+                {
+                    return NotFound();
+                }
+                group.KanbanBoards.Add(new KanbanBoard(request.Name));
+                var createdBoard = group.KanbanBoards.Last();
+                createdBoard.Members.Add(HttpContext.User.Identity.Name);
+                await db.UpdateByIdAsync<Group>(group.Id, group);
+                return CreatedAtAction("api/" + groupId + "boards/" + group.KanbanBoards.Last().Id, createdBoard);
+            }
+        }
+
         [HttpGet("{groupId}/boards")]
         public async Task<IActionResult> GetBoardsOfGroup(string groupId)
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
-                var kanbanBoards = await (from g in db.Query<Group>()
+                IEnumerable<KanbanBoard> kanbanBoards = await (from g in db.Query<Group>()
                                           from kb in g.KanbanBoards
-                                          where g.Key == groupId && kb.Members.Contains(HttpContext.User.Identity.Name)
+                                          where g.Key == groupId
                                           select g.KanbanBoards).FirstOrDefaultAsync();
+                kanbanBoards = from kb in kanbanBoards
+                               where kb.Members.Contains(HttpContext.User.Identity.Name)
+                               select kb;
                 if (kanbanBoards == null)
                 {
                     return NotFound();
@@ -179,7 +245,6 @@ namespace MaxOrg.Controllers
                 }
                 return Ok(kanbanBoard);
             }
-
         }
 
         private async Task<bool> IsGroupAdmin(string currentGroup, string userId)
@@ -206,6 +271,14 @@ namespace MaxOrg.Controllers
             }
         }
 
+        private async Task<Group> GetGroup(string groupId)
+        {
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                return await db.Query<Group>().Where(g => g.Key == groupId).Select(g => g).FirstOrDefaultAsync();
+            }
+        }
+
         private List<User> GetGroupMembers(string groupId)
         {
             using (var db = ArangoDatabase.CreateWithSetting())
@@ -224,7 +297,5 @@ namespace MaxOrg.Controllers
                 return traverse.Visited.Vertices;
             }
         }
-
-
     }
 }

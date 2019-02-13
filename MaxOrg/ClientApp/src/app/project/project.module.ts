@@ -41,6 +41,11 @@ import {CommonComponentsModule} from '../common-components/common-components.mod
 import { OrgChartComponent } from './org-chart/org-chart.component';
 import { TreeComponent } from './org-chart/tree/tree.component';
 import { GroupCardComponent } from './org-chart/group-card/group-card.component';
+import { RequirementsComponent } from './requirements/requirements.component';
+import { MembersComponent } from './members/members.component';
+import { ChangeDescriptionComponent } from './admin-dashboard/change-description/change-description.component';
+import { NotFoundComponent } from './not-found/not-found.component';
+import { ProjectIndexComponent } from './project-index/project-index.component';
 
 @NgModule({
   entryComponents: [
@@ -49,7 +54,8 @@ import { GroupCardComponent } from './org-chart/group-card/group-card.component'
     CreateDialogComponent,
     DeleteTaskDialogComponent,
     EditTaskComponent,
-    GroupCardComponent
+    GroupCardComponent,
+    ChangeDescriptionComponent
   ],
   imports: [
     CommonModule,
@@ -111,7 +117,12 @@ import { GroupCardComponent } from './org-chart/group-card/group-card.component'
     CodeComponent,
     OrgChartComponent,
     TreeComponent,
-    GroupCardComponent
+    GroupCardComponent,
+    RequirementsComponent,
+    MembersComponent,
+    ChangeDescriptionComponent,
+    NotFoundComponent,
+    ProjectIndexComponent
   ],
   bootstrap: [
     ProjectComponent

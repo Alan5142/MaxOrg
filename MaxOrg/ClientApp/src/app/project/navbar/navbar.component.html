@@ -41,79 +41,81 @@
 </mat-toolbar>
 
 <mat-sidenav-container id="container">
-  <mat-sidenav #sideNav
+  <mat-sidenav ngClass="sidenav" ngClass.lt-md="sidenav-mobile" #sideNav
                [mode]="mobileQuery.matches ? 'over' : 'side'"
                [opened]="!mobileQuery.matches" #sidenav>
-    <mat-accordion>
-      <h4 class="text-center" routerLink="/project/{{route.snapshot.paramMap.get('id')}}">[Nombre de proyecto]</h4>
+    <mat-nav-list class="no-select" (click)="sidenav.toggle(!mobileQuery.matches)">
+      <h3>[Nombre del proyecto]</h3>
+      <mat-list-item routerLink="./">
+        <mat-icon matListIcon>home</mat-icon>
+        Inicio
+      </mat-list-item>
       <mat-divider></mat-divider>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            Proyecto
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <button mat-button>Descripción</button>
-        <br>
-        <button mat-button>Integrantes</button>
-        <br>
-        <button mat-button>Subgrupos</button>
-        <br>
-        <button mat-button>Calendario</button>
-        <br>
-        <button mat-button>Requerimientos</button>
-      </mat-expansion-panel>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            Trabajo
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <button mat-button routerLink="board" (click)="sidenav.toggle(!mobileQuery.matches)">Tablero</button>
-        <br>
-        <button mat-button routerLink="./assignedWork">Asignación de trabajos</button>
-      </mat-expansion-panel>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title routerLink="./code">
-            Codigo
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <button mat-button>Archivos</button>
-        <br>
-        <button mat-button>Commits</button>
-        <br>
-        <button mat-button>Push</button>
-        <br>
-        <button mat-button>Ramas</button>
-        <br>
-        <button mat-button>Pull request</button>
-      </mat-expansion-panel>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            Tests
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <button mat-button>Estadísticas</button>
-        <br>
-        <button mat-button>Crear test</button>
-        <br>
-        <button mat-button>Test realizados</button>
-      </mat-expansion-panel>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title routerLink="/project/{{route.snapshot.paramMap.get('id')}}/messages">
-            Mensajes
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <button mat-button>Grupal</button>
-        <br>
-        <button mat-button>Personal</button>
-        <br>
-        <button mat-button>Con administrador</button>
-      </mat-expansion-panel>
-    </mat-accordion>
+      <h3 mat-subheader>Proyecto</h3>
+      <mat-list-item routerLink="./dashboard">
+        <mat-icon matListIcon>dashboard</mat-icon>
+        Panel de administrador
+      </mat-list-item>
+
+      <mat-list-item routerLink="description">
+        <mat-icon matListIcon>description</mat-icon>
+        Descripción
+      </mat-list-item>
+      <mat-list-item routerLink="members">
+        <mat-icon matListIcon>group</mat-icon>
+        Integrantes
+      </mat-list-item>
+      <mat-list-item routerLink="org-chart">
+        <mat-icon matListIcon>group_work</mat-icon>
+        Subgrupos
+      </mat-list-item>
+      <mat-list-item>
+        <mat-icon matListIcon>calendar_today</mat-icon>
+        Calendario
+      </mat-list-item>
+      <mat-list-item routerLink="requirements">
+        <mat-icon matListIcon>format_list_numbered</mat-icon>
+        Requerimientos
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <h3 mat-subheader>Trabajo</h3>
+      <mat-list-item routerLink="board">
+        <mat-icon matListIcon>view_week</mat-icon>
+        Tablero
+      </mat-list-item>
+      <mat-list-item routerLink="assigned-work">
+        <mat-icon matListIcon>work</mat-icon>
+        Asignación de trabajos
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <h3 mat-subheader>Código</h3>
+      <mat-list-item routerLink="code">
+        <mat-icon matListIcon>code</mat-icon>
+        Código
+      </mat-list-item>
+      <a [href]="'https://github.com/Alan5142/MaxOrg'">
+        <mat-list-item>
+          <mat-icon matListIcon svgIcon="github"></mat-icon>
+          Ver en github
+        </mat-list-item>
+      </a>
+      <mat-divider></mat-divider>
+      <h3 mat-subheader>Tests</h3>
+      <mat-list-item>
+        <mat-icon matListIcon>history</mat-icon>
+        Historial
+      </mat-list-item>
+      <mat-list-item>
+        <mat-icon matListIcon svgIcon="flask"></mat-icon>
+        Realizar test
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <h4 mat-subheader>Mensajería</h4>
+      <mat-list-item routerLink="./messages">
+        <mat-icon matListIcon>message</mat-icon>
+        Mensajes
+      </mat-list-item>
+    </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
     <router-outlet></router-outlet>

@@ -55,4 +55,9 @@ export class KanbanCardsService {
     const headers = new HttpHeaders().append('Authorization', 'Bearer ' + localStorage.getItem('token'));
     return this.http.get<KanbanBoard>(environment.apiUrl + 'groups/' + groupId + '/boards/' + boardId, {headers: headers});
   }
+
+  createBoard(groupId: string, boardName: string): Observable<any> {
+    const headers = new HttpHeaders().append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+    return this.http.post(environment.apiUrl + 'groups/' + groupId + '/boards', {name: boardName}, {headers: headers});
+  }
 }

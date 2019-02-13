@@ -52,4 +52,9 @@ namespace MaxOrg.Models
         public GroupHierarchy[] Subgroups { get; set; } = Array.Empty<GroupHierarchy>();
         public UserGroupView[] Users { get; set; }
     }
+
+    public class ChangeGroupDescriptionRequest
+    {
+        public string NewDescription { get; set; } = "";
+    }
 }

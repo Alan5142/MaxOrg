@@ -1,5 +1,5 @@
 <div class="grid-container">
-  <h1 class="mat-h1">Panel de administrador</h1>
+  <h1>Panel de administrador</h1>
   <mat-grid-list cols="3" rowHeight="175px">
     <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 2" [rowspan]="3">
       <mat-card class="dashboard-card mat-elevation-z3">
@@ -167,6 +167,7 @@
               <mat-form-field>
                 <textarea matInput cdkTextareaAutosize placeholder="Nombre de usuario"></textarea>
               </mat-form-field>
+              <button mat-flat-button color="accent" (click)="changeDescription()">Cambiar descripción</button>
               <button mat-flat-button color="primary">Guardar cambios</button>
             </form>
 

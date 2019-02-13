@@ -1,4 +1,4 @@
-import {ModuleWithProviders, NgModule} from '@angular/core';
+import {NgModule} from '@angular/core';
 import {Routes, RouterModule} from '@angular/router';
 import {ProjectComponent} from './project.component';
 import {DescriptionComponent} from './description/description.component';
@@ -9,12 +9,15 @@ import {AdminDashboardComponent} from './admin-dashboard/admin-dashboard.compone
 import {BoardComponent} from './kanban-board/board/board.component';
 import {KanbanIndexComponent} from './kanban-board/kanban-index/kanban-index.component';
 import {CodeComponent} from './code/code.component';
-import { OrgChartComponent } from './org-chart/org-chart.component';
-
+import {OrgChartComponent} from './org-chart/org-chart.component';
+import {RequirementsComponent} from './requirements/requirements.component';
+import {MembersComponent} from './members/members.component';
+import {NotFoundComponent} from './not-found/not-found.component';
+import {ProjectIndexComponent} from './project-index/project-index.component';
 const routes: Routes = [
   {
     path: '', component: ProjectComponent, children: [
-      {path: '', component: DescriptionComponent},
+      {path: '', component: ProjectIndexComponent},
       {
         path: 'board', component: KanbanBoardComponent, children: [
           {path: '', component: KanbanIndexComponent},
@@ -22,10 +25,15 @@ const routes: Routes = [
         ]
       },
       {path: 'messages', component: MessagesComponent},
-      {path: 'assignedWork', component: AssignedWorkComponent},
+      {path: 'assigned-work', component: AssignedWorkComponent},
       {path: 'dashboard', component: AdminDashboardComponent},
       {path: 'code', component: CodeComponent},
-      {path: 'org-chart', component: OrgChartComponent}
+      {path: 'org-chart', component: OrgChartComponent},
+      {path: 'requirements', component: RequirementsComponent},
+      {path: 'members', component: MembersComponent},
+      {path: 'description', component: DescriptionComponent},
+      {path: 'not-found', component: NotFoundComponent},
+      {path: '**', redirectTo: 'not-found'}
     ]
   }
 ];

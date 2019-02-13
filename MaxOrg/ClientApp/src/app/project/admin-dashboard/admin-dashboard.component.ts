@@ -1,6 +1,10 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MediaObserver} from '@angular/flex-layout';
-import {ChartSelectEvent, GoogleChartComponent} from 'ng2-google-charts';
+import {GoogleChartComponent} from 'ng2-google-charts';
+import {MatDialog} from '@angular/material';
+import {ChangeDescriptionComponent} from './change-description/change-description.component';
+import {ActivatedRoute} from '@angular/router';
+import * as marked from 'marked/marked.min.js';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -10,6 +14,7 @@ import {ChartSelectEvent, GoogleChartComponent} from 'ng2-google-charts';
 export class AdminDashboardComponent implements OnInit {
 
   @ViewChild('tasksChart') tasksChart: GoogleChartComponent;
+  groupId: string;
 
   pieChartData = {
     chartType: 'LineChart',
@@ -26,9 +31,22 @@ export class AdminDashboardComponent implements OnInit {
     options: {explorer: {axis: 'horizontal', keepInBounds: true}, hAxis: {format: ' dd/MM/yyyy'}, height: '1900px'}
   };
 
-  constructor(public mediaObserver: MediaObserver) {
+  constructor(public mediaObserver: MediaObserver,
+              public dialog: MatDialog,
+              public route: ActivatedRoute) {
+    route.parent.params.subscribe(params => {
+      this.groupId = params['id'];
+    });
   }
 
   ngOnInit() {
+  }
+
+  changeDescription() {
+    const dialogRef = this.dialog.open(ChangeDescriptionComponent, {
+      minWidth: '70%',
+      minHeight: '70%',
+      data: {groupId: this.groupId}
+    });
   }
 }

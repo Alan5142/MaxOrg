@@ -30,4 +30,12 @@ export class KanbanIndexComponent implements OnInit {
   goToBoard(id: string) {
     this.router.navigate([id], {relativeTo: this.route});
   }
+
+  createBoardWithName(value: string) {
+    this.kanbanService.createBoard(this.projectId, value).subscribe(ok => {
+      this.boards = this.kanbanService.getBoardsOfGroup(this.projectId);
+    }, err => {
+
+    });
+  }
 }
