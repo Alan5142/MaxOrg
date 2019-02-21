@@ -10,17 +10,16 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 steps:
-- script: dotnet build
-  displayName: 'Build maxorg dotnet'
-
 - task: NodeTool@0
   inputs:
     versionSpec: '8.x'
   displayName: 'Install Node.js'
 
 - script: |
-    cd MaxOrg/ClientApp
     npm install -g @angular/cli
-    npm install
-    ng build --prod
-  displayName: 'npm install and build'
+  displayName: 'npm install angular cli'
+
+- script: dotnet build
+  displayName: 'Build MaxOrg'
+
+
