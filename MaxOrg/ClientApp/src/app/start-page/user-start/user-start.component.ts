@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {MatDialog} from '@angular/material';
+import {MatDialog, MatSnackBar} from '@angular/material';
 import {NewProjectComponent} from '../new-project/new-project.component';
 import {MediaObserver} from '@angular/flex-layout';
 import {User, UserService} from '../../services/user.service';
@@ -22,7 +22,8 @@ export class UserStartComponent implements OnInit {
               public mediaObserver: MediaObserver,
               public userService: UserService,
               private projectsService: ProjectsService,
-              private router: Router) {
+              private router: Router,
+              private snackBar: MatSnackBar) {
     userService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
       this.projects = this.projectsService.getProjects();
@@ -37,8 +38,17 @@ export class UserStartComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      this.projects = this.projectsService.getProjects();
-      this.projectsView = this.projects;
+      if (result) {
+        const observable = result as Observable<boolean>;
+        observable.subscribe(success => {
+          this.projects = this.projectsService.getProjects();
+          this.projectsView = this.projects;
+          this.snackBar.open('Creado con exito', 'Ok', {duration: 2500});
+        }, error => {
+          console.log(error);
+          this.snackBar.open('No se pudo crear :(', 'Ok', {duration: 2500});
+        });
+      }
     });
   }
 

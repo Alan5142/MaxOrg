@@ -1,14 +1,28 @@
 .code-container {
-  margin-left: 20%;
-  margin-right: 20%;
+  margin-left: 15%;
+  margin-right: 15%;
+  min-width: 500px;
 }
 
 .code-container-mobile {
-  margin-left: 10%;
-  margin-right: 10%;
+  margin-left: 3%;
+  margin-right: 3%;
 }
 
 mat-card > mat-toolbar {
   margin: -16px 0 0 -16px;
   width: calc(100% + 32px);
+}
+
+.code-card {
+  min-height: 300px;
+  margin-top: 1px;
+}
+
+.mat-ripple-dummy {
+  position: absolute ;
+  top: 0 ;
+  bottom: 0 ;
+  left: 0 ;
+  right: 0 ;
 }
