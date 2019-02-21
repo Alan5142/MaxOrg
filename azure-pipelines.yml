@@ -10,7 +10,7 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 steps:
-- script: dotnet build --configuration
+- script: dotnet build
   displayName: 'Build maxorg dotnet'
 
 - task: NodeTool@0
