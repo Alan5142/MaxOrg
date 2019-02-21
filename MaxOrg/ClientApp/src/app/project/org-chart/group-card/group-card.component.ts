@@ -1,6 +1,5 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import {MatDividerModule} from '@angular/material/divider';
+import {Component, Inject, OnInit} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 
 @Component({
@@ -9,10 +8,15 @@ import {MatDividerModule} from '@angular/material/divider';
   styleUrls: ['./group-card.component.scss']
 })
 export class GroupCardComponent implements OnInit {
+  members: any = [{name: 'Alan'}, {name: 'Manuel'}];
+  description = '';
 
   constructor(
     public dialogRef: MatDialogRef<GroupCardComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: string) {console.log(data);}
+    @Inject(MAT_DIALOG_DATA) public data: any) {
+    console.log(data);
+  }
+
 
   onNoClick(): void {
     this.dialogRef.close();
@@ -20,5 +24,4 @@ export class GroupCardComponent implements OnInit {
 
   ngOnInit() {
   }
-  members: any=[{name:'Alan'},{name:'Manuel'}]
 }
