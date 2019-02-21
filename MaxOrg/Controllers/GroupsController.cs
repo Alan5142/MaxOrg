@@ -119,7 +119,7 @@ namespace MaxOrg.Controllers
         /// <summary>
         /// Cambia la descripción del grupo
         /// </summary>
-        /// <param name="groupId">Grupo al que se desea cambiar la descripción</param>
+        /// <param name="groupId">Grupo al que se desea cambiar la descripción</param> 
         /// <param name="newDescription">Nueva descripción</param>
         /// <returns>404 si no se encuentra el recurso, 401 si no es admin, 200 si se cambio con exito</returns>
         [HttpPost("{groupId}/description")]
