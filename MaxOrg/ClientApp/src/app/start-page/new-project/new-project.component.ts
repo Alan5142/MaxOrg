@@ -1,10 +1,7 @@
 import {Component} from '@angular/core';
-import {MatAutocompleteSelectedEvent, MatChipInputEvent, MatDialogRef, MatSnackBar} from '@angular/material';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import {MatAutocompleteSelectedEvent, MatDialogRef} from '@angular/material';
 import {User, UserService} from '../../services/user.service';
 import {ProjectsService} from '../../services/projects.service';
-import {FormGroup} from '@angular/forms';
 
 
 @Component({
@@ -19,25 +16,22 @@ export class NewProjectComponent {
 
   constructor(public dialogRef: MatDialogRef<NewProjectComponent>,
               private userService: UserService,
-              private projectService: ProjectsService,
-              private snackBar: MatSnackBar) {
+              private projectService: ProjectsService) {
     this.selectedUsers = [];
     this.autocompleteUsers = [];
   }
 
   createProject(): void {
-    this.projectService.createProject({name: this.projectName, members: this.selectedUsers}).subscribe(result => {
-      this.snackBar.open('Creado con exito', 'Ok', {duration: 2500});
-    }, error => {
-      console.log(error);
-      this.snackBar.open('No se pudo crear :(', 'Ok', {duration: 2500});
-    });
-    this.dialogRef.close();
+    const returnPromise = this.projectService.createProject({name: this.projectName, members: this.selectedUsers});
+    this.dialogRef.close(returnPromise);
   }
 
+  /**
+   * Elimina a un usuario de la lista de selección de usuario
+   * @param username Nombre del usuario a eliminar de la lista
+   */
   remove(username: string): void {
     const index = this.selectedUsers.indexOf(username);
-
     if (index >= 0) {
       this.selectedUsers.splice(index, 1);
     }

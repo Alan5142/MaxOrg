@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {MatIconRegistry} from '@angular/material';
+import {MediaObserver} from '@angular/flex-layout';
 
 @Component({
   selector: 'app-code',
@@ -16,7 +17,7 @@ export class CodeComponent implements OnInit {
     {isFolder: false, name: 'hello world 2.kt'}
     ];
 
-  constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
+  constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer, public mediaObserver: MediaObserver) {
     iconRegistry.addSvgIcon(
       'file',
       sanitizer.bypassSecurityTrustResourceUrl('/icons/file_icon.svg'));

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using shortid;
 using System;
 using System.Net;
 using System.Text;
@@ -172,6 +173,10 @@ namespace MaxOrg
             {
                 routes.MapHub<NotificationHub>("/notificationHub");
             });
+
+            // Configure id generator
+            ShortId.SetCharacters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
+            ShortId.SetSeed(1939048828);
         }
 
         void CreateCollection(IArangoDatabase db, string collectionName, CollectionType type = CollectionType.Document)
