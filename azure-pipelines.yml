@@ -16,8 +16,8 @@ steps:
   displayName: 'Install Node.js'
 
 - script: |
+    cd MaxOrg/ClientApp
     npm install -g @angular/cli
     npm install
-    cd MaxOrg/ClientApp
     ng build --prod
   displayName: 'npm install and build'
