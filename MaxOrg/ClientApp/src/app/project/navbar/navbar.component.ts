@@ -14,7 +14,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   mobileQuery: MediaQueryList;
 
-  private _mobileQueryListener: () => void;
+  private readonly _mobileQueryListener: () => void;
 
   route: ActivatedRoute;
 

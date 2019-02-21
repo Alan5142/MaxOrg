@@ -1,5 +1,5 @@
 <mat-toolbar color="primary" fxLayout="row">
-  <button mat-button routerLink="/"><h1>MaxOrg</h1></button>
+  <button mat-button routerLink="/">MaxOrg</button>
   <div fxFlex></div>
   <button *ngIf="!userService.isUserLoggedIn()" mat-button (click)="displayLoginDialog()" i18n>Iniciar sesión</button>
 
