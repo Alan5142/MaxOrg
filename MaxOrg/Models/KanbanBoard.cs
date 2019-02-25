@@ -12,7 +12,7 @@ namespace MaxOrg.Models
     [CollectionProperty(Naming = NamingConvention.ToCamelCase)]
     public class KanbanCard
     {
-        public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 15);
+        public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 20);
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
@@ -21,7 +21,7 @@ namespace MaxOrg.Models
     [CollectionProperty(Naming = NamingConvention.ToCamelCase)]
     public class KanbanGroup
     {
-        public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 15);
+        public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 20);
         public string Name { get; set; }
         public List<KanbanCard> Cards { get; set; } = new List<KanbanCard>();
         public string Color { get; set; } = "";
@@ -41,7 +41,7 @@ namespace MaxOrg.Models
             KanbanGroups[0].Cards.Add(new KanbanCard { Title = "Tu primera tarea", Description = "Este es tu nuevo grupo de tarjetas :)" });
         }
 
-        public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 15);
+        public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 20);
         public string Name { get; set; }
         public List<string> Members { get; set; } = new List<string>();
         public List<KanbanGroup> KanbanGroups { get; set; } = new List<KanbanGroup>();

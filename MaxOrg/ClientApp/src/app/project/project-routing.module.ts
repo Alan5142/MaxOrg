@@ -14,6 +14,8 @@ import {RequirementsComponent} from './requirements/requirements.component';
 import {MembersComponent} from './members/members.component';
 import {NotFoundComponent} from './not-found/not-found.component';
 import {ProjectIndexComponent} from './project-index/project-index.component';
+import {CalendarComponent} from './calendar/calendar.component';
+
 const routes: Routes = [
   {
     path: '', component: ProjectComponent, children: [
@@ -24,6 +26,7 @@ const routes: Routes = [
           {path: ':boardId', component: BoardComponent}
         ]
       },
+      {path: 'calendar', component: CalendarComponent},
       {path: 'messages', component: MessagesComponent},
       {path: 'assigned-work', component: AssignedWorkComponent},
       {path: 'dashboard', component: AdminDashboardComponent},
