@@ -45,8 +45,9 @@ import { RequirementsComponent } from './requirements/requirements.component';
 import { MembersComponent } from './members/members.component';
 import { ChangeDescriptionComponent } from './admin-dashboard/change-description/change-description.component';
 import { NotFoundComponent } from './not-found/not-found.component';
-import { ProjectIndexComponent } from './project-index/project-index.component';
+import { PostsComponent } from './posts/posts.component';
 import { CalendarComponent } from './calendar/calendar.component';
+import { CreateCardComponent } from './kanban-board/board/create-card/create-card.component';
 
 @NgModule({
   entryComponents: [
@@ -56,7 +57,8 @@ import { CalendarComponent } from './calendar/calendar.component';
     DeleteTaskDialogComponent,
     EditTaskComponent,
     GroupCardComponent,
-    ChangeDescriptionComponent
+    ChangeDescriptionComponent,
+    CreateCardComponent
   ],
   imports: [
     CommonModule,
@@ -123,8 +125,9 @@ import { CalendarComponent } from './calendar/calendar.component';
     MembersComponent,
     ChangeDescriptionComponent,
     NotFoundComponent,
-    ProjectIndexComponent,
-    CalendarComponent
+    PostsComponent,
+    CalendarComponent,
+    CreateCardComponent
   ],
   bootstrap: [
     ProjectComponent

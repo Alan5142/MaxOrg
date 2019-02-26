@@ -33,7 +33,7 @@
         {{day?.getDate()}}
       </button>
       <ng-template #elseStatement>
-        <button mat-icon-button>
+        <button mat-icon-button *ngIf="day !== null">
           {{day?.getDate()}}
         </button>
       </ng-template>

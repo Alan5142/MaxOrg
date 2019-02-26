@@ -53,4 +53,10 @@ namespace MaxOrg.Models
         [Required]
         public string Name { get; set; }
     }
+
+    public class CreateKanbanCardInSectionRequest
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
 }

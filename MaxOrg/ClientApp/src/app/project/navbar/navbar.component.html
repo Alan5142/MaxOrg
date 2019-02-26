@@ -56,10 +56,13 @@
         <mat-icon matListIcon>dashboard</mat-icon>
         Panel de administrador
       </mat-list-item>
-
-      <mat-list-item routerLink="description">
+      <mat-list-item routerLink="./messages">
+        <mat-icon matListIcon>message</mat-icon>
+        Mensajes
+      </mat-list-item>
+      <mat-list-item routerLink="posts">
         <mat-icon matListIcon>description</mat-icon>
-        Descripción
+        Posts
       </mat-list-item>
       <mat-list-item routerLink="members">
         <mat-icon matListIcon>group</mat-icon>
@@ -108,12 +111,6 @@
       <mat-list-item>
         <mat-icon matListIcon svgIcon="flask"></mat-icon>
         Realizar test
-      </mat-list-item>
-      <mat-divider></mat-divider>
-      <h4 mat-subheader>Mensajería</h4>
-      <mat-list-item routerLink="./messages">
-        <mat-icon matListIcon>message</mat-icon>
-        Mensajes
       </mat-list-item>
     </mat-nav-list>
   </mat-sidenav>

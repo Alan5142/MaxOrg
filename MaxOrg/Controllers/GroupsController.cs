@@ -19,6 +19,16 @@ namespace MaxOrg.Controllers
         {
         }
 
+        /// <summary>
+        /// Crea un grupo dentro de un grupo o un proyecto
+        /// </summary>
+        /// <param name="createGroup">
+        /// Información requerida para poder crear el grupo
+        /// </param>
+        /// <returns>
+        /// BadRequest si algún parametro ingresado por el usuario junto con un mensaje de descripción
+        /// Created junto con la dirección del recurso si se creo exitosamente
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult> CreateGroup([FromBody] CreateGroupRequest createGroup)
         {
@@ -26,7 +36,7 @@ namespace MaxOrg.Controllers
             {
                 var currentDate = DateTime.Now;
 
-                // user is not admin
+                // El usuario no es administrador del grupo que se planea hacer un subgrupo
                 if (!await IsGroupAdmin(createGroup.CurrentGroupId, HttpContext.User.Identity.Name))
                 {
                     return Unauthorized();
@@ -57,7 +67,7 @@ namespace MaxOrg.Controllers
                              where u.Key == um.Key
                              select u;
 
-                // Mismatch, some users are not valid
+                // Algunos usuarios no son validos
                 if (createGroup.Members.Count != usersToAdd.Count())
                 {
                     return BadRequest(new { message = "Some users are invalid" });
@@ -180,6 +190,8 @@ namespace MaxOrg.Controllers
             }
         }
 
+        #region Kanban Boards
+
         [HttpPost("{groupId}/boards")]
         public async Task<IActionResult> CreateBoard(string groupId, [FromBody] CreateKanbanBoardRequest request)
         {
@@ -204,9 +216,9 @@ namespace MaxOrg.Controllers
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 IEnumerable<KanbanBoard> kanbanBoards = await (from g in db.Query<Group>()
-                                          from kb in g.KanbanBoards
-                                          where g.Key == groupId
-                                          select g.KanbanBoards).FirstOrDefaultAsync();
+                                                               from kb in g.KanbanBoards
+                                                               where g.Key == groupId
+                                                               select g.KanbanBoards).FirstOrDefaultAsync();
                 kanbanBoards = from kb in kanbanBoards
                                where kb.Members.Contains(HttpContext.User.Identity.Name)
                                select kb;
@@ -246,6 +258,41 @@ namespace MaxOrg.Controllers
                 return Ok(kanbanBoard);
             }
         }
+
+        [HttpPost("{groupId}/boards/{boardId}/sections/{sectionId}/cards")]
+        public async Task<IActionResult> CreateCardInSection(string groupId, string boardId, string sectionId, [FromBody] CreateKanbanCardInSectionRequest cardInfo)
+        {
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                var group = await (from g in db.Query<Group>()
+                                   where g.Key == groupId
+                                   select g).FirstOrDefaultAsync();
+                if (group == null)
+                {
+                    return NotFound();
+                }
+                var kanbanSection = (from kb in @group.KanbanBoards
+                                    where kb.Id == boardId
+                                    from ks in kb.KanbanGroups
+                                    where ks.Id == sectionId
+                                    select ks).FirstOrDefault();
+                if (kanbanSection == null)
+                {
+                    return NotFound();
+                }
+
+                var card = new KanbanCard
+                {
+                    Title = cardInfo.Name,
+                    Description = cardInfo.Description
+                };
+
+                kanbanSection.Cards.Add(card);
+                await db.UpdateByIdAsync<Group>(group.Id, group);
+                return Ok();
+            }
+        }
+        #endregion
 
         private async Task<bool> IsGroupAdmin(string currentGroup, string userId)
         {

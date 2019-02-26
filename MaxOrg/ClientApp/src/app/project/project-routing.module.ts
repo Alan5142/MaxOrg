@@ -13,13 +13,13 @@ import {OrgChartComponent} from './org-chart/org-chart.component';
 import {RequirementsComponent} from './requirements/requirements.component';
 import {MembersComponent} from './members/members.component';
 import {NotFoundComponent} from './not-found/not-found.component';
-import {ProjectIndexComponent} from './project-index/project-index.component';
+import {PostsComponent} from './posts/posts.component';
 import {CalendarComponent} from './calendar/calendar.component';
 
 const routes: Routes = [
   {
     path: '', component: ProjectComponent, children: [
-      {path: '', component: ProjectIndexComponent},
+      {path: '', component: DescriptionComponent},
       {
         path: 'board', component: KanbanBoardComponent, children: [
           {path: '', component: KanbanIndexComponent},
@@ -34,7 +34,7 @@ const routes: Routes = [
       {path: 'org-chart', component: OrgChartComponent},
       {path: 'requirements', component: RequirementsComponent},
       {path: 'members', component: MembersComponent},
-      {path: 'description', component: DescriptionComponent},
+      {path: 'posts', component: PostsComponent},
       {path: 'not-found', component: NotFoundComponent},
       {path: '**', redirectTo: 'not-found'}
     ]
