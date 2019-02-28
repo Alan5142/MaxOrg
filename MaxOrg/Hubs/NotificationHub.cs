@@ -1,17 +1,31 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using ArangoDB.Client;
+using MaxOrg.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MaxOrg.Hubs
 {
+    public enum NotificationReceiverType
+    {
+        User,
+        Group
+    }
+
+    public class NotificationRequest
+    {
+        public string Message { get; set; }
+        public NotificationReceiverType ReceiverType { get; set; }
+
+        public string[] UsersOrGroups { get; set; }
+    }
+
+    [Authorize]
     public class NotificationHub : Hub
     {
-        private async Task SendNotification(string user, string notification)
+        public async Task SendNotificationToUser(string user, string notification)
         {
-            await Clients.All.SendAsync("ReceiveNotification", user, notification);
+            await Clients.Group("User/" + user).SendAsync("notificationReceived", notification);
         }
 
         public async Task JoinNotificationGroup(string groupName)
@@ -19,7 +33,6 @@ namespace MaxOrg.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
         }
 
-        [Authorize]
         public async Task ConnectToHub()
         {
             var name = Context.User.Identity.Name;

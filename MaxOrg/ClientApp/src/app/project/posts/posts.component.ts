@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import {NotificationService} from '../../services/notification.service';
+
 
 @Component({
   selector: 'app-project-index',
@@ -12,4 +14,6 @@ export class PostsComponent implements OnInit {
   ngOnInit() {
   }
 
+  testNotification() {
+  }
 }

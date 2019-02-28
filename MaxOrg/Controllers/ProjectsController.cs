@@ -1,8 +1,10 @@
 ﻿using ArangoDB.Client;
+using MaxOrg.Hubs;
 using MaxOrg.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +17,10 @@ namespace MaxOrg.Controllers
     [ApiController]
     public class ProjectsController : ControllerBase
     {
-        public ProjectsController()
+        private IHubContext<NotificationHub> m_notificationHub;
+        public ProjectsController(IHubContext<NotificationHub> notificationHub)
         {
+            m_notificationHub = notificationHub;
         }
 
         [HttpGet]
@@ -114,6 +118,9 @@ namespace MaxOrg.Controllers
                         AddedBy = currentUser.Key
                     };
                     await groupGraph.InsertEdgeAsync<UsersInGroup>(userToAdd);
+                    await m_notificationHub.Clients
+                        .Group("Users/" + user.Key)
+                        .SendAsync("notificationReceived", $"{currentUser.Username} te ha agregado al proyecto '{projectGroup.Name}'");
                 }
 
                 // TODO trigger notification

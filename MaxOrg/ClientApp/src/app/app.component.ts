@@ -7,4 +7,14 @@ import {Component} from '@angular/core';
 })
 
 export class AppComponent {
+  constructor() {
+
+    Notification.requestPermission(function (result) {
+      if (result === 'granted') {
+        navigator.serviceWorker.ready.then(function (registration) {
+          registration.showNotification('Notification with ServiceWorker');
+        });
+      }
+    });
+  }
 }
