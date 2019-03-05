@@ -19,6 +19,9 @@ using System.Threading.Tasks;
 
 namespace MaxOrg
 {
+    /// <summary>
+    /// Configura varios servicios necesarios
+    /// </summary>
     public class Startup
     {
         public Startup(IConfiguration configuration)

@@ -59,4 +59,9 @@ namespace MaxOrg.Models
         public string Name { get; set; }
         public string Description { get; set; }
     }
+
+    public class MoveKanbanCardRequest
+    {
+        public string NewSectionId { get; set; }
+    }
 }

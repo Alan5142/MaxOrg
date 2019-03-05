@@ -8,8 +8,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+
+/// <summary>
+/// :D
+/// </summary>
 namespace MaxOrg.Controllers
 {
+    
+    /// <summary>
+    /// Se encarga de administrar todos las peticiones HTTP que involucren a los grupos de trabajo
+    /// </summary>
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
@@ -22,9 +30,7 @@ namespace MaxOrg.Controllers
         /// <summary>
         /// Crea un grupo dentro de un grupo o un proyecto
         /// </summary>
-        /// <param name="createGroup">
-        /// Información requerida para poder crear el grupo
-        /// </param>
+        /// <param name="createGroup">Información requerida para poder crear el grupo</param>
         /// <returns>
         /// BadRequest si algún parametro ingresado por el usuario junto con un mensaje de descripción
         /// Created junto con la dirección del recurso si se creo exitosamente
@@ -222,10 +228,6 @@ namespace MaxOrg.Controllers
                 kanbanBoards = from kb in kanbanBoards
                                where kb.Members.Contains(HttpContext.User.Identity.Name)
                                select kb;
-                if (kanbanBoards == null)
-                {
-                    return NotFound();
-                }
                 // send only names and ids
 
                 return Ok(new
@@ -259,6 +261,16 @@ namespace MaxOrg.Controllers
             }
         }
 
+        /// <summary>
+        /// Crea una tarjeta en determinada sección
+        /// </summary>
+        /// <param name="groupId">
+        /// Identificador
+        /// </param>
+        /// <param name="boardId"></param>
+        /// <param name="sectionId"></param>
+        /// <param name="cardInfo"></param>
+        /// <returns></returns>
         [HttpPost("{groupId}/boards/{boardId}/sections/{sectionId}/cards")]
         public async Task<IActionResult> CreateCardInSection(string groupId, string boardId, string sectionId, [FromBody] CreateKanbanCardInSectionRequest cardInfo)
         {
@@ -292,8 +304,103 @@ namespace MaxOrg.Controllers
                 return Ok();
             }
         }
+
+        /// <summary>
+        /// Mueve de sección una tarjeta
+        /// </summary>
+        /// <param name="groupId">
+        /// Identificador del grupo en el que se encuentra la tarjeta
+        /// </param>
+        /// <param name="boardId">
+        /// Identificador del tablero en el que se encuentra la tarjeta
+        /// </param>
+        /// <param name="sectionId">
+        /// Identificador de la sección en la que se encuentra la tarjeta
+        /// </param>
+        /// <param name="cardId">
+        /// Identificador de la tarjeta que se desea mover
+        /// </param>
+        /// <param name="moveKanbanCardRequest">
+        /// Parametro que se envía por "body" que contiene el Id de la otra sección
+        /// </param>
+        /// <returns>
+        /// NotFound en caso de que no exista el grupo, el tablero, la sección o la tarjeta, Ok en
+        /// caso de que se haya modificado con exito
+        /// </returns>
+        [HttpPut("{groupId}/boards/{boardId}/sections/{sectionId}/cards/{cardId}")]
+        public async Task<IActionResult> MoveCard(string groupId, string boardId, string sectionId, string cardId,
+            [FromBody] MoveKanbanCardRequest moveKanbanCardRequest)
+        {
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                // obtenemos el grupo y verificamos si existe
+                var group = await (from g in db.Query<Group>()
+                    where g.Key == groupId
+                    select g).FirstOrDefaultAsync();
+                if (group == null)
+                {
+                    return NotFound();
+                }
+                
+                // obtenemos la sección y verificamos si existe
+                var kanbanSection = (from kb in @group.KanbanBoards
+                    where kb.Id == boardId
+                    from ks in kb.KanbanGroups
+                    where ks.Id == sectionId
+                    select ks).FirstOrDefault();
+                
+                if (kanbanSection == null)
+                {
+                    return NotFound();
+                }
+
+                // obtenemos la tarjeta
+                var kanbanCard = (from kc in kanbanSection.Cards
+                    where kc.Id == cardId
+                    select kc).FirstOrDefault();
+
+                if (kanbanCard == null)
+                {
+                    return NotFound();
+                }
+                
+                // obtenemos la nueva sección
+                var newKanbanSection = (from kb in @group.KanbanBoards
+                    where kb.Id == boardId
+                    from nks in kb.KanbanGroups
+                    where nks.Id == moveKanbanCardRequest.NewSectionId
+                    select nks).FirstOrDefault();
+
+                if (newKanbanSection == null)
+                {
+                    return NotFound();
+                }
+                
+                // añadimos la tarjeta a la nueva sección y la eliminamos de la anterior
+                newKanbanSection.Cards.Add(kanbanCard);
+                kanbanSection.Cards.Remove(kanbanCard);
+                // actualizamos :)
+                await db.UpdateByIdAsync<Group>(group.Id, group);
+                return Ok();
+            }
+        }
+        
         #endregion
 
+
+        /// <summary>
+        /// Obtiene un valor de verdadero o falso si un usuario en cuestión es administrador de un grupo definido por un
+        /// identificador
+        /// </summary>
+        /// <param name="currentGroup">
+        /// Identificador del grupo en el que se desea saber si determinado usuario es administrador
+        /// </param>
+        /// <param name="userId">
+        /// Identificador del usuario del que se desea saber si es administrador de cierto grupo
+        /// </param>
+        /// <returns>
+        /// Asincronicamente retorna verdadero si es administrador, de lo contrario retorna false
+        /// </returns>
         private async Task<bool> IsGroupAdmin(string currentGroup, string userId)
         {
             using (var db = ArangoDatabase.CreateWithSetting())
@@ -326,6 +433,13 @@ namespace MaxOrg.Controllers
             }
         }
 
+        /// <summary>
+        /// Obtiene la lista de usuarios de determinado grupo
+        /// </summary>
+        /// <param name="groupId">
+        /// Identificador del grupo del que se desea obtener todos los usuarios
+        /// </param>
+        /// <returns></returns>
         private List<User> GetGroupMembers(string groupId)
         {
             using (var db = ArangoDatabase.CreateWithSetting())
