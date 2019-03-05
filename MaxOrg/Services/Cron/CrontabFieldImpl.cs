@@ -30,10 +30,10 @@ namespace MaxOrg.Services.Cron
                 "Saturday"
             });
 
-        private static readonly CrontabFieldImpl[] FieldByKind = { Minute, Hour, Day, Month, DayOfWeek };
+        private static readonly CrontabFieldImpl[] FieldByKind = {Minute, Hour, Day, Month, DayOfWeek};
 
         private static readonly CompareInfo Comparer = CultureInfo.InvariantCulture.CompareInfo;
-        private static readonly char[] Comma = { ',' };
+        private static readonly char[] Comma = {','};
 
         private readonly CrontabFieldKind _kind;
         private readonly int _maxValue;
@@ -91,9 +91,9 @@ namespace MaxOrg.Services.Cron
                     string.Join(", ", Enum.GetNames(typeof(CrontabFieldKind)))), nameof(kind));
             }
 
-            return FieldByKind[(int)kind];
+            return FieldByKind[(int) kind];
         }
-        
+
         public void Format(CrontabField field, TextWriter writer, bool noNames)
         {
             if (field == null)
@@ -170,12 +170,12 @@ namespace MaxOrg.Services.Cron
 
             if (value >= 10)
             {
-                writer.Write((char)('0' + (value / 10)));
-                writer.Write((char)('0' + (value % 10)));
+                writer.Write((char) ('0' + (value / 10)));
+                writer.Write((char) ('0' + (value % 10)));
             }
             else
             {
-                writer.Write((char)('0' + value));
+                writer.Write((char) ('0' + value));
             }
         }
 

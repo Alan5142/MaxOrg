@@ -51,9 +51,9 @@ namespace MaxOrg
             services.AddAuthorization(auth =>
             {
                 auth.AddPolicy("Bearer", new AuthorizationPolicyBuilder()
-                  .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-                  .RequireAuthenticatedUser()
-                  .Build());
+                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .Build());
                 auth.DefaultPolicy = auth.GetPolicy(JwtBearerDefaults.AuthenticationScheme);
             });
 
@@ -61,59 +61,58 @@ namespace MaxOrg
             var key = Encoding.ASCII.GetBytes(Configuration["AppSettings:Secret"]);
 
             services.AddAuthentication(options =>
-            {
-                options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = "GitHub";
-            })
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidIssuer = Configuration["AppSettings:DefaultURL"],
-                    ClockSkew = TimeSpan.Zero
-                };
-                options.Audience = Configuration["AppSettings:Jwt:Audience"];
-                options.Events = new JwtBearerEvents
+                    options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = "GitHub";
+                })
+                .AddJwtBearer(options =>
                 {
-                    OnMessageReceived = context =>
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        var accessToken = context.Request.Query["access_token"];
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidIssuer = Configuration["AppSettings:DefaultURL"],
+                        ClockSkew = TimeSpan.Zero
+                    };
+                    options.Audience = Configuration["AppSettings:Jwt:Audience"];
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
 
-                        // If the request is for our hub...
-                        var path = context.HttpContext.Request.Path;
-                        if (!string.IsNullOrEmpty(accessToken) &&
-                            (path.StartsWithSegments("/notification-hub")))
+                            // If the request is for our hub...
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                (path.StartsWithSegments("/notification-hub")))
+                            {
+                                // Read the token out of the query string
+                                context.Token = accessToken;
+                            }
+
+                            return Task.CompletedTask;
+                        },
+                        OnAuthenticationFailed = context =>
                         {
-                            // Read the token out of the query string
-                            context.Token = accessToken;
+                            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                            {
+                                context.Response.Headers.Add("Token-Expired", "true");
+                            }
+
+                            return Task.CompletedTask;
                         }
-                        return Task.CompletedTask;
-                    },
-                    OnAuthenticationFailed = context =>
-                    {
-                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-                        {
-                            context.Response.Headers.Add("Token-Expired", "true");
-                        }
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+                    };
+                });
 
             // In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/dist";
-            });
+            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/dist"; });
 
             // Configure ArangoDB settings, to instantiate an object to communicate with Arango
             ArangoDatabase.ChangeSetting(settings =>
@@ -140,13 +139,11 @@ namespace MaxOrg
                 CreateCollection(db, "Subgroup", CollectionType.Edge);
                 CreateCollection(db, "UsersInGroup", CollectionType.Edge);
             }
+
             services.AddSingleton(ArangoDatabase.CreateWithSetting());
 
             services.AddSingleton<IScheduledTask, RemoveExpiredTokens>();
-            services.AddScheduler((sender, args) =>
-            {
-                args.SetObserved();
-            });
+            services.AddScheduler((sender, args) => { args.SetObserved(); });
             services.AddSignalR();
         }
 
@@ -157,8 +154,8 @@ namespace MaxOrg
             //            builder
             //            .WithOrigins("https://localhost:44384", "http://localhost:4200").AllowAnyOrigin());
             app.UseCors(builder =>
-                        builder
-                        .AllowAnyOrigin());
+                builder
+                    .AllowAnyOrigin());
 
             if (env.IsDevelopment())
             {
@@ -174,10 +171,7 @@ namespace MaxOrg
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
-            app.UseSignalR(routes =>
-            {
-                routes.MapHub<NotificationHub>("/notification-hub");
-            });
+            app.UseSignalR(routes => { routes.MapHub<NotificationHub>("/notification-hub"); });
 
             app.UseMvc(routes =>
             {
@@ -206,7 +200,8 @@ namespace MaxOrg
             ShortId.SetSeed(1939048828);
         }
 
-        private void CreateCollection(IArangoDatabase db, string collectionName, CollectionType type = CollectionType.Document)
+        private void CreateCollection(IArangoDatabase db, string collectionName,
+            CollectionType type = CollectionType.Document)
         {
             try
             {

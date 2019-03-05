@@ -1,9 +1,11 @@
-<h1 mat-dialog-title class="center">{{data.name}}</h1>
+<h1 class="center" mat-dialog-title>{{data.name}}</h1>
 <mat-dialog-content>
   <h2>Descripción</h2>
   <p>{{description}}</p>
   <mat-divider></mat-divider>
 
   <h2>Miembros</h2>
-  <ul><li *ngFor="let member of members">{{member.name}}</li></ul>
+  <ul>
+    <li *ngFor="let member of members">{{member.name}}</li>
+  </ul>
 </mat-dialog-content>

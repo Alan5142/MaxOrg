@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { GroupsService } from './groups.service';
+import {GroupsService} from './groups.service';
 
 describe('GroupsService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

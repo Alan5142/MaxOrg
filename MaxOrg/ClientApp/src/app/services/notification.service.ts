@@ -18,6 +18,10 @@ export interface NotificationRequest {
 export class NotificationService {
   connection: signalR.HubConnection;
 
+  constructor() {
+    console.log(':D');
+  }
+
   public connect() {
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl('/notification-hub', {accessTokenFactory: () => localStorage.getItem('token')})
@@ -31,9 +35,5 @@ export class NotificationService {
       const notification = new Notification(message, {icon: '/favicon.ico', requireInteraction: false, silent: true});
       console.log('Se recibio notificación :D');
     });
-  }
-
-  constructor() {
-    console.log(':D');
   }
 }

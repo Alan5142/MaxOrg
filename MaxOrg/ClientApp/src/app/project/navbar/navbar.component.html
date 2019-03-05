@@ -1,6 +1,6 @@
 <mat-toolbar color="primary" fxLayout="row">
   <div fxFlex="33">
-    <button mat-icon-button (click)="sidenav.toggle()">
+    <button (click)="sidenav.toggle()" mat-icon-button>
       <mat-icon>menu</mat-icon>
     </button>
     <button mat-button routerLink="/start"><h1>MaxOrg</h1></button>
@@ -8,9 +8,9 @@
 
   <div fxFlex fxLayout="row" fxLayoutAlign="end end">
     <mat-menu #accountMenu="matMenu">
-      <button mat-menu-item routerLink="/start/todos" i18n>Mis pendientes</button>
+      <button i18n mat-menu-item routerLink="/start/todos">Mis pendientes</button>
       <mat-divider></mat-divider>
-      <button mat-menu-item routerLink="/start/my_account" i18n>Opciones</button>
+      <button i18n mat-menu-item routerLink="/start/my_account">Opciones</button>
     </mat-menu>
 
     <mat-menu #notificationMenu="matMenu">
@@ -20,7 +20,7 @@
             <div>
               <img class="image" src='https://material.angular.io/assets/img/examples/shiba1.jpg'>
             </div>
-            <button mat-button fxFill>
+            <button fxFill mat-button>
               Ha publicado...
             </button>
           </div>
@@ -29,11 +29,11 @@
       </div>
     </mat-menu>
 
-    <button mat-icon-button [matMenuTriggerFor]="notificationMenu">
-      <mat-icon matBadge="3" matBadgePosition="above after" matBadgeColor="warn">notifications</mat-icon>
+    <button [matMenuTriggerFor]="notificationMenu" mat-icon-button>
+      <mat-icon matBadge="3" matBadgeColor="warn" matBadgePosition="above after">notifications</mat-icon>
     </button>
     <div fxFlex="2" fxFlex.gt-md="1"></div>
-    <button mat-icon-button [matMenuTriggerFor]="accountMenu">
+    <button [matMenuTriggerFor]="accountMenu" mat-icon-button>
       <mat-icon>account_circle</mat-icon>
     </button>
     <div fxFlex="3" fxFlex.gt-md="6"></div>

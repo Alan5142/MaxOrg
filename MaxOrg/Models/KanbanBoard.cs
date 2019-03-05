@@ -33,12 +33,13 @@ namespace MaxOrg.Models
         public KanbanBoard(string name = "")
         {
             Name = name;
-            KanbanGroups.Add(new KanbanGroup { Name = "En planeación" });
-            KanbanGroups.Add(new KanbanGroup { Name = "En proceso" });
-            KanbanGroups.Add(new KanbanGroup { Name = "En pruebas" });
-            KanbanGroups.Add(new KanbanGroup { Name = "Finalizado" });
+            KanbanGroups.Add(new KanbanGroup {Name = "En planeación"});
+            KanbanGroups.Add(new KanbanGroup {Name = "En proceso"});
+            KanbanGroups.Add(new KanbanGroup {Name = "En pruebas"});
+            KanbanGroups.Add(new KanbanGroup {Name = "Finalizado"});
 
-            KanbanGroups[0].Cards.Add(new KanbanCard { Title = "Tu primera tarea", Description = "Este es tu nuevo grupo de tarjetas :)" });
+            KanbanGroups[0].Cards.Add(new KanbanCard
+                {Title = "Tu primera tarea", Description = "Este es tu nuevo grupo de tarjetas :)"});
         }
 
         public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 20);
@@ -50,8 +51,7 @@ namespace MaxOrg.Models
 
     public class CreateKanbanBoardRequest
     {
-        [Required]
-        public string Name { get; set; }
+        [Required] public string Name { get; set; }
     }
 
     public class CreateKanbanCardInSectionRequest

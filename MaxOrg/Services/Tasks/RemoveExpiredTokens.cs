@@ -20,14 +20,13 @@ namespace MaxOrg.Services.Tasks
                 {
                     var dateTimeNow = DateTime.Now;
                     db.Query<RefreshToken>()
-                                    .Where(t => t.Expires <= dateTimeNow)
-                                    .Remove()
-                                    .Execute();
+                        .Where(t => t.Expires <= dateTimeNow)
+                        .Remove()
+                        .Execute();
                 }
             });
             task.Start();
             return task;
         }
-
     }
 }

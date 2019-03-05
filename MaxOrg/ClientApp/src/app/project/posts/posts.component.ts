@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import {NotificationService} from '../../services/notification.service';
+import {Component, OnInit} from '@angular/core';
 
 
 @Component({
@@ -9,7 +8,8 @@ import {NotificationService} from '../../services/notification.service';
 })
 export class PostsComponent implements OnInit {
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
   }

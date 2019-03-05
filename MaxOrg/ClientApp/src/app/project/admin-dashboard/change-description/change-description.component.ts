@@ -11,6 +11,7 @@ import {GroupsService} from '../../../services/groups.service';
 export class ChangeDescriptionComponent implements OnInit {
   description: string;
   groupId: string;
+
   constructor(public dialogRef: MatDialogRef<ChangeDescriptionComponent>,
               public mediaObserver: MediaObserver,
               private groups: GroupsService,

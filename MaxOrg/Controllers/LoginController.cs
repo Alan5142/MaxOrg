@@ -41,19 +41,22 @@ namespace MaxOrg.Controllers
         {
             if (userLoginData.password == null || userLoginData.username == null)
             {
-                return BadRequest(new { message = "No password or username was given" });
+                return BadRequest(new {message = "No password or username was given"});
             }
+
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var user = await (from u in db.Query<Models.User>()
-                                  where u.Username == userLoginData.username
-                                  select u).FirstOrDefaultAsync();
+                    where u.Username == userLoginData.username
+                    select u).FirstOrDefaultAsync();
                 if (user != null)
                 {
-                    if (m_passwordHasher.VerifyHashedPassword(user, user.Password, user.Salt + userLoginData.password) != PasswordVerificationResult.Success)
+                    if (m_passwordHasher.VerifyHashedPassword(user, user.Password,
+                            user.Salt + userLoginData.password) != PasswordVerificationResult.Success)
                     {
-                        return BadRequest(new { message = "Username or password are incorrect" });
+                        return BadRequest(new {message = "Username or password are incorrect"});
                     }
+
                     var token = await GenerateRefreshAndJwtToken(user);
                     var response = new LoginResponse
                     {
@@ -66,7 +69,7 @@ namespace MaxOrg.Controllers
                 }
                 else
                 {
-                    return NotFound(new { message = "Incorrect username or password" });
+                    return NotFound(new {message = "Incorrect username or password"});
                 }
             }
         }
@@ -78,15 +81,15 @@ namespace MaxOrg.Controllers
             {
                 var dateNow = DateTime.Now;
                 var userTokenPair = await (from t in db.Query<RefreshToken>()
-                                           from u in db.Query<Models.User>()
-                                           where t.UserKey == u.Key
-                                           select new { token = t, user = u }).FirstOrDefaultAsync();
+                    from u in db.Query<Models.User>()
+                    where t.UserKey == u.Key
+                    select new {token = t, user = u}).FirstOrDefaultAsync();
 
                 var expirationDate = userTokenPair.token.Expires;
                 // refresh token is not valid :(
                 if (expirationDate <= dateNow)
                 {
-                    return BadRequest(new { message = "Token expired" });
+                    return BadRequest(new {message = "Token expired"});
                 }
 
                 // created token
@@ -124,14 +127,15 @@ namespace MaxOrg.Controllers
                 {
                     return StatusCode(500);
                 }
+
                 githubClient.Credentials = tokenAuth;
 
                 // get user email
                 var githubUser = await githubClient.User.Current();
 
                 var userWithSameId = await (from u in db.Query<Models.User>()
-                                            where u.GithubId == githubUser.Id
-                                            select u).FirstOrDefaultAsync();
+                    where u.GithubId == githubUser.Id
+                    select u).FirstOrDefaultAsync();
 
                 // the account is linked
                 if (userWithSameId != null)
@@ -145,12 +149,12 @@ namespace MaxOrg.Controllers
                     // but we can link those accounts with existing accounts :)
                     if (githubUser.Email == null)
                     {
-                        return BadRequest(new { message = "GitHub user doesn't have a published email" });
+                        return BadRequest(new {message = "GitHub user doesn't have a published email"});
                     }
 
                     var userWithSameEmail = await (from u in db.Query<Models.User>()
-                                                   where u.Email == githubUser.Email
-                                                   select u).FirstOrDefaultAsync();
+                        where u.Email == githubUser.Email
+                        select u).FirstOrDefaultAsync();
                     if (userWithSameEmail != null)
                     {
                         // Email is already registered
@@ -160,8 +164,10 @@ namespace MaxOrg.Controllers
                         {
                             // well, user needs to link his account from account settings
                             return
-                                BadRequest(new { message = "Email already exists, link your account from 'Account settings'" });
+                                BadRequest(new
+                                    {message = "Email already exists, link your account from 'Account settings'"});
                         }
+
                         userToAuth = userWithSameEmail;
                         hasPassword = false;
                     }
@@ -177,8 +183,8 @@ namespace MaxOrg.Controllers
                         };
 
                         var usernameExists = await (from u in db.Query<Models.User>()
-                                                    where u.Username == githubUser.Login
-                                                    select u).FirstOrDefaultAsync();
+                            where u.Username == githubUser.Login
+                            select u).FirstOrDefaultAsync();
                         string username = githubUser.Login;
 
                         // concat a random number to username if the username exists
@@ -209,6 +215,7 @@ namespace MaxOrg.Controllers
                 {
                     HttpContext.Response.Headers.Add("HasPassword", "true");
                 }
+
                 return Ok(response);
             }
         }
@@ -223,12 +230,12 @@ namespace MaxOrg.Controllers
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var httpResult = await client.PostAsJsonAsync("https://github.com/login/oauth/access_token",
-            new
-            {
-                client_id = Configuration["AppSettings:GitHub:ClientID"],
-                client_secret = Configuration["AppSettings:GitHub:ClientSecret"],
-                code
-            });
+                new
+                {
+                    client_id = Configuration["AppSettings:GitHub:ClientID"],
+                    client_secret = Configuration["AppSettings:GitHub:ClientSecret"],
+                    code
+                });
             var data = await httpResult.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<GitHubTokenResponse>(data);
         }
@@ -248,16 +255,17 @@ namespace MaxOrg.Controllers
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
-                        {
-                            new Claim(ClaimTypes.Name, user.Key.ToString()),
-                            new Claim(ClaimTypes.Email, user.Email),
-                            new Claim(ClaimTypes.Surname, user.Username)
-                        }),
+                {
+                    new Claim(ClaimTypes.Name, user.Key.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Surname, user.Username)
+                }),
                 NotBefore = nowDate,
                 Expires = nowDate.AddDays(1),
                 Issuer = Configuration["AppSettings:DefaultURL"],
                 Audience = Configuration["AppSettings:Jwt:Audience"],
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
@@ -316,7 +324,5 @@ namespace MaxOrg.Controllers
                 await db.InsertAsync<RefreshToken>(token);
             }
         }
-
-
     }
 }

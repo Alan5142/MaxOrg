@@ -4,16 +4,13 @@ import {NgModule} from '@angular/core';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {GestureConfig, MatInputModule, MatToolbarModule} from '@angular/material';
-import {MatButtonModule} from '@angular/material';
-import {MatDialogModule} from '@angular/material';
-import {MatFormFieldModule} from '@angular/material';
+import {GestureConfig, MatButtonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatToolbarModule} from '@angular/material';
 import {HttpClientModule} from '@angular/common/http';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ServicesModule} from './services/services.module';
-import { ServiceWorkerModule } from '@angular/service-worker';
-import { environment } from '../environments/environment';
+import {ServiceWorkerModule} from '@angular/service-worker';
+import {environment} from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -33,7 +30,7 @@ import { environment } from '../environments/environment';
     ServicesModule,
     FormsModule,
     ReactiveFormsModule,
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
+    ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production})
   ],
   providers: [
     {provide: HAMMER_GESTURE_CONFIG, useClass: GestureConfig}

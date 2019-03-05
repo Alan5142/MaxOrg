@@ -1,9 +1,10 @@
-<div ngClass.gt-md='desktop-view' [ngClass.lt-md]="['mobile-view']" fxLayout="column" fxLayoutAlign="center stretch">
-  <h1 i18n class="text-center">Mi cuenta</h1>
+<div [ngClass.lt-md]="['mobile-view']" fxLayout="column" fxLayoutAlign="center stretch" ngClass.gt-md='desktop-view'>
+  <h1 class="text-center" i18n>Mi cuenta</h1>
 
   <div fxLayout="row" fxLayoutAlign="center stretch">
-    <img ngClass="image" ngClass.xs="image-small" [src]="fileData == null ? 'https://material.angular.io/assets/img/examples/shiba1.jpg' : fileData">
-    <button mat-icon-button fxFlexAlign="end" (click)="selectImage()">
+    <img [src]="fileData == null ? 'https://material.angular.io/assets/img/examples/shiba1.jpg' : fileData" ngClass="image"
+         ngClass.xs="image-small">
+    <button (click)="selectImage()" fxFlexAlign="end" mat-icon-button>
       <mat-icon>edit</mat-icon>
     </button>
   </div>
@@ -11,35 +12,36 @@
   <mat-divider></mat-divider>
   <form fxLayout="column">
     <mat-form-field>
-      <input matInput type="text" placeholder="Nombre de usuario" i18n-placeholder
-             [value]="currentUser === null ? '' : currentUser.username">
+      <input [value]="currentUser === null ? '' : currentUser.username" i18n-placeholder matInput placeholder="Nombre de usuario"
+             type="text">
     </mat-form-field>
     <mat-form-field>
-      <textarea cdkTextareaAutosize matInput placeholder="Descripción" i18n-placeholder [value]="currentUser !== null ? currentUser.description : ''"></textarea>
+      <textarea [value]="currentUser !== null ? currentUser.description : ''" cdkTextareaAutosize i18n-placeholder matInput
+                placeholder="Descripción"></textarea>
     </mat-form-field>
 
     <mat-form-field>
       <div fxLayout="row">
-        <input matInput type="password" placeholder="contraseña" i18n-placeholder>
-        <button mat-icon-button (click)="passwordChanged = true">
+        <input i18n-placeholder matInput placeholder="contraseña" type="password">
+        <button (click)="passwordChanged = true" mat-icon-button>
           <mat-icon>edit</mat-icon>
         </button>
       </div>
     </mat-form-field>
     <mat-form-field *ngIf="passwordChanged">
       <div fxLayout="row">
-        <input matInput type="password" placeholder="repetir contraseña" i18n-placeholder>
+        <input i18n-placeholder matInput placeholder="repetir contraseña" type="password">
       </div>
     </mat-form-field>
     <mat-form-field>
 
-      <mat-select placeholder="Sonido de notificaciones" i18n-placeholder>
-        <mat-option value="all" i18n>Todas las prioridades</mat-option>
-        <mat-option value="medium-high" i18n>Media y alta prioridad</mat-option>
-        <mat-option value="high-only" i18n>Solo alta prioridad</mat-option>
+      <mat-select i18n-placeholder placeholder="Sonido de notificaciones">
+        <mat-option i18n value="all">Todas las prioridades</mat-option>
+        <mat-option i18n value="medium-high">Media y alta prioridad</mat-option>
+        <mat-option i18n value="high-only">Solo alta prioridad</mat-option>
       </mat-select>
 
     </mat-form-field>
-    <button mat-flat-button color="accent" i18n>Guardar cambios</button>
+    <button color="accent" i18n mat-flat-button>Guardar cambios</button>
   </form>
 </div>

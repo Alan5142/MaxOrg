@@ -13,14 +13,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
   notifications: number[];
 
   mobileQuery: MediaQueryList;
-
-  private _mobileQueryListener: () => void;
-
   route: ActivatedRoute;
-
   @ViewChildren(MatSidenav) sidenav: MatSidenav;
-
   SWIPE_ACTION = {LEFT: 'swipeleft', RIGHT: 'swiperight'};
+  private _mobileQueryListener: () => void;
 
   constructor(changeDetectorRef: ChangeDetectorRef,
               media: MediaMatcher,

@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { KanbanToolbarComponent } from './kanban-toolbar.component';
+import {KanbanToolbarComponent} from './kanban-toolbar.component';
 
 describe('KanbanToolbarComponent', () => {
   let component: KanbanToolbarComponent;
@@ -8,9 +8,9 @@ describe('KanbanToolbarComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ KanbanToolbarComponent ]
+      declarations: [KanbanToolbarComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

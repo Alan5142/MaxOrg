@@ -20,25 +20,6 @@ export class CalendarComponent implements OnInit {
   ngOnInit() {
   }
 
-  private refreshCalendar() {
-    this.dates = [];
-    const tempDate = new Date(this.calendarFilterDate);
-    tempDate.setDate(1);
-    for (let i = 0; i < 7; i++) {
-      if (tempDate.getDay() !== i) {
-        this.dates.push(null);
-      } else {
-        break;
-      }
-    }
-    while (tempDate.getMonth() === this.calendarFilterDate.getMonth()) {
-      const dateToInsert = new Date(tempDate);
-      this.dates.push(dateToInsert);
-      tempDate.setDate(tempDate.getDate() + 1);
-    }
-  }
-
-
   getMonthName(): string {
     const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
       'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -60,5 +41,23 @@ export class CalendarComponent implements OnInit {
     return this.calendarFilterDate.getMonth() === this.currentDate.getMonth() &&
       this.calendarFilterDate.getFullYear() === this.currentDate.getFullYear() &&
       this.calendarFilterDate.getDate() === this.currentDate.getDate();
+  }
+
+  private refreshCalendar() {
+    this.dates = [];
+    const tempDate = new Date(this.calendarFilterDate);
+    tempDate.setDate(1);
+    for (let i = 0; i < 7; i++) {
+      if (tempDate.getDay() !== i) {
+        this.dates.push(null);
+      } else {
+        break;
+      }
+    }
+    while (tempDate.getMonth() === this.calendarFilterDate.getMonth()) {
+      const dateToInsert = new Date(tempDate);
+      this.dates.push(dateToInsert);
+      tempDate.setDate(tempDate.getDate() + 1);
+    }
   }
 }

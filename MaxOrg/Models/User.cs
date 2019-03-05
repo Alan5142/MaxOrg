@@ -25,6 +25,7 @@ namespace MaxOrg.Models
 
         [DocumentProperty(Identifier = IdentifierType.Key)]
         public string Key { get; set; }
+
         [DocumentProperty(Identifier = IdentifierType.Handle)]
         public string Id { get; set; }
 
@@ -36,8 +37,10 @@ namespace MaxOrg.Models
         public string Description { get; set; }
         public string Occupation { get; set; }
         public DateTime Birthday { get; set; } = DateTime.MinValue;
+
         [DocumentProperty(IgnoreProperty = true)]
         public int? GithubId { get; set; }
+
         public string GithubToken { get; set; }
 
         /// <summary>
@@ -48,15 +51,16 @@ namespace MaxOrg.Models
 
     public class UserForm
     {
-        [StringLength(maximumLength: 20,MinimumLength = 7)]
+        [StringLength(maximumLength: 20, MinimumLength = 7)]
         [Required]
         public string Username { get; set; }
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+
+        [Required] [EmailAddress] public string Email { get; set; }
+
         [Required]
         [StringLength(maximumLength: 100, MinimumLength = 8)]
         public string Password { get; set; }
+
         public string RealName { get; set; }
         public string Description { get; set; }
         public string Occupation { get; set; }
@@ -67,10 +71,12 @@ namespace MaxOrg.Models
     {
         [StringLength(maximumLength: 20, MinimumLength = 7)]
         public string username { get; set; }
-        [EmailAddress]
-        public string email { get; set; }
+
+        [EmailAddress] public string email { get; set; }
+
         [StringLength(maximumLength: 100, MinimumLength = 8)]
         public string password { get; set; }
+
         public string realName { get; set; }
         public string description { get; set; }
         public string occupation { get; set; }

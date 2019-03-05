@@ -1,21 +1,21 @@
 <div fxLayout="column" fxLayoutGap="60px" ngClass="post-container" ngClass.lt-md="post-container-mobile">
   <div>
     <form fxLayout="column">
-      <mat-form-field fxFlex appearance="outline">
-        <textarea matInput cdkTextareaAutosize cdkAutosizeMaxRows="5"></textarea>
+      <mat-form-field appearance="outline" fxFlex>
+        <textarea cdkAutosizeMaxRows="5" cdkTextareaAutosize matInput></textarea>
         <mat-label>Post</mat-label>
         <mat-hint>Puedes utilizar markdown y HTML</mat-hint>
       </mat-form-field>
-      <button mat-flat-button color="primary" (click)="testNotification()">Publicar</button>
+      <button (click)="testNotification()" color="primary" mat-flat-button>Publicar</button>
     </form>
   </div>
 
   <mat-card>
     <mat-card-header>
-      <div mat-card-avatar matRipple class="example-header-image"></div>
+      <div class="example-header-image" mat-card-avatar matRipple></div>
       <mat-card-title class="no-select" matRipple>[Nombre de usuario]</mat-card-title>
     </mat-card-header>
-    <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu">
+    <img alt="Photo of a Shiba Inu" mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg">
     <mat-card-content>
       <p>
         Aquí va el post de la persona, el contenido se renderizará con markdown con la finalidad de que el usuario tenga

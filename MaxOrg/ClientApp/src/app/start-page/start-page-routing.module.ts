@@ -1,5 +1,5 @@
-import {ModuleWithProviders, NgModule} from '@angular/core';
-import {Routes, RouterModule} from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 import {IndexComponent} from './index/index.component';
 import {StartPageComponent} from './start-page.component';
 import {UserStartComponent} from './user-start/user-start.component';

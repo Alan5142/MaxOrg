@@ -8,13 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-
-/// <summary>
-/// :D
-/// </summary>
 namespace MaxOrg.Controllers
 {
-    
     /// <summary>
     /// Se encarga de administrar todos las peticiones HTTP que involucren a los grupos de trabajo
     /// </summary>
@@ -47,36 +42,38 @@ namespace MaxOrg.Controllers
                 {
                     return Unauthorized();
                 }
+
                 // Subgroup admin doesn't exist
-                var subgroupAdmin = await db.Query<User>().Where(u => u.Key == createGroup.SubgroupAdminId).FirstOrDefaultAsync();
+                var subgroupAdmin = await db.Query<User>().Where(u => u.Key == createGroup.SubgroupAdminId)
+                    .FirstOrDefaultAsync();
                 if (subgroupAdmin == null)
                 {
-                    return BadRequest(new { message = "Invalid subgroup admin" });
+                    return BadRequest(new {message = "Invalid subgroup admin"});
                 }
 
                 var groupGraph = db.Graph("GroupUsersGraph");
 
                 var usersToAdd = from u in db.Query<User>()
-                                 from ud in createGroup.Members
-                                 where u.Username == ud
-                                 select u;
+                    from ud in createGroup.Members
+                    where u.Username == ud
+                    select u;
 
                 var groupMembers = GetGroupMembers(createGroup.CurrentGroupId);
 
                 if (groupMembers.Find(u => u.Key == createGroup.SubgroupAdminId) == null)
                 {
-                    return BadRequest(new { message = "Invalid subgroup admin id" });
+                    return BadRequest(new {message = "Invalid subgroup admin id"});
                 }
 
                 usersToAdd = from u in usersToAdd
-                             from um in groupMembers
-                             where u.Key == um.Key
-                             select u;
+                    from um in groupMembers
+                    where u.Key == um.Key
+                    select u;
 
                 // Algunos usuarios no son validos
                 if (createGroup.Members.Count != usersToAdd.Count())
                 {
-                    return BadRequest(new { message = "Some users are invalid" });
+                    return BadRequest(new {message = "Some users are invalid"});
                 }
 
                 var newGroup = new Group
@@ -90,12 +87,12 @@ namespace MaxOrg.Controllers
                 var createdGroup = await db.InsertAsync<Group>(newGroup);
 
                 var currentUser = await (from u in db.Query<User>()
-                                         where u.Key == HttpContext.User.Identity.Name
-                                         select u).FirstOrDefaultAsync();
+                    where u.Key == HttpContext.User.Identity.Name
+                    select u).FirstOrDefaultAsync();
 
                 var currentGroup = await (from g in db.Query<Group>()
-                                          where g.Key == createGroup.CurrentGroupId
-                                          select g).FirstOrDefaultAsync();
+                    where g.Key == createGroup.CurrentGroupId
+                    select g).FirstOrDefaultAsync();
                 var subgroup = new Subgroup
                 {
                     Parent = currentGroup.Id,
@@ -128,6 +125,7 @@ namespace MaxOrg.Controllers
                     };
                     await groupGraph.InsertEdgeAsync<UsersInGroup>(userToAdd);
                 }
+
                 return Created("api/groups/" + createdGroup.Key, null);
             }
         }
@@ -139,7 +137,8 @@ namespace MaxOrg.Controllers
         /// <param name="newDescription">Nueva descripción</param>
         /// <returns>404 si no se encuentra el recurso, 401 si no es admin, 200 si se cambio con exito</returns>
         [HttpPost("{groupId}/description")]
-        public async Task<IActionResult> ChangeGroupDescription(string groupId, [FromBody] ChangeGroupDescriptionRequest newDescription)
+        public async Task<IActionResult> ChangeGroupDescription(string groupId,
+            [FromBody] ChangeGroupDescriptionRequest newDescription)
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
@@ -148,14 +147,17 @@ namespace MaxOrg.Controllers
                 {
                     return NotFound();
                 }
+
                 if (!await IsGroupAdmin(groupId, HttpContext.User.Identity.Name))
                 {
                     return Unauthorized();
                 }
+
                 // TODO sanitize c:
                 group.Description = newDescription.NewDescription;
                 await db.UpdateByIdAsync<Group>(group.Id, group);
             }
+
             return Ok();
         }
 
@@ -169,12 +171,14 @@ namespace MaxOrg.Controllers
                 {
                     return NotFound();
                 }
+
                 if (GetGroupMembers(groupId).Find(u => u.Key == HttpContext.User.Identity.Name) == null)
                 {
                     // the user is not in the group
                     return Unauthorized();
                 }
-                return Ok(new { group.Description });
+
+                return Ok(new {group.Description});
             }
         }
 
@@ -184,15 +188,17 @@ namespace MaxOrg.Controllers
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var group = await (from g in db.Query<Group>()
-                                   where g.Key == groupId && g.IsRoot == false
-                                   select g).FirstOrDefaultAsync();
+                    where g.Key == groupId && g.IsRoot == false
+                    select g).FirstOrDefaultAsync();
                 if (group == null)
                 {
                     return NotFound();
                 }
-                var members = GetGroupMembers(groupId).Select(u => new { u.Key, u.Username, u.Email });
 
-                return Ok(new { group.Name, group.Key, group.GroupOwner, group.CreationDate, group.Description, members });
+                var members = GetGroupMembers(groupId).Select(u => new {u.Key, u.Username, u.Email});
+
+                return Ok(new
+                    {group.Name, group.Key, group.GroupOwner, group.CreationDate, group.Description, members});
             }
         }
 
@@ -208,6 +214,7 @@ namespace MaxOrg.Controllers
                 {
                     return NotFound();
                 }
+
                 group.KanbanBoards.Add(new KanbanBoard(request.Name));
                 var createdBoard = group.KanbanBoards.Last();
                 createdBoard.Members.Add(HttpContext.User.Identity.Name);
@@ -222,18 +229,18 @@ namespace MaxOrg.Controllers
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 IEnumerable<KanbanBoard> kanbanBoards = await (from g in db.Query<Group>()
-                                                               from kb in g.KanbanBoards
-                                                               where g.Key == groupId
-                                                               select g.KanbanBoards).FirstOrDefaultAsync();
+                    from kb in g.KanbanBoards
+                    where g.Key == groupId
+                    select g.KanbanBoards).FirstOrDefaultAsync();
                 kanbanBoards = from kb in kanbanBoards
-                               where kb.Members.Contains(HttpContext.User.Identity.Name)
-                               select kb;
+                    where kb.Members.Contains(HttpContext.User.Identity.Name)
+                    select kb;
                 // send only names and ids
 
                 return Ok(new
                 {
                     boards = from kb in kanbanBoards
-                             select new { kb.Name, kb.Id }
+                        select new {kb.Name, kb.Id}
                 });
             }
         }
@@ -244,19 +251,21 @@ namespace MaxOrg.Controllers
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var boards = await (from g in db.Query<Group>()
-                                    from kb in g.KanbanBoards
-                                    where g.Key == groupId && kb.Members.Contains(HttpContext.User.Identity.Name) && kb.Id == boardId
-                                    select g).FirstOrDefaultAsync();
+                    from kb in g.KanbanBoards
+                    where g.Key == groupId && kb.Members.Contains(HttpContext.User.Identity.Name) && kb.Id == boardId
+                    select g).FirstOrDefaultAsync();
                 if (boards == null)
                 {
                     return NotFound();
                 }
+
                 var kanbanBoard = boards.KanbanBoards.FirstOrDefault();
 
                 if (kanbanBoard == null)
                 {
                     return NotFound();
                 }
+
                 return Ok(kanbanBoard);
             }
         }
@@ -272,22 +281,24 @@ namespace MaxOrg.Controllers
         /// <param name="cardInfo"></param>
         /// <returns></returns>
         [HttpPost("{groupId}/boards/{boardId}/sections/{sectionId}/cards")]
-        public async Task<IActionResult> CreateCardInSection(string groupId, string boardId, string sectionId, [FromBody] CreateKanbanCardInSectionRequest cardInfo)
+        public async Task<IActionResult> CreateCardInSection(string groupId, string boardId, string sectionId,
+            [FromBody] CreateKanbanCardInSectionRequest cardInfo)
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var group = await (from g in db.Query<Group>()
-                                   where g.Key == groupId
-                                   select g).FirstOrDefaultAsync();
+                    where g.Key == groupId
+                    select g).FirstOrDefaultAsync();
                 if (group == null)
                 {
                     return NotFound();
                 }
+
                 var kanbanSection = (from kb in @group.KanbanBoards
-                                    where kb.Id == boardId
-                                    from ks in kb.KanbanGroups
-                                    where ks.Id == sectionId
-                                    select ks).FirstOrDefault();
+                    where kb.Id == boardId
+                    from ks in kb.KanbanGroups
+                    where ks.Id == sectionId
+                    select ks).FirstOrDefault();
                 if (kanbanSection == null)
                 {
                     return NotFound();
@@ -341,14 +352,14 @@ namespace MaxOrg.Controllers
                 {
                     return NotFound();
                 }
-                
+
                 // obtenemos la sección y verificamos si existe
                 var kanbanSection = (from kb in @group.KanbanBoards
                     where kb.Id == boardId
                     from ks in kb.KanbanGroups
                     where ks.Id == sectionId
                     select ks).FirstOrDefault();
-                
+
                 if (kanbanSection == null)
                 {
                     return NotFound();
@@ -363,7 +374,7 @@ namespace MaxOrg.Controllers
                 {
                     return NotFound();
                 }
-                
+
                 // obtenemos la nueva sección
                 var newKanbanSection = (from kb in @group.KanbanBoards
                     where kb.Id == boardId
@@ -375,7 +386,7 @@ namespace MaxOrg.Controllers
                 {
                     return NotFound();
                 }
-                
+
                 // añadimos la tarjeta a la nueva sección y la eliminamos de la anterior
                 newKanbanSection.Cards.Add(kanbanCard);
                 kanbanSection.Cards.Remove(kanbanCard);
@@ -384,7 +395,7 @@ namespace MaxOrg.Controllers
                 return Ok();
             }
         }
-        
+
         #endregion
 
 
@@ -408,8 +419,8 @@ namespace MaxOrg.Controllers
                 var graph = db.Graph("GroupUsersGraph");
 
                 var user = await (from u in db.Query<User>()
-                                  where u.Key == userId
-                                  select u).FirstOrDefaultAsync();
+                    where u.Key == userId
+                    select u).FirstOrDefaultAsync();
                 var traversal = db.Traverse<User, UsersInGroup>(new TraversalConfig
                 {
                     StartVertex = "Group/" + currentGroup,
@@ -419,9 +430,9 @@ namespace MaxOrg.Controllers
                     MaxDepth = 1
                 });
                 return (from u in traversal.Visited.Paths
-                        from e in u.Edges
-                        where e.User == "User/" + userId
-                        select e.IsAdmin).FirstOrDefault();
+                    from e in u.Edges
+                    where e.User == "User/" + userId
+                    select e.IsAdmin).FirstOrDefault();
             }
         }
 

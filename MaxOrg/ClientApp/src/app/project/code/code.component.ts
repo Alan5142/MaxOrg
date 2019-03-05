@@ -15,7 +15,7 @@ export class CodeComponent implements OnInit {
     {isFolder: true, name: 'folder example 2'},
     {isFolder: false, name: 'hello world.py'},
     {isFolder: false, name: 'hello world 2.kt'}
-    ];
+  ];
 
   constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer, public mediaObserver: MediaObserver) {
     iconRegistry.addSvgIcon(

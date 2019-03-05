@@ -1,13 +1,13 @@
-<div style="overflow-x: hidden" class="calendar-container">
+<div class="calendar-container" style="overflow-x: hidden">
   <div class="month">
     <ul>
       <li class="prev">
-        <button mat-icon-button (click)="goToPreviousMonth()">
+        <button (click)="goToPreviousMonth()" mat-icon-button>
           ❮
         </button>
       </li>
       <li class="next">
-        <button mat-icon-button (click)="goToNextMonth()">
+        <button (click)="goToNextMonth()" mat-icon-button>
           ❯
         </button>
       </li>
@@ -29,11 +29,11 @@
     <li *ngFor="let day of dates">
     <span>
       <button *ngIf="compareDates() && day?.getDate() === currentDate.getDate(); else elseStatement"
-              mat-icon-button mat-flat-button color="primary">
+              color="primary" mat-flat-button mat-icon-button>
         {{day?.getDate()}}
       </button>
       <ng-template #elseStatement>
-        <button mat-icon-button *ngIf="day !== null">
+        <button *ngIf="day !== null" mat-icon-button>
           {{day?.getDate()}}
         </button>
       </ng-template>

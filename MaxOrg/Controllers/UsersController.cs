@@ -46,34 +46,38 @@ namespace MaxOrg.Controllers
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var query = from u in db.Query<User>()
-                            select new
-                            {
-                                u.Key,
-                                u.Username,
-                                u.RealName,
-                                u.Email,
-                                u.Description,
-                                u.Occupation,
-                                birthday = AQL.DateFormat(u.Birthday, "%dd/%mm/%yyyy")
-                            };
+                    select new
+                    {
+                        u.Key,
+                        u.Username,
+                        u.RealName,
+                        u.Email,
+                        u.Description,
+                        u.Occupation,
+                        birthday = AQL.DateFormat(u.Birthday, "%dd/%mm/%yyyy")
+                    };
                 if (options.name != null)
                 {
                     query = query.Where(u => AQL.Contains(AQL.Lower(u.Username), AQL.Lower(options.name)));
                 }
+
                 if (options.email != null)
                 {
                     query = from u in query
-                            where AQL.Lower(u.Email) == AQL.Lower(options.email)
-                            select u;
+                        where AQL.Lower(u.Email) == AQL.Lower(options.email)
+                        select u;
                 }
+
                 if (options.limit.HasValue)
                 {
                     query = query.Take(options.limit.Value);
                 }
+
                 if (options.sorted.HasValue && options.sorted.Value == true)
                 {
                     query.OrderBy(user => user.Username);
                 }
+
                 var defaultValue = query.FirstOrDefault();
                 var queryCount = query.Count();
                 if (query.Count() >= 250 || options.page.HasValue)
@@ -81,10 +85,12 @@ namespace MaxOrg.Controllers
                     int skipValue = (options.page ?? 0) * 250;
                     query = query.Skip(skipValue).Take(250).Select(u => u);
                 }
-                if(options.maxElements.HasValue && options.maxElements.Value > 0)
+
+                if (options.maxElements.HasValue && options.maxElements.Value > 0)
                 {
                     query = query.Take(options.maxElements.Value);
                 }
+
                 return Ok(query);
             }
         }
@@ -98,25 +104,28 @@ namespace MaxOrg.Controllers
         public async Task<ActionResult> PostAsync([FromBody] UserForm user)
         {
             if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password) ||
-                        string.IsNullOrEmpty(user.Email))
+                string.IsNullOrEmpty(user.Email))
             {
-                return BadRequest(new { message = "username, password or email are empty" });
+                return BadRequest(new {message = "username, password or email are empty"});
             }
+
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var query = from u in db.Query<User>()
-                            where u.Username == user.Username
-                            select u;
+                    where u.Username == user.Username
+                    select u;
 
                 if (query.Count() > 0)
                 {
-                    return Conflict(new { message = $"Username {user.Username} already exists" });
+                    return Conflict(new {message = $"Username {user.Username} already exists"});
                 }
+
                 query = db.Query<User>().Where(u => u.Email == user.Email);
                 if (query.Count() > 0)
                 {
-                    return Conflict(new { message = $"Email {user.Email} already exists" });
+                    return Conflict(new {message = $"Email {user.Email} already exists"});
                 }
+
                 var random = new RNGCryptoServiceProvider();
                 var salt = new byte[32];
                 random.GetBytes(salt);
@@ -143,13 +152,14 @@ namespace MaxOrg.Controllers
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var user = await (from u in db.Query<User>()
-                             where u.Key == userId
-                             select new { u.Username, u.RealName, u.Email, u.Description, u.Birthday, u.Occupation })
-                             .FirstOrDefaultAsync();
+                        where u.Key == userId
+                        select new {u.Username, u.RealName, u.Email, u.Description, u.Birthday, u.Occupation})
+                    .FirstOrDefaultAsync();
                 if (user == null)
                 {
                     return NotFound();
                 }
+
                 return Ok(user);
             }
         }
@@ -158,23 +168,26 @@ namespace MaxOrg.Controllers
         [HttpPatch("{userId}")]
         public async Task<ActionResult> ChangeUserInformation(string userId, [FromBody] UserUpdateInfo userData)
         {
-            if(userId != HttpContext.User.Claims.FirstOrDefault().Value)
+            if (userId != HttpContext.User.Claims.FirstOrDefault().Value)
             {
                 return Unauthorized();
             }
+
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var user = await (from u in db.Query<User>()
-                           where u.Key == userId
-                           select u).FirstOrDefaultAsync();
+                    where u.Key == userId
+                    select u).FirstOrDefaultAsync();
 
                 // no user exists
-                if(user == null)
+                if (user == null)
                 {
                     return NotFound();
                 }
 
-                user.Password = userData.password != null ? m_passwordHasher.HashPassword(user, userData.password) : user.Password;
+                user.Password = userData.password != null
+                    ? m_passwordHasher.HashPassword(user, userData.password)
+                    : user.Password;
                 user.Username = userData.username ?? user.Username;
                 user.Email = userData.email ?? userData.email;
                 user.RealName = userData.realName ?? user.RealName;
@@ -192,7 +205,7 @@ namespace MaxOrg.Controllers
         public ActionResult Projects()
         {
             var claim = HttpContext.User.Claims.FirstOrDefault();
-            return Ok(new { projects = new string[] { "hello", "world" }, claim = claim.Value });
+            return Ok(new {projects = new string[] {"hello", "world"}, claim = claim.Value});
         }
     }
 }
