@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild, ViewChildren} from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChildren} from '@angular/core';
 import {MediaObserver} from '@angular/flex-layout';
 import {MatDialog, MatTab, MatTabGroup} from '@angular/material';
 import {AssignWorkComponent} from './assign-work/assign-work.component';
@@ -11,13 +11,12 @@ import {AssignWorkComponent} from './assign-work/assign-work.component';
 export class AssignedWorkComponent implements OnInit, AfterViewInit {
   @ViewChildren(MatTabGroup) group;
   @ViewChildren(MatTab) tabs;
-
-  constructor(public mediaObserver: MediaObserver, public dialog: MatDialog) {
-  }
-
   tab_num = 0;
   selected = 0;
   SWIPE_ACTION = {LEFT: 'swipeleft', RIGHT: 'swiperight'};
+
+  constructor(public mediaObserver: MediaObserver, public dialog: MatDialog) {
+  }
 
   ngOnInit() {
   }

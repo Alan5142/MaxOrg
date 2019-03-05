@@ -1,8 +1,7 @@
-import {Component, OnInit, SecurityContext, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {GroupsService} from '../../services/groups.service';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
-import {not} from 'rxjs/internal-compatibility';
 
 declare var require: any;
 

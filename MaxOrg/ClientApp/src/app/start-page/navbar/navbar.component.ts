@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
 import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {UserService} from '../../services/user.service';
@@ -19,13 +19,12 @@ export interface DialogData {
 
 export class NavbarComponent implements OnInit {
   notifications: number[];
+  username: string;
+  password: string;
 
   constructor(private dialog: MatDialog, public userService: UserService) {
     this.notifications = Array(10).fill(4);
   }
-
-  username: string;
-  password: string;
 
   ngOnInit() {
   }

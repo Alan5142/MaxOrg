@@ -9,10 +9,10 @@
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
-          <div fxLayout="column" class="height-100" style="overflow-x: auto; overflow-y: hidden">
+          <div class="height-100" fxLayout="column" style="overflow-x: auto; overflow-y: hidden">
             <google-chart #tasksChart
-                          class="chart-style"
-                          [data]="pieChartData"></google-chart>
+                          [data]="pieChartData"
+                          class="chart-style"></google-chart>
           </div>
           <div>
             <div fxLayout="row">
@@ -56,9 +56,9 @@
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
-          <div fxLayout="column" fxLayoutAlign="center center" class="height-100 width-100">
-            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50" mode="determinate"
-                                  [value]="50"></mat-progress-spinner>
+          <div class="height-100 width-100" fxLayout="column" fxLayoutAlign="center center">
+            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50" [value]="50"
+                                  mode="determinate"></mat-progress-spinner>
             <h2 *ngIf="!mediaObserver.isActive('lt-md')">50%</h2>
             <h1 *ngIf="mediaObserver.isActive('lt-md')">50%</h1>
           </div>
@@ -150,33 +150,33 @@
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
           <div fxLayout="row" fxLayout.lt-md="column">
-            <form fxFlex="50" fxLayout="column" class="options-container">
+            <form class="options-container" fxFlex="50" fxLayout="column">
               <div fxFlexAlign="start">
                 <mat-slide-toggle color="primary" style="width: min-content;">Solo lectura</mat-slide-toggle>
               </div>
               <p class="text-left">Cambiar nombre</p>
               <mat-form-field>
-                <input matInput type="text" maxlength="30" placeholder="Nombre del proyecto">
+                <input matInput maxlength="30" placeholder="Nombre del proyecto" type="text">
                 <mat-hint>Longitud máxima de 30 caracteres</mat-hint>
               </mat-form-field>
               <p class="text-left">Agregar usuarios</p>
               <mat-form-field>
-                <textarea matInput cdkTextareaAutosize placeholder="Nombre de usuario"></textarea>
+                <textarea cdkTextareaAutosize matInput placeholder="Nombre de usuario"></textarea>
               </mat-form-field>
               <p class="text-left">Eliminar usuarios</p>
               <mat-form-field>
-                <textarea matInput cdkTextareaAutosize placeholder="Nombre de usuario"></textarea>
+                <textarea cdkTextareaAutosize matInput placeholder="Nombre de usuario"></textarea>
               </mat-form-field>
-              <button mat-flat-button color="accent" (click)="changeDescription()">Cambiar descripción</button>
-              <button mat-flat-button color="primary">Guardar cambios</button>
+              <button (click)="changeDescription()" color="accent" mat-flat-button>Cambiar descripción</button>
+              <button color="primary" mat-flat-button>Guardar cambios</button>
             </form>
 
-            <form fxFlex="50" fxLayout="column" class="options-container">
+            <form class="options-container" fxFlex="50" fxLayout="column">
               <h2>Ceder administración a otro usuario</h2>
               <mat-form-field>
-                <input matInput type="text" placeholder="Nombre de usuario del nuevo administrador">
+                <input matInput placeholder="Nombre de usuario del nuevo administrador" type="text">
               </mat-form-field>
-              <button mat-flat-button color="warn">Ceder administración</button>
+              <button color="warn" mat-flat-button>Ceder administración</button>
             </form>
 
           </div>

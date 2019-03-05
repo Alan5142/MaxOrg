@@ -4,7 +4,6 @@ import {GoogleChartComponent} from 'ng2-google-charts';
 import {MatDialog} from '@angular/material';
 import {ChangeDescriptionComponent} from './change-description/change-description.component';
 import {ActivatedRoute} from '@angular/router';
-import * as marked from 'marked/marked.min.js';
 
 @Component({
   selector: 'app-admin-dashboard',

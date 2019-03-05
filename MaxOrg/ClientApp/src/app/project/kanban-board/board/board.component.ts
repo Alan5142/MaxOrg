@@ -43,19 +43,6 @@ export class BoardComponent implements OnInit {
   ngOnInit() {
   }
 
-  private updateData() {
-    this.route.params.subscribe(params => {
-      this.route.parent.parent.params.subscribe(parentParameters => {
-        this.projectId = parentParameters['id'];
-        this.boardId = params['boardId'];
-        this.board = this.kanbanService.getBoardData(this.projectId, this.boardId);
-        this.groups = this.board.pipe(map<KanbanBoard, KanbanGroup[]>(result => {
-          return result.kanbanGroups;
-        }));
-      });
-    });
-  }
-
   getKanbanGroups(): Observable<KanbanGroup[]> {
     return this.board.pipe(map<KanbanBoard, KanbanGroup[]>(result => {
       console.log(result);
@@ -79,5 +66,18 @@ export class BoardComponent implements OnInit {
             break;
         }
       });
+  }
+
+  private updateData() {
+    this.route.params.subscribe(params => {
+      this.route.parent.parent.params.subscribe(parentParameters => {
+        this.projectId = parentParameters['id'];
+        this.boardId = params['boardId'];
+        this.board = this.kanbanService.getBoardData(this.projectId, this.boardId);
+        this.groups = this.board.pipe(map<KanbanBoard, KanbanGroup[]>(result => {
+          return result.kanbanGroups;
+        }));
+      });
+    });
   }
 }

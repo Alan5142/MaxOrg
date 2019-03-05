@@ -1,6 +1,5 @@
-import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_BOTTOM_SHEET_DATA, MatBottomSheet} from '@angular/material';
-import {MatBottomSheetRef} from '@angular/material';
+import {Component, OnInit} from '@angular/core';
+import {MatBottomSheet, MatBottomSheetRef} from '@angular/material';
 import {User, UserService} from '../../services/user.service';
 
 @Component({

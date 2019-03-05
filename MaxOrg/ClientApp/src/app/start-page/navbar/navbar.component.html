@@ -1,16 +1,16 @@
 <mat-toolbar color="primary" fxLayout="row">
   <button mat-button routerLink="/"><h1>MaxOrg</h1></button>
   <div fxFlex></div>
-  <button *ngIf="!userService.isUserLoggedIn()" mat-button (click)="displayLoginDialog()" i18n>Iniciar sesión</button>
+  <button (click)="displayLoginDialog()" *ngIf="!userService.isUserLoggedIn()" i18n mat-button>Iniciar sesión</button>
 
 
   <div *ngIf="userService.isUserLoggedIn()">
 
     <mat-menu #accountMenu="matMenu">
-      <button mat-menu-item routerLink="todos" i18n>Mis pendientes</button>
-      <button mat-menu-item routerLink="my_account" i18n>Opciones</button>
+      <button i18n mat-menu-item routerLink="todos">Mis pendientes</button>
+      <button i18n mat-menu-item routerLink="my_account">Opciones</button>
       <mat-divider></mat-divider>
-      <button mat-menu-item i18n (click)="userService.closeSession()">Cerrar sesión</button>
+      <button (click)="userService.closeSession()" i18n mat-menu-item>Cerrar sesión</button>
     </mat-menu>
 
     <mat-menu #notificationMenu="matMenu">
@@ -20,7 +20,7 @@
             <div>
               <img class="image" src='https://material.angular.io/assets/img/examples/shiba1.jpg'>
             </div>
-            <button mat-button fxFill>
+            <button fxFill mat-button>
               Ha publicado...
             </button>
           </div>
@@ -29,10 +29,10 @@
       </div>
     </mat-menu>
 
-    <button mat-button [matMenuTriggerFor]="notificationMenu">
-      <mat-icon matBadge="3" matBadgePosition="above after" matBadgeColor="warn">notifications</mat-icon>
+    <button [matMenuTriggerFor]="notificationMenu" mat-button>
+      <mat-icon matBadge="3" matBadgeColor="warn" matBadgePosition="above after">notifications</mat-icon>
     </button>
-    <button mat-button [matMenuTriggerFor]="accountMenu">
+    <button [matMenuTriggerFor]="accountMenu" mat-button>
       <mat-icon>account_circle</mat-icon>
     </button>
   </div>
