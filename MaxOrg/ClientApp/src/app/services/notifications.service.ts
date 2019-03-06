@@ -1,8 +1,7 @@
 import {Injectable} from '@angular/core';
-import {HubConnection} from '@aspnet/signalr';
+import {HubConnection, HubConnectionBuilder} from '@aspnet/signalr';
 import {UserService} from './user.service';
 import {Observable} from 'rxjs';
-import {HubConnectionBuilder} from '@aspnet/signalr';
 
 interface Notification {
   message: string;

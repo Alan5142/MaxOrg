@@ -1,5 +1,5 @@
-<div class="speech-bubble mat-elevation-z4"
-     [fxFlexAlign]="selfMessage ? 'end' : 'start'"
-     [ngClass]="{'other-message': !selfMessage, 'self-message': selfMessage, 'chat-message-common': true}">
+<div [fxFlexAlign]="selfMessage ? 'end' : 'start'"
+     [ngClass]="{'other-message': !selfMessage, 'self-message': selfMessage, 'chat-message-common': true}"
+     class="speech-bubble mat-elevation-z4">
   <p>{{message}}{{message}}{{message}}{{message}}</p>
 </div>

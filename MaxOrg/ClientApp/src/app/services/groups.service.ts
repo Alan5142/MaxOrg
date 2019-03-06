@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
@@ -9,7 +9,8 @@ import {map} from 'rxjs/operators';
 })
 export class GroupsService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
   getGroupDescription(groupId: string): Observable<string> {
     const headers = new HttpHeaders().append('Authorization', 'Bearer ' + localStorage.getItem('token'));
@@ -22,6 +23,7 @@ export class GroupsService {
   changeGroupDescription(groupId: string, newDescription: string): void {
     const headers = new HttpHeaders().append('Authorization', 'Bearer ' + localStorage.getItem('token'));
     const url = environment.apiUrl + 'groups/' + groupId + '/description';
-    this.http.post(url, {newDescription: newDescription}, {headers: headers}).subscribe(val => {});
+    this.http.post(url, {newDescription: newDescription}, {headers: headers}).subscribe(val => {
+    });
   }
 }

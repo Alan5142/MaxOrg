@@ -9,7 +9,7 @@
         <h2 class="mat-h2">{{group.name}}
         </h2>
         <div fxFlex></div>
-        <button style="top: -15px;" mat-icon-button fxFlexAlign="baseline">
+        <button style="top: -15px;" mat-icon-button fxFlexAlign="baseline" (click)="addCardToSection(group.id)">
           <mat-icon>add</mat-icon>
         </button>
         <button style="top: -15px;" mat-icon-button fxFlexAlign="baseline">

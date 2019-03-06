@@ -1,11 +1,13 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {
+  MatAutocompleteModule,
   MatBadgeModule,
   MatBottomSheetModule,
   MatButtonModule,
   MatCardModule,
   MatChipsModule,
+  MatDatepickerModule,
   MatDialogModule,
   MatExpansionModule,
   MatFormFieldModule,
@@ -13,16 +15,17 @@ import {
   MatInputModule,
   MatListModule,
   MatMenuModule,
+  MatNativeDateModule,
   MatOptionModule,
+  MatProgressBarModule,
+  MatProgressSpinnerModule,
   MatRadioModule,
   MatSelectModule,
-  MatToolbarModule,
   MatSidenavModule,
+  MatSliderModule,
+  MatSnackBarModule,
   MatStepperModule,
-  MatDatepickerModule,
-  MatNativeDateModule,
-  MatProgressSpinnerModule,
-  MatAutocompleteModule, MatProgressBarModule, MatSnackBarModule, MatSliderModule
+  MatToolbarModule
 } from '@angular/material';
 import {HttpClientModule} from '@angular/common/http';
 import {FlexLayoutModule} from '@angular/flex-layout';
@@ -35,14 +38,13 @@ import {UserStartComponent} from './user-start/user-start.component';
 import {MyAccountComponent, MyAccountPickImageComponent} from './my-account/my-account.component';
 import {NewProjectComponent} from './new-project/new-project.component';
 import {TodosComponent} from './todos/todos.component';
-import { RegisterComponent } from './register/register.component';
+import {RegisterComponent} from './register/register.component';
 import {ServicesModule} from '../services/services.module';
-import { GithubLoginComponent } from './github-login/github-login.component';
-import { NotFoundComponent } from './not-found/not-found.component';
+import {GithubLoginComponent} from './github-login/github-login.component';
+import {NotFoundComponent} from './not-found/not-found.component';
 
 @NgModule({
-  providers: [
-  ],
+  providers: [],
   entryComponents: [
     NavbarComponent,
     NavbarDialogComponent,

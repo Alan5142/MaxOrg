@@ -7,6 +7,7 @@ import {Project, ProjectsService} from '../../services/projects.service';
 import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {map} from 'rxjs/operators';
+import {NotificationService} from '../../services/notification.service';
 
 @Component({
   selector: 'app-user-start',
@@ -23,7 +24,9 @@ export class UserStartComponent implements OnInit {
               public userService: UserService,
               private projectsService: ProjectsService,
               private router: Router,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              private notificationService: NotificationService) {
+    notificationService.connect();
     userService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
       this.projects = this.projectsService.getProjects();

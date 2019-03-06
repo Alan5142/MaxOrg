@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {User} from './user.service';
-import {Observable} from 'rxjs';
 
 export interface Message {
   sender: string;

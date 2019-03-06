@@ -1,11 +1,11 @@
 <mat-nav-list>
-  <a mat-list-item (click)="openLink($event)">
+  <a (click)="openLink($event)" mat-list-item>
     <span mat-line>URL</span>
     <span mat-line>Seleccionar imagen de una URL</span>
   </a>
-  <a mat-list-item (click)="openFile($event)">
+  <a (click)="openFile($event)" mat-list-item>
     <span mat-line>Del dispositivo</span>
     <span mat-line>Sube una imágen</span>
   </a>
-  <input id="fileToUpload" type="file" hidden="hidden" accept="image/*" (change)="onFileChanged($event)">
+  <input (change)="onFileChanged($event)" accept="image/*" hidden="hidden" id="fileToUpload" type="file">
 </mat-nav-list>

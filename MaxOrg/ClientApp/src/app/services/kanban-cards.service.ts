@@ -35,6 +35,11 @@ export interface KanbanBoardDescription {
   name: string;
 }
 
+export interface CreateCardRequest {
+  name: string;
+  description: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -59,5 +64,12 @@ export class KanbanCardsService {
   createBoard(groupId: string, boardName: string): Observable<any> {
     const headers = new HttpHeaders().append('Authorization', 'Bearer ' + localStorage.getItem('token'));
     return this.http.post(environment.apiUrl + 'groups/' + groupId + '/boards', {name: boardName}, {headers: headers});
+  }
+
+
+  createCardInSection(groupId: string, boardId: string, sectionId: string, cardData: CreateCardRequest) {
+    const headers = new HttpHeaders().append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+    return this.http.post(environment.apiUrl + `groups/${groupId}/boards/${boardId}/sections/${sectionId}/cards`,
+      cardData, {headers: headers});
   }
 }

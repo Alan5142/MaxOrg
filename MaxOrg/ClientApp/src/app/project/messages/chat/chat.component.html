@@ -1,7 +1,7 @@
-<div fxLayout="column" fxLayoutAlign="end stretch" class="height-100">
+<div class="height-100" fxLayout="column" fxLayoutAlign="end stretch">
   <div>
     <mat-toolbar>
-      <button *ngIf="mediaObserver.isActive('lt-md')" fxFlexAlign="center" mat-icon-button (click)="location.back()">
+      <button (click)="location.back()" *ngIf="mediaObserver.isActive('lt-md')" fxFlexAlign="center" mat-icon-button>
         <mat-icon>arrow_back</mat-icon>
       </button>
       <div fxFlex fxLayout="column" fxLayoutAlign="center stretch">
@@ -16,9 +16,9 @@
 
   <mat-divider></mat-divider>
 
-  <virtual-scroller #scroll [items]="items" class="height-100" [enableUnequalChildrenSizes]="true" [bufferAmount]="100">
+  <virtual-scroller #scroll [bufferAmount]="100" [enableUnequalChildrenSizes]="true" [items]="items" class="height-100">
 
-    <app-chat-message fxLayout="column" *ngFor="let item of scroll.viewPortItems;" class="chat-element chat-view"
+    <app-chat-message *ngFor="let item of scroll.viewPortItems;" class="chat-element chat-view" fxLayout="column"
                       message="{{item}}"></app-chat-message>
 
 
@@ -34,9 +34,9 @@
     </div>
   </cdk-virtual-scroll-viewport>
 -->
-  <mat-form-field fxFlexAlign="end" appearance="outline" class="width-100">
-    <textarea matInput cdkTextareaAutosize placeholder="mensaje"></textarea>
-    <button matSuffix mat-fab fxFlexAlign="top" color="primary">
+  <mat-form-field appearance="outline" class="width-100" fxFlexAlign="end">
+    <textarea cdkTextareaAutosize matInput placeholder="mensaje"></textarea>
+    <button color="primary" fxFlexAlign="top" mat-fab matSuffix>
       <mat-icon>message</mat-icon>
     </button>
   </mat-form-field>

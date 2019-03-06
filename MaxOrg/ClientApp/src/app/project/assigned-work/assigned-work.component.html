@@ -3,7 +3,7 @@
     <mat-tab label="Asignación de trabajos">
       <h4>Grupos</h4>
       <mat-divider></mat-divider>
-      <div ngClass.gt-md="group-members-container" ngClass="">
+      <div ngClass="" ngClass.gt-md="group-members-container">
         <mat-accordion>
           <mat-expansion-panel>
             <mat-expansion-panel-header>
@@ -41,8 +41,8 @@
               </mat-expansion-panel>
             </mat-accordion>
 
-            <div fxLayout="row" fxLayoutAlign="end center" class="width-100">
-              <button mat-icon-button mat-flat-button color="primary" (click)="openAssignTask()">
+            <div class="width-100" fxLayout="row" fxLayoutAlign="end center">
+              <button (click)="openAssignTask()" color="primary" mat-flat-button mat-icon-button>
                 <mat-icon>add</mat-icon>
               </button>
             </div>

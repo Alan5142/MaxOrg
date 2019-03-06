@@ -1,4 +1,4 @@
-import {Component, OnInit, SecurityContext, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {GroupsService} from '../../services/groups.service';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
@@ -17,6 +17,7 @@ export class DescriptionComponent implements OnInit {
   description: SafeHtml = null;
 
   constructor(public route: ActivatedRoute, public group: GroupsService, private sanitizer: DomSanitizer) {
+
     marked.setOptions({
       renderer: new marked.Renderer(),
       /*highlight: function(code) {

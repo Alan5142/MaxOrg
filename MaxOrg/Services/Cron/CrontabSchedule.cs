@@ -12,7 +12,7 @@ namespace MaxOrg.Services.Cron
     [Serializable]
     public sealed class CrontabSchedule
     {
-        private static readonly char[] Separators = { ' ' };
+        private static readonly char[] Separators = {' '};
         private readonly CrontabField _days;
         private readonly CrontabField _daysOfWeek;
         private readonly CrontabField _hours;
@@ -198,7 +198,7 @@ namespace MaxOrg.Services.Cron
             // Day of week
             //
 
-            if (_daysOfWeek.Contains((int)nextTime.DayOfWeek))
+            if (_daysOfWeek.Contains((int) nextTime.DayOfWeek))
                 return nextTime;
 
             return GetNextOccurrence(new DateTime(year, month, day, 23, 59, 0, 0, baseTime.Kind), endTime);

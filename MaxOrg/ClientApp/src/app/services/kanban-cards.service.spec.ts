@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { KanbanCardsService } from './kanban-cards.service';
+import {KanbanCardsService} from './kanban-cards.service';
 
 describe('KanbanCardsService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

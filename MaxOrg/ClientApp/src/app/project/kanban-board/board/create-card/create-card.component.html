@@ -1,0 +1,39 @@
+<h1 mat-dialog-title>Crear nueva tarjeta</h1>
+<div mat-dialog-content>
+  <form fxLayout="column" [formGroup]="createCardForm">
+    <mat-form-field>
+      <input #title matInput type="text" formControlName="title" minlength="3" maxlength="17">
+
+      <mat-error *ngIf="createCardForm.controls.title.errors?.required">
+        El campo es obligatorio
+      </mat-error>
+
+      <mat-error
+        *ngIf="createCardForm.controls.title.errors?.minlength && !createCardForm.controls.title.errors?.required">
+        La descripción debe tener minimo 3 caracteres
+      </mat-error>
+      <mat-error
+        *ngIf="createCardForm.controls.title.errors?.maxlength && !createCardForm.controls.title.errors?.required">
+        La descripción debe tener máximo 17 caracteres
+      </mat-error>
+
+      <mat-label>Titulo de la tarjeta</mat-label>
+    </mat-form-field>
+    <mat-form-field>
+      <textarea #description matInput cdkTextareaAutosize placeholder="Descripción"
+                formControlName="description" maxlength="30"></textarea>
+
+      <mat-error *ngIf="createCardForm.controls.description.errors?.required">
+        El campo es obligatorio
+      </mat-error>
+      <mat-error
+        *ngIf="createCardForm.controls.description.errors?.maxlength && !createCardForm.controls.description.errors?.required">
+        La descripción debe tener máximo 30 caracteres
+      </mat-error>
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="">CANCELAR</button>
+  <button mat-flat-button cdkFocusInitial color="primary" (click)="createCard()">CREAR</button>
+</div>

@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, TemplateRef, ViewChild, ViewContainerRef} from '@angular/core';
+import {Component, OnInit, TemplateRef, ViewChild, ViewContainerRef} from '@angular/core';
 import {Overlay, OverlayRef} from '@angular/cdk/overlay';
 import {TemplatePortal} from '@angular/cdk/portal';
 import {fromEvent} from 'rxjs';
@@ -46,8 +46,8 @@ export class ContextMenuComponent implements OnInit {
     this.overlayRef.attach(new TemplatePortal(this.userMenu, this.viewContainerRef));
     fromEvent<MouseEvent>(document, 'click')
       .pipe(
-        filter(event => {
-          const clickTarget = event.target as HTMLElement;
+        filter(ev => {
+          const clickTarget = ev.target as HTMLElement;
           return !!this.overlayRef && !this.overlayRef.overlayElement.contains(clickTarget);
         }),
         take(1)

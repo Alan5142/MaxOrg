@@ -14,6 +14,7 @@ namespace MaxOrg.Hubs
     public class ChatHub : Hub
     {
         private readonly ILogger m_logger;
+
         public ChatHub(ILogger logger)
         {
             m_logger = logger;
@@ -29,8 +30,8 @@ namespace MaxOrg.Hubs
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var chatGroup = await (from chat in db.Query<Chat>()
-                                       where chat.Name == groupName
-                                       select chat).FirstOrDefaultAsync();
+                    where chat.Name == groupName
+                    select chat).FirstOrDefaultAsync();
 
                 var messageToAdd = new Message
                 {
@@ -45,10 +46,10 @@ namespace MaxOrg.Hubs
                     m_logger.LogError("Somebody tried to send a message to a non existing chat");
                     return;
                 }
+
                 chatGroup.Messages.Add(messageToAdd);
                 await Clients.Group(groupName).SendAsync("OnReceiveMessage", messageToAdd);
             }
-            
         }
     }
 }

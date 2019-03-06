@@ -1,11 +1,11 @@
 <div fxLayout="column" fxLayoutAlign="center">
-  <h1 style="text-align: center;" i18n>
+  <h1 i18n style="text-align: center;">
     Por hacer
   </h1>
 
-  <div fxLayout="row" fxFlex="100%">
+  <div fxFlex="100%" fxLayout="row">
     <div fxFlex.gt-md="25%" fxFlex.lt-md="0%"></div>
-    <div fxLayout="column" fxFlex="100%">
+    <div fxFlex="100%" fxLayout="column">
       <mat-expansion-panel *ngFor="let project of projects">
         <mat-expansion-panel-header>
           <mat-panel-title>

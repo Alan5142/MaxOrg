@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { KanbanBoardComponent } from './kanban-board.component';
+import {KanbanBoardComponent} from './kanban-board.component';
 
 describe('KanbanBoardComponent', () => {
   let component: KanbanBoardComponent;
@@ -8,9 +8,9 @@ describe('KanbanBoardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ KanbanBoardComponent ]
+      declarations: [KanbanBoardComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

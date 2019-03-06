@@ -1,0 +1,25 @@
+<h1>Historial de tests</h1>
+<div ngClass="" ngClass.lt-md="tests-container-mobile" ngClass.gt-md="tests-container" fxLayout="column"
+     fxLayoutGap="16px">
+  <app-create-test></app-create-test>
+  <div fxLayout="column-reverse" fxLayoutGap="30px">
+    <mat-card *ngFor="let testData of data">
+      <mat-card-header>
+        <mat-card-title>#{{testData.number}}, {{testData.numberOfTests}} tests</mat-card-title>
+      </mat-card-header>
+      <mat-card-content fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap="10px">
+        <mat-progress-spinner mode="determinate"
+                              [value]="testData.passed / testData.numberOfTests * 100"></mat-progress-spinner>
+        <h3>{{testData.passed}} tests pasados</h3>
+        <h3>{{testData.failed}} tests fallados</h3>
+        <button (click)="openCreateReportDialog()" mat-flat-button color="primary"
+                [disabled]="!testData.needReport">
+          {{testData.needReport ? 'CREAR REPORTE' : 'ESTE TEST YA CONTIENE UN REPORTE'}}
+        </button>
+        <button mat-flat-button color="primary" *ngIf="!testData.needReport" routerLink="reports"
+                [queryParams]="{number: testData.number}">VER REPORTE
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

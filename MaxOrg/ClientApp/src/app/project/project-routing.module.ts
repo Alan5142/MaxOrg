@@ -1,5 +1,5 @@
 import {NgModule} from '@angular/core';
-import {Routes, RouterModule} from '@angular/router';
+import {RouterModule, Routes} from '@angular/router';
 import {ProjectComponent} from './project.component';
 import {DescriptionComponent} from './description/description.component';
 import {KanbanBoardComponent} from './kanban-board/kanban-board.component';
@@ -13,17 +13,23 @@ import {OrgChartComponent} from './org-chart/org-chart.component';
 import {RequirementsComponent} from './requirements/requirements.component';
 import {MembersComponent} from './members/members.component';
 import {NotFoundComponent} from './not-found/not-found.component';
-import {ProjectIndexComponent} from './project-index/project-index.component';
+import {PostsComponent} from './posts/posts.component';
+import {CalendarComponent} from './calendar/calendar.component';
+import {TestsComponent} from './tests/tests.component';
+import {ReportsComponent} from './tests/reports/reports.component';
+import {RecordComponent} from './tests/record/record.component';
+
 const routes: Routes = [
   {
     path: '', component: ProjectComponent, children: [
-      {path: '', component: ProjectIndexComponent},
+      {path: '', component: DescriptionComponent},
       {
         path: 'board', component: KanbanBoardComponent, children: [
           {path: '', component: KanbanIndexComponent},
           {path: ':boardId', component: BoardComponent}
         ]
       },
+      {path: 'calendar', component: CalendarComponent},
       {path: 'messages', component: MessagesComponent},
       {path: 'assigned-work', component: AssignedWorkComponent},
       {path: 'dashboard', component: AdminDashboardComponent},
@@ -31,8 +37,12 @@ const routes: Routes = [
       {path: 'org-chart', component: OrgChartComponent},
       {path: 'requirements', component: RequirementsComponent},
       {path: 'members', component: MembersComponent},
-      {path: 'description', component: DescriptionComponent},
+      {path: 'posts', component: PostsComponent},
       {path: 'not-found', component: NotFoundComponent},
+      {path: 'tests', component: TestsComponent, children: [
+          {path: '', component: RecordComponent},
+          {path: 'reports', component: ReportsComponent}
+        ]},
       {path: '**', redirectTo: 'not-found'}
     ]
   }

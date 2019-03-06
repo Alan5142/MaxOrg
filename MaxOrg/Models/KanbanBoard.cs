@@ -12,7 +12,7 @@ namespace MaxOrg.Models
     [CollectionProperty(Naming = NamingConvention.ToCamelCase)]
     public class KanbanCard
     {
-        public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 15);
+        public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 20);
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
@@ -21,7 +21,7 @@ namespace MaxOrg.Models
     [CollectionProperty(Naming = NamingConvention.ToCamelCase)]
     public class KanbanGroup
     {
-        public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 15);
+        public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 20);
         public string Name { get; set; }
         public List<KanbanCard> Cards { get; set; } = new List<KanbanCard>();
         public string Color { get; set; } = "";
@@ -33,15 +33,16 @@ namespace MaxOrg.Models
         public KanbanBoard(string name = "")
         {
             Name = name;
-            KanbanGroups.Add(new KanbanGroup { Name = "En planeación" });
-            KanbanGroups.Add(new KanbanGroup { Name = "En proceso" });
-            KanbanGroups.Add(new KanbanGroup { Name = "En pruebas" });
-            KanbanGroups.Add(new KanbanGroup { Name = "Finalizado" });
+            KanbanGroups.Add(new KanbanGroup {Name = "En planeación"});
+            KanbanGroups.Add(new KanbanGroup {Name = "En proceso"});
+            KanbanGroups.Add(new KanbanGroup {Name = "En pruebas"});
+            KanbanGroups.Add(new KanbanGroup {Name = "Finalizado"});
 
-            KanbanGroups[0].Cards.Add(new KanbanCard { Title = "Tu primera tarea", Description = "Este es tu nuevo grupo de tarjetas :)" });
+            KanbanGroups[0].Cards.Add(new KanbanCard
+                {Title = "Tu primera tarea", Description = "Este es tu nuevo grupo de tarjetas :)"});
         }
 
-        public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 15);
+        public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 20);
         public string Name { get; set; }
         public List<string> Members { get; set; } = new List<string>();
         public List<KanbanGroup> KanbanGroups { get; set; } = new List<KanbanGroup>();
@@ -50,7 +51,17 @@ namespace MaxOrg.Models
 
     public class CreateKanbanBoardRequest
     {
-        [Required]
+        [Required] public string Name { get; set; }
+    }
+
+    public class CreateKanbanCardInSectionRequest
+    {
         public string Name { get; set; }
+        public string Description { get; set; }
+    }
+
+    public class MoveKanbanCardRequest
+    {
+        public string NewSectionId { get; set; }
     }
 }

@@ -41,5 +41,4 @@ namespace MaxOrg.Models
         public string token;
         public string message;
     }
-
 }

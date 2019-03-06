@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {MediaObserver} from '@angular/flex-layout';
 import {Location} from '@angular/common';
 import {VirtualScrollerComponent} from 'ngx-virtual-scroller';

@@ -1,7 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {TreeComponent} from './tree/tree.component';
-import {unsupported} from '@angular/compiler/src/render3/view/util';
-import {isNullOrUndefined} from 'util';
 
 @Component({
   selector: 'app-org-chart',
@@ -10,9 +7,6 @@ import {isNullOrUndefined} from 'util';
 
 })
 export class OrgChartComponent implements OnInit {
-
-  constructor() {
-  }
 
   treeWidth = 75;
   myTree = [
@@ -36,6 +30,9 @@ export class OrgChartComponent implements OnInit {
       ]
     }
   ];
+
+  constructor() {
+  }
 
   ngOnInit() {
     this.calcLeafs(this.myTree);

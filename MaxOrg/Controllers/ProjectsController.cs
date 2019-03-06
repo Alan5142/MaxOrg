@@ -1,8 +1,10 @@
 ﻿using ArangoDB.Client;
+using MaxOrg.Hubs;
 using MaxOrg.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +17,11 @@ namespace MaxOrg.Controllers
     [ApiController]
     public class ProjectsController : ControllerBase
     {
-        public ProjectsController()
+        private IHubContext<NotificationHub> m_notificationHub;
+
+        public ProjectsController(IHubContext<NotificationHub> notificationHub)
         {
+            m_notificationHub = notificationHub;
         }
 
         [HttpGet]
@@ -32,15 +37,15 @@ namespace MaxOrg.Controllers
                     MinDepth = 1
                 });
                 var projects = from g in traversal.Visited.Vertices
-                               from u in db.Query<User>()
-                               where g.IsRoot && g.GroupOwner == u.Key
-                               select new
-                               {
-                                   g.Name,
-                                   Id = g.Key,
-                                   ProjectOwner = u.Username
-                               };
-                return Ok(new { projects });
+                    from u in db.Query<User>()
+                    where g.IsRoot && g.GroupOwner == u.Key
+                    select new
+                    {
+                        g.Name,
+                        Id = g.Key,
+                        ProjectOwner = u.Username
+                    };
+                return Ok(new {projects});
             }
         }
 
@@ -52,8 +57,8 @@ namespace MaxOrg.Controllers
                 var currentDate = DateTime.Now;
 
                 var currentUser = await (from u in db.Query<User>()
-                                         where u.Key == HttpContext.User.Identity.Name
-                                         select u).FirstOrDefaultAsync();
+                    where u.Key == HttpContext.User.Identity.Name
+                    select u).FirstOrDefaultAsync();
                 if (currentUser == null)
                 {
                     return Unauthorized();
@@ -63,19 +68,19 @@ namespace MaxOrg.Controllers
 
                 // obtenemos los usuarios
                 var usersToAdd = from u in db.Query<User>()
-                                 from ud in data.Members
-                                 where u.Username == ud
-                                 select u;
+                    from ud in data.Members
+                    where u.Username == ud
+                    select u;
 
                 if (data.Members.Count != usersToAdd.Count())
                 {
-                    return BadRequest(new { message = "Some users are invalid" });
+                    return BadRequest(new {message = "Some users are invalid"});
                 }
 
                 // En caso de que el usuario haya puesto su nombre de usuario, lo eliminamos, el se añade aparte puesto que será administrador
                 usersToAdd = from u in usersToAdd
-                             where u.Key != currentUser.Key
-                             select u;
+                    where u.Key != currentUser.Key
+                    select u;
 
                 var projectGroup = new Group
                 {
@@ -86,11 +91,12 @@ namespace MaxOrg.Controllers
                 };
 
                 // Default kanban creation
-                projectGroup.KanbanBoards = new List<KanbanBoard> { new KanbanBoard(data.Name) };
+                projectGroup.KanbanBoards = new List<KanbanBoard> {new KanbanBoard(data.Name)};
                 projectGroup.KanbanBoards[0].Members = await usersToAdd.Select(u => u.Key).ToListAsync();
                 projectGroup.KanbanBoards[0].Members.Add(currentUser.Key);
 
-                var createdGroup = await db.InsertAsync<Group>(projectGroup); ;
+                var createdGroup = await db.InsertAsync<Group>(projectGroup);
+                ;
 
                 var admin = new UsersInGroup
                 {
@@ -114,6 +120,10 @@ namespace MaxOrg.Controllers
                         AddedBy = currentUser.Key
                     };
                     await groupGraph.InsertEdgeAsync<UsersInGroup>(userToAdd);
+                    await m_notificationHub.Clients
+                        .Group("Users/" + user.Key)
+                        .SendAsync("notificationReceived",
+                            $"{currentUser.Username} te ha agregado al proyecto '{projectGroup.Name}'");
                 }
 
                 // TODO trigger notification
@@ -128,12 +138,13 @@ namespace MaxOrg.Controllers
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var project = await (from p in db.Query<Group>()
-                                     where p.Key == id && p.IsRoot == true
-                                     select p).FirstOrDefaultAsync();
+                    where p.Key == id && p.IsRoot == true
+                    select p).FirstOrDefaultAsync();
                 if (project == null)
                 {
                     return NotFound();
                 }
+
                 var graph = db.Graph("GroupUsersGraph");
                 var traversal = db.Traverse<User, UsersInGroup>(new TraversalConfig
                 {
@@ -144,11 +155,12 @@ namespace MaxOrg.Controllers
                     MaxDepth = 1
                 });
                 var members = from u in traversal.Visited.Vertices
-                              select new { u.Key, u.Username };
+                    select new {u.Key, u.Username};
                 if (members.Where(u => u.Key == HttpContext.User.Identity.Name).Count() == 0)
                 {
                     return NotFound();
                 }
+
                 var subgrp = GetSubgroupHierarchy(project.Key);
 
                 var subgroups = db.Traverse<Group, Subgroup>(new TraversalConfig
@@ -182,6 +194,7 @@ namespace MaxOrg.Controllers
                 subgroup.Subgroups = GetSubgroupHierarchy(subgroup.Id);
                 subgroup.Users = GetGroupMembers(subgroup.Id);
             }
+
             return subgroups;
         }
 
@@ -198,11 +211,11 @@ namespace MaxOrg.Controllers
                     MaxDepth = 1
                 });
                 var members = from u in traversal.Visited.Vertices
-                              select new UserGroupView
-                              {
-                                  Id = u.Key,
-                                  Username = u.Username
-                              };
+                    select new UserGroupView
+                    {
+                        Id = u.Key,
+                        Username = u.Username
+                    };
                 return members.ToArray();
             }
         }
@@ -218,14 +231,15 @@ namespace MaxOrg.Controllers
                     Direction = EdgeDirection.Outbound,
                     MinDepth = 1,
                     MaxDepth = 1
-                }).Visited.Vertices.Select(g => new GroupHierarchy // we map this subgroups to a group hierarchy structure
-                {
-                    Id = g.Key,
-                    Name = g.Name,
-                    Description = g.Description,
-                    GroupOwner = g.GroupOwner,
-                    CreationDate = g.CreationDate
-                });
+                }).Visited.Vertices.Select(g =>
+                    new GroupHierarchy // we map this subgroups to a group hierarchy structure
+                    {
+                        Id = g.Key,
+                        Name = g.Name,
+                        Description = g.Description,
+                        GroupOwner = g.GroupOwner,
+                        CreationDate = g.CreationDate
+                    });
                 return subgroups.ToArray();
             }
         }

@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { OrgChartComponent } from './org-chart.component';
+import {OrgChartComponent} from './org-chart.component';
 
 describe('OrgChartComponent', () => {
   let component: OrgChartComponent;
@@ -8,9 +8,9 @@ describe('OrgChartComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ OrgChartComponent ]
+      declarations: [OrgChartComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

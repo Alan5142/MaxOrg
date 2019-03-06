@@ -1,7 +1,6 @@
-import {InjectionToken, NgModule} from '@angular/core';
-import {Routes, RouterModule, PreloadAllModules, ActivatedRouteSnapshot} from '@angular/router';
+import {NgModule} from '@angular/core';
+import {PreloadAllModules, RouterModule, Routes} from '@angular/router';
 import {IsLoggedInGuard} from './services/guards/is-logged-in.guard';
-import {AppComponent} from './app.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'start', pathMatch: 'full'},

@@ -12,7 +12,8 @@ namespace MaxOrg.Services.Tasks
             return services.AddSingleton<IHostedService, SchedulerHostedService>();
         }
 
-        public static IServiceCollection AddScheduler(this IServiceCollection services, EventHandler<UnobservedTaskExceptionEventArgs> unobservedTaskExceptionHandler)
+        public static IServiceCollection AddScheduler(this IServiceCollection services,
+            EventHandler<UnobservedTaskExceptionEventArgs> unobservedTaskExceptionHandler)
         {
             return services.AddSingleton<IHostedService, SchedulerHostedService>(serviceProvider =>
             {

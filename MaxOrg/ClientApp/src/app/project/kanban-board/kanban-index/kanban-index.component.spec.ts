@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { KanbanIndexComponent } from './kanban-index.component';
+import {KanbanIndexComponent} from './kanban-index.component';
 
 describe('KanbanIndexComponent', () => {
   let component: KanbanIndexComponent;
@@ -8,9 +8,9 @@ describe('KanbanIndexComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ KanbanIndexComponent ]
+      declarations: [KanbanIndexComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

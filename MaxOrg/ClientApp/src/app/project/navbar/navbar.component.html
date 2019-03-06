@@ -1,6 +1,6 @@
 <mat-toolbar color="primary" fxLayout="row">
   <div fxFlex="33">
-    <button mat-icon-button (click)="sidenav.toggle()">
+    <button (click)="sidenav.toggle()" mat-icon-button>
       <mat-icon>menu</mat-icon>
     </button>
     <button mat-button routerLink="/start"><h1>MaxOrg</h1></button>
@@ -8,9 +8,9 @@
 
   <div fxFlex fxLayout="row" fxLayoutAlign="end end">
     <mat-menu #accountMenu="matMenu">
-      <button mat-menu-item routerLink="/start/todos" i18n>Mis pendientes</button>
+      <button i18n mat-menu-item routerLink="/start/todos">Mis pendientes</button>
       <mat-divider></mat-divider>
-      <button mat-menu-item routerLink="/start/my_account" i18n>Opciones</button>
+      <button i18n mat-menu-item routerLink="/start/my_account">Opciones</button>
     </mat-menu>
 
     <mat-menu #notificationMenu="matMenu">
@@ -20,7 +20,7 @@
             <div>
               <img class="image" src='https://material.angular.io/assets/img/examples/shiba1.jpg'>
             </div>
-            <button mat-button fxFill>
+            <button fxFill mat-button>
               Ha publicado...
             </button>
           </div>
@@ -29,11 +29,11 @@
       </div>
     </mat-menu>
 
-    <button mat-icon-button [matMenuTriggerFor]="notificationMenu">
-      <mat-icon matBadge="3" matBadgePosition="above after" matBadgeColor="warn">notifications</mat-icon>
+    <button [matMenuTriggerFor]="notificationMenu" mat-icon-button>
+      <mat-icon matBadge="3" matBadgeColor="warn" matBadgePosition="above after">notifications</mat-icon>
     </button>
     <div fxFlex="2" fxFlex.gt-md="1"></div>
-    <button mat-icon-button [matMenuTriggerFor]="accountMenu">
+    <button [matMenuTriggerFor]="accountMenu" mat-icon-button>
       <mat-icon>account_circle</mat-icon>
     </button>
     <div fxFlex="3" fxFlex.gt-md="6"></div>
@@ -56,10 +56,13 @@
         <mat-icon matListIcon>dashboard</mat-icon>
         Panel de administrador
       </mat-list-item>
-
-      <mat-list-item routerLink="description">
+      <mat-list-item routerLink="./messages">
+        <mat-icon matListIcon>message</mat-icon>
+        Mensajes
+      </mat-list-item>
+      <mat-list-item routerLink="posts">
         <mat-icon matListIcon>description</mat-icon>
-        Descripción
+        Posts
       </mat-list-item>
       <mat-list-item routerLink="members">
         <mat-icon matListIcon>group</mat-icon>
@@ -69,7 +72,7 @@
         <mat-icon matListIcon>group_work</mat-icon>
         Subgrupos
       </mat-list-item>
-      <mat-list-item>
+      <mat-list-item routerLink="calendar">
         <mat-icon matListIcon>calendar_today</mat-icon>
         Calendario
       </mat-list-item>
@@ -101,19 +104,9 @@
       </a>
       <mat-divider></mat-divider>
       <h3 mat-subheader>Tests</h3>
-      <mat-list-item>
-        <mat-icon matListIcon>history</mat-icon>
-        Historial
-      </mat-list-item>
-      <mat-list-item>
+      <mat-list-item routerLink="tests">
         <mat-icon matListIcon svgIcon="flask"></mat-icon>
-        Realizar test
-      </mat-list-item>
-      <mat-divider></mat-divider>
-      <h4 mat-subheader>Mensajería</h4>
-      <mat-list-item routerLink="./messages">
-        <mat-icon matListIcon>message</mat-icon>
-        Mensajes
+        Tests
       </mat-list-item>
     </mat-nav-list>
   </mat-sidenav>

@@ -1,6 +1,6 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ContextMenuComponent } from './context-menu/context-menu.component';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {ContextMenuComponent} from './context-menu/context-menu.component';
 
 @NgModule({
   declarations: [ContextMenuComponent],
@@ -9,4 +9,5 @@ import { ContextMenuComponent } from './context-menu/context-menu.component';
   ],
   exports: [ContextMenuComponent]
 })
-export class CommonComponentsModule { }
+export class CommonComponentsModule {
+}

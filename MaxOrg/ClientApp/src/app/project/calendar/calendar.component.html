@@ -1,0 +1,43 @@
+<div class="calendar-container" style="overflow-x: hidden">
+  <div class="month">
+    <ul>
+      <li class="prev">
+        <button (click)="goToPreviousMonth()" mat-icon-button>
+          ❮
+        </button>
+      </li>
+      <li class="next">
+        <button (click)="goToNextMonth()" mat-icon-button>
+          ❯
+        </button>
+      </li>
+      <li>{{getMonthName()}}<br><span>{{calendarFilterDate.getFullYear()}}</span></li>
+    </ul>
+  </div>
+
+  <ul class="weekdays">
+    <li>D</li>
+    <li>L</li>
+    <li>M</li>
+    <li>X</li>
+    <li>J</li>
+    <li>V</li>
+    <li>S</li>
+  </ul>
+
+  <ul class="days">
+    <li *ngFor="let day of dates">
+    <span>
+      <button *ngIf="compareDates() && day?.getDate() === currentDate.getDate(); else elseStatement"
+              color="primary" mat-flat-button mat-icon-button>
+        {{day?.getDate()}}
+      </button>
+      <ng-template #elseStatement>
+        <button *ngIf="day !== null" mat-icon-button>
+          {{day?.getDate()}}
+        </button>
+      </ng-template>
+    </span>
+    </li>
+  </ul>
+</div>

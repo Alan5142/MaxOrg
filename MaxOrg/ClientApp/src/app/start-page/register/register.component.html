@@ -2,49 +2,50 @@
   <h1 class="text-center">Registrarse</h1>
   <h3 class="text-center">Es muy sencillo, solo llena los siguientes campos</h3>
   <mat-vertical-stepper #stepper [linear]="true">
-    <mat-step [stepControl]="requiredInformation" label="Datos básicos" i18n-label>
-      <form id="requiredInformation" [formGroup]="requiredInformation">
+    <mat-step [stepControl]="requiredInformation" i18n-label label="Datos básicos">
+      <form [formGroup]="requiredInformation" id="requiredInformation">
         <div fxLayout="column" fxLayoutAlign="center center">
           <mat-form-field>
             <input #username
-                   matInput
-                   type="text"
-                   placeholder="Nombre de usuario"
                    formControlName="username"
-                   i18n-placeholder>
+                   i18n-placeholder
+                   matInput
+                   placeholder="Nombre de usuario"
+                   type="text">
             <mat-hint *ngIf="username.value === ''" i18n>Debe ser unico</mat-hint>
             <mat-error *ngIf="requiredInformation.controls.username.errors?.required">No puede estar vacio</mat-error>
-            <mat-error *ngIf="requiredInformation.controls.username.errors?.minlength && !requiredInformation.controls.username.errors?.required">
+            <mat-error
+              *ngIf="requiredInformation.controls.username.errors?.minlength && !requiredInformation.controls.username.errors?.required">
               El nombre de usuario debe tener una longitud minima de 7 letras
             </mat-error>
             <mat-error *ngIf="requiredInformation.controls.username.errors?.usernameexists">El usuario ya existe
             </mat-error>
-            <mat-icon matSuffix *ngIf="requiredInformation.controls.username.valid">done</mat-icon>
-            <mat-spinner matSuffix [diameter]="20" *ngIf="requiredInformation.get('username').pending"></mat-spinner>
+            <mat-icon *ngIf="requiredInformation.controls.username.valid" matSuffix>done</mat-icon>
+            <mat-spinner *ngIf="requiredInformation.get('username').pending" [diameter]="20" matSuffix></mat-spinner>
           </mat-form-field>
-          
+
           <mat-form-field>
-            <input id="email"
+            <input formControlName="email"
+                   id="email"
                    matInput
-                   type="email"
                    placeholder="Correo electronico"
-                   formControlName="email">
-            <mat-error *ngIf="requiredInformation.controls.email.errors?.pattern">Correo electronico invalido
+                   type="email">
+            <mat-error *ngIf="requiredInformation.controls.email.errors?.email">Correo electronico invalido
             </mat-error>
             <mat-error *ngIf="requiredInformation.controls.email.errors?.required">No puede estar vacio</mat-error>
             <mat-error *ngIf="requiredInformation.controls.email.errors?.emailexists">El email ya existe</mat-error>
-            <mat-spinner matSuffix [diameter]="20" *ngIf="requiredInformation.get('email').pending"></mat-spinner>
-            <mat-icon matSuffix *ngIf="requiredInformation.controls.email.valid">done</mat-icon>
+            <mat-spinner *ngIf="requiredInformation.get('email').pending" [diameter]="20" matSuffix></mat-spinner>
+            <mat-icon *ngIf="requiredInformation.controls.email.valid" matSuffix>done</mat-icon>
           </mat-form-field>
-          
+
           <mat-form-field>
             <input #password
-                   matInput
-                   type="password"
-                   placeholder="Contraseña"
+                   (keyup)="triggerPasswordValidation()"
                    formControlName="password"
                    i18n-placeholder
-                   (keyup)="triggerPasswordValidation()">
+                   matInput
+                   placeholder="Contraseña"
+                   type="password">
             <mat-error *ngIf="requiredInformation.controls.password.errors?.required">No puede estar vacio</mat-error>
             <mat-error *ngIf="requiredInformation.controls.password.errors?.minlength &&
                               !requiredInformation.controls.password.errors?.required">Debe tener una
@@ -52,22 +53,22 @@
               8 letras
             </mat-error>
           </mat-form-field>
-          
+
           <mat-form-field>
             <input #repeat_password
-                   matInput
-                   type="password"
-                   placeholder="Repetir contraseña"
                    formControlName="repeat_password"
-                   i18n-placeholder>
+                   i18n-placeholder
+                   matInput
+                   placeholder="Repetir contraseña"
+                   type="password">
             <mat-error *ngIf="requiredInformation.controls.repeat_password.errors?.required">No puede estar vacio
             </mat-error>
             <mat-error *ngIf="requiredInformation.controls.repeat_password.errors?.controlValueEquals">Las contraseñas
               no coinciden
             </mat-error>
           </mat-form-field>
-          
-          <button [disabled]="!requiredInformation.valid" mat-flat-button color="primary" matStepperNext i18n>
+
+          <button [disabled]="!requiredInformation.valid" color="primary" i18n mat-flat-button matStepperNext>
             Continuar
           </button>
         </div>
@@ -78,25 +79,25 @@
       <form [formGroup]="optionalInformation">
         <div fxLayout="column" fxLayoutAlign="center center">
           <mat-form-field>
-            <input matInput type="text" placeholder="Tu nombre" formControlName="realName">
+            <input formControlName="realName" matInput placeholder="Tu nombre" type="text">
           </mat-form-field>
-          
+
           <mat-form-field fxShow>
-            <input matInput
-                   [matDatepicker]="picker"
-                   placeholder="Fecha de nacimiento"
-                   formControlName="birthday">
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker [touchUi]="mediaObserver.isActive('lt-md')" #picker></mat-datepicker>
+            <input [matDatepicker]="picker"
+                   formControlName="birthday"
+                   matInput
+                   placeholder="Fecha de nacimiento">
+            <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
+            <mat-datepicker #picker [touchUi]="mediaObserver.isActive('lt-md')"></mat-datepicker>
           </mat-form-field>
-          
+
           <mat-form-field>
-            <textarea matInput placeholder="Descripción" formControlName="description"></textarea>
+            <textarea formControlName="description" matInput placeholder="Descripción"></textarea>
           </mat-form-field>
           <mat-form-field>
-            <input matInput placeholder="Ocupación" formControlName="occupation">
+            <input formControlName="occupation" matInput placeholder="Ocupación">
           </mat-form-field>
-          <button mat-flat-button color="primary" matStepperNext i18n>
+          <button color="primary" i18n mat-flat-button matStepperNext>
             Continuar
           </button>
         </div>
@@ -106,7 +107,7 @@
       <div fxLayout="column" fxLayoutAlign="center center">
         <h3 class="text-center" i18n>Verifica que la información sea correcta</h3>
         <p i18n>Puedes cambiar los datos opcionales en "mi cuenta"</p>
-        <button mat-raised-button color="primary" (click)="submitUserData()">Crear cuenta</button>
+        <button (click)="submitUserData()" color="primary" mat-raised-button>Crear cuenta</button>
       </div>
     </mat-step>
   </mat-vertical-stepper>
