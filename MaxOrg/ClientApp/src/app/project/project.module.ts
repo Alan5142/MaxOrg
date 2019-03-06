@@ -67,6 +67,11 @@ import {PostsComponent} from './posts/posts.component';
 import {CalendarComponent} from './calendar/calendar.component';
 import {CreateCardComponent} from './kanban-board/board/create-card/create-card.component';
 import {TestsComponent} from './tests/tests.component';
+import {RecordComponent} from './tests/record/record.component';
+import {CreateTestComponent} from './tests/create-test/create-test.component';
+import {CreateTestDialogComponent} from './tests/create-test/create-test-dialog/create-test-dialog.component';
+import {CreateReportDialogComponent} from './tests/record/create-report-dialog/create-report-dialog.component';
+import {ReportsComponent} from './tests/reports/reports.component';
 
 @NgModule({
   entryComponents: [
@@ -77,7 +82,9 @@ import {TestsComponent} from './tests/tests.component';
     EditTaskComponent,
     GroupCardComponent,
     ChangeDescriptionComponent,
-    CreateCardComponent
+    CreateCardComponent,
+    CreateReportDialogComponent,
+    CreateTestDialogComponent
   ],
   imports: [
     CommonModule,
@@ -147,7 +154,12 @@ import {TestsComponent} from './tests/tests.component';
     PostsComponent,
     CalendarComponent,
     CreateCardComponent,
-    TestsComponent
+    TestsComponent,
+    RecordComponent,
+    CreateTestComponent,
+    CreateTestDialogComponent,
+    CreateReportDialogComponent,
+    ReportsComponent
   ],
   bootstrap: [
     ProjectComponent

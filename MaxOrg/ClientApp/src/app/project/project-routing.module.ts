@@ -15,6 +15,9 @@ import {MembersComponent} from './members/members.component';
 import {NotFoundComponent} from './not-found/not-found.component';
 import {PostsComponent} from './posts/posts.component';
 import {CalendarComponent} from './calendar/calendar.component';
+import {TestsComponent} from './tests/tests.component';
+import {ReportsComponent} from './tests/reports/reports.component';
+import {RecordComponent} from './tests/record/record.component';
 
 const routes: Routes = [
   {
@@ -36,6 +39,10 @@ const routes: Routes = [
       {path: 'members', component: MembersComponent},
       {path: 'posts', component: PostsComponent},
       {path: 'not-found', component: NotFoundComponent},
+      {path: 'tests', component: TestsComponent, children: [
+          {path: '', component: RecordComponent},
+          {path: 'reports', component: ReportsComponent}
+        ]},
       {path: '**', redirectTo: 'not-found'}
     ]
   }
