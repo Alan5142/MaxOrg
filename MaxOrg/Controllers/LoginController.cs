@@ -111,7 +111,7 @@ namespace MaxOrg.Controllers
 
             using (var db = ArangoDatabase.CreateWithSetting())
             {
-                bool hasPassword = true;
+                var hasPassword = true;
                 Models.User userToAuth;
 
                 // MaxOrg is using the API
