@@ -14,6 +14,7 @@ import {RequirementsComponent} from './requirements/requirements.component';
 import {MembersComponent} from './members/members.component';
 import {NotFoundComponent} from './not-found/not-found.component';
 import {ProjectIndexComponent} from './project-index/project-index.component';
+import { PostsSectionComponent } from './posts-section/posts-section.component';
 const routes: Routes = [
   {
     path: '', component: ProjectComponent, children: [
@@ -32,6 +33,7 @@ const routes: Routes = [
       {path: 'requirements', component: RequirementsComponent},
       {path: 'members', component: MembersComponent},
       {path: 'description', component: DescriptionComponent},
+      {path: 'posts', component: PostsSectionComponent},
       {path: 'not-found', component: NotFoundComponent},
       {path: '**', redirectTo: 'not-found'}
     ]

@@ -1,0 +1,21 @@
+<mat-card>
+  <mat-card-header>
+    <div mat-card-avatar matRipple class="example-header-image"></div>
+    <mat-card-title class="no-select" matRipple>[Nombre de usuario]</mat-card-title>
+  </mat-card-header>
+  <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu">
+  <mat-card-content>
+    <p>
+      {{id}}{{content}}
+    </p>
+    <mat-divider></mat-divider>
+    <h5>comentarios</h5>
+    <ul><li *ngFor="let comment of comments">{{comment.contenido}}</li></ul>
+    <form fxLayout="column">
+      <mat-form-field fxFlex appearance="outline">
+        <textarea matInput cdkTextareaAutosize cdkAutosizeMaxRows="5" [(ngModel)]="newContent" name="contenido"></textarea>
+      </mat-form-field>
+      <button mat-flat-button color="primary" (click)="onClick()">comentar</button>
+    </form>
+  </mat-card-content>
+</mat-card>

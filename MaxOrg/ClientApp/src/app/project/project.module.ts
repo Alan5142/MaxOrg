@@ -46,6 +46,8 @@ import { MembersComponent } from './members/members.component';
 import { ChangeDescriptionComponent } from './admin-dashboard/change-description/change-description.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { ProjectIndexComponent } from './project-index/project-index.component';
+import { PostsSectionComponent } from './posts-section/posts-section.component';
+import { PostComponent } from './posts-section/post/post.component';
 
 @NgModule({
   entryComponents: [
@@ -122,7 +124,9 @@ import { ProjectIndexComponent } from './project-index/project-index.component';
     MembersComponent,
     ChangeDescriptionComponent,
     NotFoundComponent,
-    ProjectIndexComponent
+    ProjectIndexComponent,
+    PostsSectionComponent,
+    PostComponent
   ],
   bootstrap: [
     ProjectComponent

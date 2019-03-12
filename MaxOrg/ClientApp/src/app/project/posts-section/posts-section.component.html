@@ -1,0 +1,16 @@
+<div fxLayout="column" fxLayoutGap="60px" ngClass="post-container" ngClass.lt-md="post-container-mobile">
+  <div>
+    <form fxLayout="column">
+      <mat-form-field fxFlex appearance="outline">
+        <textarea matInput cdkTextareaAutosize cdkAutosizeMaxRows="5" [(ngModel)]="newContent" name="contenido"></textarea>
+        <mat-label>Post</mat-label>
+        <mat-hint>Puedes utilizar markdown y HTML</mat-hint>
+      </mat-form-field>
+      <button mat-flat-button color="primary" (click)="onClick()">Publicar</button>
+    </form>
+  </div>
+
+  <div *ngFor="let post of posts">
+    <app-post [id]="post.ID" [content]="post.contenido"></app-post>
+  </div>
+</div>
