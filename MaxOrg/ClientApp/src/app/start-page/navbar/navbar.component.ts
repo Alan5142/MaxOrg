@@ -4,7 +4,9 @@ import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {UserService} from '../../services/user.service';
 import {environment} from '../../../environments/environment';
-
+import {Observable} from "rxjs";
+import {Notification as UserNotification} from '../../services/user.service';
+import {not} from "rxjs/internal-compatibility";
 
 export interface DialogData {
   username: string;
@@ -18,12 +20,15 @@ export interface DialogData {
 })
 
 export class NavbarComponent implements OnInit {
-  notifications: number[];
+  notifications: Observable<UserNotification[]>;
   username: string;
   password: string;
 
-  constructor(private dialog: MatDialog, public userService: UserService) {
-    this.notifications = Array(10).fill(4);
+  constructor(private dialog: MatDialog,
+              public userService: UserService,
+              private router: Router) {
+    this.notifications = userService.getUserNotifications();
+    this.notifications.subscribe(result => console.debug(result));
   }
 
   ngOnInit() {
@@ -34,6 +39,19 @@ export class NavbarComponent implements OnInit {
       minWidth: '330px',
       data: {username: this.username, password: this.password}
     });
+  }
+
+  navigateToContext(notification: UserNotification) {
+    this.router.navigate([notification.context]);
+    this.userService.markNotificationAsReaded(notification).subscribe(result => console.debug(result));
+  }
+
+  getNumberOfUnreadNotifications(notification: UserNotification[]): number {
+    if (notification === null) {
+      return null;
+    }
+    const length = notification.filter(not => not.read === false).length;
+    return length > 0 ? length : null;
   }
 }
 

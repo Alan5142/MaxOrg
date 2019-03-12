@@ -41,6 +41,21 @@ export interface GitHubLogin {
   firstLogin: boolean;
 }
 
+export enum NotificationPriority {
+  Low,
+  Medium,
+  High
+}
+
+export interface Notification {
+  id: string;
+  message: string;
+  context: string;
+  triggerDate: string;
+  priority: NotificationPriority;
+  read: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -149,4 +164,20 @@ export class UserService {
     this.router.navigate(['/']);
   }
 
+  public getUserNotifications(): Observable<Notification[]> {
+    let headers = new HttpHeaders();
+    headers = headers.append('Content-Type', 'application/json');
+    headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+
+    return this.http.get<Notification[]>(`${environment.apiUrl}users/notifications`, {headers: headers});
+  }
+
+  public markNotificationAsReaded(notification: Notification) {
+    let headers = new HttpHeaders();
+    headers = headers.append('Content-Type', 'application/json');
+    headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+
+    return this.http.put<HttpResponse<any>>(`${environment.apiUrl}users/notifications/${notification.id}/mark-as-read`,
+      null, {headers: headers, observe: 'response'}).pipe(map<HttpResponse<any>, boolean>(result => result.ok));
+  }
 }

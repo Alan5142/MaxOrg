@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -21,6 +22,12 @@ namespace MaxOrg.Controllers
         public int? maxElements { get; set; }
     }
 
+    public class NotificationQueryOptions
+    {
+        public int? Limit { get; set; }
+        public int? Page { get; set; }
+    }
+    
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -75,14 +82,14 @@ namespace MaxOrg.Controllers
 
                 if (options.sorted.HasValue && options.sorted.Value == true)
                 {
-                    query.OrderBy(user => user.Username);
+                    query = query.OrderBy(user => user.Username);
                 }
 
                 var defaultValue = query.FirstOrDefault();
                 var queryCount = query.Count();
                 if (query.Count() >= 250 || options.page.HasValue)
                 {
-                    int skipValue = (options.page ?? 0) * 250;
+                    var skipValue = (options.page ?? 0) * 250;
                     query = query.Skip(skipValue).Take(250).Select(u => u);
                 }
 
@@ -115,13 +122,13 @@ namespace MaxOrg.Controllers
                     where u.Username == user.Username
                     select u;
 
-                if (query.Count() > 0)
+                if (query.Any())
                 {
                     return Conflict(new {message = $"Username {user.Username} already exists"});
                 }
 
                 query = db.Query<User>().Where(u => u.Email == user.Email);
-                if (query.Count() > 0)
+                if (query.Any())
                 {
                     return Conflict(new {message = $"Email {user.Email} already exists"});
                 }
@@ -168,7 +175,7 @@ namespace MaxOrg.Controllers
         [HttpPatch("{userId}")]
         public async Task<ActionResult> ChangeUserInformation(string userId, [FromBody] UserUpdateInfo userData)
         {
-            if (userId != HttpContext.User.Claims.FirstOrDefault().Value)
+            if (userId != HttpContext.User.Claims.FirstOrDefault()?.Value)
             {
                 return Unauthorized();
             }
@@ -205,7 +212,78 @@ namespace MaxOrg.Controllers
         public ActionResult Projects()
         {
             var claim = HttpContext.User.Claims.FirstOrDefault();
-            return Ok(new {projects = new string[] {"hello", "world"}, claim = claim.Value});
+            return Ok(new {projects = new string[] {"hello", "world"}, claim = claim?.Value});
         }
+
+        #region Notifications
+        
+        [Authorize]
+        [HttpGet("notifications")]
+        public async Task<IActionResult> GetUserNotifications([FromQuery] NotificationQueryOptions queryOptions)
+        {
+            var user = await GetUserWithId(HttpContext.User.Identity.Name);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            IEnumerable<Notification> notifications = user.Notifications;
+
+            if (queryOptions?.Limit != null)
+            {
+                notifications = notifications
+                    .Skip((queryOptions.Page - 1) * queryOptions.Limit.Value ?? 0 + queryOptions.Limit.Value)
+                    .Take(queryOptions.Limit.Value);
+            }
+
+            return Ok(notifications);
+        }
+
+        [Authorize]
+        [HttpPut("notifications/{notificationId}/mark-as-read")]
+        public async Task<IActionResult> MarkNotificationAsRead(string notificationId)
+        {
+            var user = await GetUserWithId(HttpContext.User.Identity.Name);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var notification =  user.Notifications.Find(n => n.Id == notificationId);
+            if (notification == null)
+            {
+                return NotFound();
+            }
+
+            notification.Read = true;
+
+            await UpdateUser(user);
+            return Ok();
+        }
+        
+        #endregion
+
+        #region Common
+
+        private async Task<User> GetUserWithId(string userId)
+        {
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                var selectedUser = await (from u in db.Query<Models.User>()
+                    where u.Key == userId
+                    select u).FirstOrDefaultAsync();
+                return selectedUser;
+            }
+        }
+
+        private async Task UpdateUser(User userToUpdate)
+        {
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                await db.UpdateByIdAsync<User>(userToUpdate.Id, userToUpdate);
+            }
+        }
+        
+        #endregion
     }
 }

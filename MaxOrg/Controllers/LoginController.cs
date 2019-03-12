@@ -23,16 +23,14 @@ namespace MaxOrg.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        private readonly IArangoDatabase m_database;
-        public IConfiguration Configuration { get; }
-        private PasswordHasher<Models.User> m_passwordHasher;
-        private static HttpClient client = new HttpClient();
+        private IConfiguration Configuration { get; }
+        private readonly PasswordHasher<Models.User> m_passwordHasher;
+        private static readonly HttpClient client = new HttpClient();
 
         public LoginController(IConfiguration configuration, IArangoDatabase database)
         {
             Configuration = configuration;
             m_passwordHasher = new PasswordHasher<Models.User>();
-            m_database = database;
         }
 
         [HttpPost]
