@@ -6,33 +6,28 @@ using System.Threading.Tasks;
 
 namespace MaxOrg.Hubs
 {
-    public enum NotificationReceiverType
-    {
-        User,
-        Group
-    }
-
-    public class NotificationRequest
-    {
-        public string Message { get; set; }
-        public NotificationReceiverType ReceiverType { get; set; }
-
-        public string[] UsersOrGroups { get; set; }
-    }
-
+    /// <summary>
+    /// Hub de notificaciones, utiliza SignalR para la comunicación bidireccional en tiempo real entre los clientes y el
+    /// servidor, 
+    /// </summary>
     [Authorize]
     public class NotificationHub : Hub
     {
-        public async Task SendNotificationToUser(string user, string notification)
-        {
-            await Clients.Group("User/" + user).SendAsync("notificationReceived", notification);
-        }
-
+        /// <summary>
+        /// Une a un determinado usuario a un grupo de notificaciones
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <returns></returns>
         public async Task JoinNotificationGroup(string groupName)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
         }
 
+        /// <summary>
+        /// Conecta a un usuario con los grupos a los que pertenece, de esta manera se suscribe a las notificaciones
+        /// de los grupos a los que pertenece
+        /// </summary>
+        /// <returns>Nada cx</returns>
         public async Task ConnectToHub()
         {
             var name = Context.User.Identity.Name;

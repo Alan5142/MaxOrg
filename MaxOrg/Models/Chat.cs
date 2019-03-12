@@ -15,8 +15,12 @@ namespace MaxOrg.Models
         /// Identificador del chat
         /// </summary>
         [DocumentProperty(Identifier = IdentifierType.Key)]
-        public string key;
+        public string Key;
 
+        /// <summary>
+        /// Identificador completo del chat, esta representado en ArangoDB como: "Chat/Key", siendo Key el campo de arriba, el
+        /// cual es un identificador generado por el mismo ArangoDB
+        /// </summary>
         [DocumentProperty(Identifier = IdentifierType.Handle)]
         public string Id { get; set; }
 

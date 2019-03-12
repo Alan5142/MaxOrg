@@ -234,3 +234,6 @@ _Pvt_Extensions
 
 # IntelliJ IDE generated files
 .idea/
+
+# docfx generated code
+# docfx_project/

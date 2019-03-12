@@ -120,10 +120,25 @@ namespace MaxOrg.Controllers
                         AddedBy = currentUser.Key
                     };
                     await groupGraph.InsertEdgeAsync<UsersInGroup>(userToAdd);
+
+                    var notificationMessage = string.Format($"{currentUser.Username} te ha agregado " +
+                                                               $"al proyecto '{projectGroup.Name}'", projectGroup.Name);
+                    
+                    // enviar la notificación
                     await m_notificationHub.Clients
                         .Group("Users/" + user.Key)
-                        .SendAsync("notificationReceived",
-                            $"{currentUser.Username} te ha agregado al proyecto '{projectGroup.Name}'");
+                        .SendAsync("notificationReceived", notificationMessage);
+
+                    var notification = new Notification
+                    {
+                        Read = false, 
+                        Message = notificationMessage, 
+                        // TODO checar prioridad
+                        Priority = NotificationPriority.Medium,
+                        Context = $"project/{createdGroup.Key}"
+                    };
+                    user.Notifications.Add(notification);
+                    await db.UpdateByIdAsync<User>(user.Id, user);
                 }
 
                 // TODO trigger notification

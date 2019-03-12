@@ -3,15 +3,16 @@
      fxLayoutGap="16px">
   <app-create-test></app-create-test>
   <div fxLayout="column-reverse" fxLayoutGap="30px">
-    <mat-card *ngFor="let testData of data">
+    <mat-card *ngFor="let testData of data" class="mat-elevation-z6">
       <mat-card-header>
-        <mat-card-title>#{{testData.number}}, {{testData.numberOfTests}} tests</mat-card-title>
+        <mat-card-title>#{{testData.number}}</mat-card-title>
       </mat-card-header>
       <mat-card-content fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap="10px">
         <mat-progress-spinner mode="determinate"
                               [value]="testData.passed / testData.numberOfTests * 100"></mat-progress-spinner>
-        <h3>{{testData.passed}} tests pasados</h3>
-        <h3>{{testData.failed}} tests fallados</h3>
+        <h3 class="text-center">{{testData.numberOfTests}} tests, de los cuales</h3>
+        <h3 class="text-center" style="color: #41c300">{{testData.passed}} tests fueron completados con exito</h3>
+        <h3 class="text-center" style="color: #e53935">{{testData.failed}} tests fallaron en el proceso</h3>
         <button (click)="openCreateReportDialog()" mat-flat-button color="primary"
                 [disabled]="!testData.needReport">
           {{testData.needReport ? 'CREAR REPORTE' : 'ESTE TEST YA CONTIENE UN REPORTE'}}

@@ -1,17 +1,6 @@
 import {Injectable} from '@angular/core';
 import * as signalR from '@aspnet/signalr';
 
-export enum NotificationReceiverType {
-  user,
-  group
-}
-
-export interface NotificationRequest {
-  message: string;
-  receiverType: NotificationReceiverType;
-  usersOrGroups: string[];
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -19,7 +8,6 @@ export class NotificationService {
   connection: signalR.HubConnection;
 
   constructor() {
-    console.log(':D');
   }
 
   public connect() {
@@ -36,4 +24,5 @@ export class NotificationService {
       console.log('Se recibio notificación :D');
     });
   }
+
 }
