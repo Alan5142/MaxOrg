@@ -1,8 +1,12 @@
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChildren} from '@angular/core';
 import {MediaMatcher} from '@angular/cdk/layout';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {MatIconRegistry, MatSidenav} from '@angular/material';
 import {DomSanitizer} from '@angular/platform-browser';
+import {GroupInfo, GroupsService} from "../../services/groups.service";
+import {Observable} from "rxjs";
+import {User, UserService} from "../../services/user.service";
+import {shareReplay} from "rxjs/operators";
 
 @Component({
   selector: 'app-project-navbar',
@@ -11,18 +15,24 @@ import {DomSanitizer} from '@angular/platform-browser';
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   notifications: number[];
+  user: Observable<User>;
+  projectInfo: Observable<GroupInfo>;
+
 
   mobileQuery: MediaQueryList;
   route: ActivatedRoute;
   @ViewChildren(MatSidenav) sidenav: MatSidenav;
   SWIPE_ACTION = {LEFT: 'swipeleft', RIGHT: 'swiperight'};
-  private _mobileQueryListener: () => void;
+  _mobileQueryListener: () => void;
 
   constructor(changeDetectorRef: ChangeDetectorRef,
               media: MediaMatcher,
               route: ActivatedRoute,
               iconRegistry: MatIconRegistry,
-              sanitizer: DomSanitizer) {
+              sanitizer: DomSanitizer,
+              private groupsService: GroupsService,
+              private router: ActivatedRoute,
+              private userService: UserService) {
     iconRegistry.addSvgIcon(
       'github',
       sanitizer.bypassSecurityTrustResourceUrl('/icons/github.svg'));
@@ -35,7 +45,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
 
+    this.user = userService.getCurrentUser();
+
+    this.router.paramMap.subscribe(params => {
+      this.projectInfo = this.groupsService.getGroupInfo(params.get('id')).pipe(shareReplay(1));
+      this.projectInfo.subscribe(result => console.log(result));
+    });
   }
+
 
   ngOnInit() {
   }

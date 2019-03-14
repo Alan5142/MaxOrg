@@ -172,10 +172,10 @@ export class UserService {
     return this.http.get<Notification[]>(`${environment.apiUrl}users/notifications`, {headers: headers});
   }
 
-  public markNotificationAsReaded(notification: Notification) {
+  public markNotificationAsRead(notification: Notification) {
     let headers = new HttpHeaders();
     headers = headers.append('Content-Type', 'application/json');
-    headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+    headers = headers.append('Authorization',  `Bearer ${localStorage.getItem('token')}`);
 
     return this.http.put<HttpResponse<any>>(`${environment.apiUrl}users/notifications/${notification.id}/mark-as-read`,
       null, {headers: headers, observe: 'response'}).pipe(map<HttpResponse<any>, boolean>(result => result.ok));

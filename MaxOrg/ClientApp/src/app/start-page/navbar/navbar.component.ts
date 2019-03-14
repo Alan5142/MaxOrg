@@ -1,12 +1,11 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar} from '@angular/material';
 import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {UserService} from '../../services/user.service';
 import {environment} from '../../../environments/environment';
 import {Observable} from "rxjs";
 import {Notification as UserNotification} from '../../services/user.service';
-import {not} from "rxjs/internal-compatibility";
 
 export interface DialogData {
   username: string;
@@ -26,7 +25,8 @@ export class NavbarComponent implements OnInit {
 
   constructor(private dialog: MatDialog,
               public userService: UserService,
-              private router: Router) {
+              private router: Router,
+              private snackBar: MatSnackBar) {
     this.notifications = userService.getUserNotifications();
     this.notifications.subscribe(result => console.debug(result));
   }
@@ -42,8 +42,13 @@ export class NavbarComponent implements OnInit {
   }
 
   navigateToContext(notification: UserNotification) {
-    this.router.navigate([notification.context]);
-    this.userService.markNotificationAsReaded(notification).subscribe(result => console.debug(result));
+    if (!notification.context) {
+      this.snackBar.open('Error al intentar navegar a la notificación', 'OK', {duration: 1500});
+      return;
+    }
+    this.userService.markNotificationAsRead(notification).subscribe();
+    this.router.navigate([notification.context])
+      .catch(() => this.snackBar.open('Error al intentar navegar a la notificación', 'OK', {duration: 1500}));
   }
 
   getNumberOfUnreadNotifications(notification: UserNotification[]): number {

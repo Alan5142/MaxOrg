@@ -52,7 +52,7 @@
       </mat-list-item>
       <mat-divider></mat-divider>
       <h3 mat-subheader>Proyecto</h3>
-      <mat-list-item routerLink="./dashboard">
+      <mat-list-item routerLink="./dashboard" *ngIf="(user | async)?.key === (projectInfo | async)?.groupOwner">
         <mat-icon matListIcon>dashboard</mat-icon>
         Panel de administrador
       </mat-list-item>

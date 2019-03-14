@@ -10,7 +10,7 @@ import {
   MatDatepickerModule,
   MatDialogModule,
   MatExpansionModule,
-  MatFormFieldModule,
+  MatFormFieldModule, MatGridListModule,
   MatIconModule,
   MatInputModule,
   MatListModule,
@@ -100,7 +100,8 @@ import {NotFoundComponent} from './not-found/not-found.component';
     ServicesModule,
     MatProgressBarModule,
     MatSnackBarModule,
-    MatSliderModule
+    MatSliderModule,
+    MatGridListModule
   ],
   bootstrap: [StartPageComponent]
 })

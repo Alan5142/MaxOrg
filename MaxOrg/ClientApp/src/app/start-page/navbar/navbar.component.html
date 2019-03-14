@@ -4,7 +4,7 @@
   <button (click)="displayLoginDialog()" *ngIf="!userService.isUserLoggedIn()" i18n mat-button>Iniciar sesión</button>
 
 
-  <div *ngIf="userService.isUserLoggedIn()">
+  <div fxLayout="row" fxFlex="100" *ngIf="userService.isUserLoggedIn()">
 
     <mat-menu #accountMenu="matMenu">
       <button i18n mat-menu-item routerLink="todos">Mis pendientes</button>
@@ -14,9 +14,10 @@
     </mat-menu>
 
     <mat-menu #notificationMenu="matMenu">
-      <div fxLayout="column-reverse" style="width: 280px; height: 300px; overflow-x: hidden;">
+      <div fxLayout="column" style="width: 280px; height: 300px; overflow-x: hidden;">
         <div *ngFor="let notification of notifications | async">
-          <div fxLayout="row" fxLayoutAlign="center center" matRipple class="no-select" (click)="navigateToContext(notification)">
+          <div fxLayout="row" fxLayoutAlign="center center" matRipple class="no-select"
+               (click)="navigateToContext(notification)">
             <div>
               <img class="image" src='https://material.angular.io/assets/img/examples/shiba1.jpg'>
             </div>
@@ -29,12 +30,16 @@
       </div>
     </mat-menu>
 
-    <button [matMenuTriggerFor]="notificationMenu" mat-button>
-      <mat-icon [matBadge]="getNumberOfUnreadNotifications((notifications | async))" matBadgeColor="warn" matBadgePosition="above after">notifications</mat-icon>
+    <div fxFlex></div>
+    <button [matMenuTriggerFor]="notificationMenu" mat-icon-button>
+      <mat-icon [matBadge]="getNumberOfUnreadNotifications((notifications | async))" matBadgeColor="warn"
+                matBadgePosition="above after">notifications
+      </mat-icon>
     </button>
-    <button [matMenuTriggerFor]="accountMenu" mat-button>
+    <div fxFlex.lt-md="1" fxFlex.gt-md="1"></div>
+    <button [matMenuTriggerFor]="accountMenu" mat-icon-button>
       <mat-icon>account_circle</mat-icon>
     </button>
   </div>
-  <div fxFlex="1" fxFlex.gt-md="5"></div>
+  <div fxFlex.lt-md="1" fxFlex.gt-md="5"></div>
 </mat-toolbar>

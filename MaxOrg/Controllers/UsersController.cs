@@ -160,7 +160,7 @@ namespace MaxOrg.Controllers
             {
                 var user = await (from u in db.Query<User>()
                         where u.Key == userId
-                        select new {u.Username, u.RealName, u.Email, u.Description, u.Birthday, u.Occupation})
+                        select new {u.Username, u.RealName, u.Email, u.Description, u.Birthday, u.Occupation, u.Key})
                     .FirstOrDefaultAsync();
                 if (user == null)
                 {
@@ -235,6 +235,8 @@ namespace MaxOrg.Controllers
                     .Skip((queryOptions.Page - 1) * queryOptions.Limit.Value ?? 0 + queryOptions.Limit.Value)
                     .Take(queryOptions.Limit.Value);
             }
+
+            notifications = notifications.OrderByDescending(not => not.TriggerDate);
 
             return Ok(notifications);
         }

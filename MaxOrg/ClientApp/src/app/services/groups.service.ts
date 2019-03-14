@@ -3,6 +3,15 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {map} from 'rxjs/operators';
+import {User} from "./user.service";
+
+export interface GroupInfo {
+  name: string;
+  key: string;
+  groupOwner: string;
+  creationDate: Date;
+  members: User[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +19,11 @@ import {map} from 'rxjs/operators';
 export class GroupsService {
 
   constructor(private http: HttpClient) {
+  }
+
+  getGroupInfo(groupId: string): Observable<GroupInfo> {
+    const headers = new HttpHeaders().append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+    return this.http.get<GroupInfo>(`${environment.apiUrl}groups/${groupId}`, {headers: headers});
   }
 
   getGroupDescription(groupId: string): Observable<string> {
