@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {MatBottomSheet, MatBottomSheetRef} from '@angular/material';
-import {User, UserService} from '../../services/user.service';
+import {NotificationPreference, User, UserService} from '../../services/user.service';
+import {Observable} from "rxjs";
+import {shareReplay} from "rxjs/operators";
 
 @Component({
   selector: 'app-my-account',
@@ -12,11 +14,14 @@ export class MyAccountComponent implements OnInit {
   passwordChanged = false;
   currentUser: User | null = null;
   fileData: string = null;
+  userNotificationPreference: Observable<NotificationPreference>;
 
   constructor(private bottomSheet: MatBottomSheet, private userService: UserService) {
     userService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
     });
+    this.userNotificationPreference = userService.userPreferences.pipe(shareReplay(1));
+    this.userNotificationPreference.subscribe(r => console.log(r.toString()));
   }
 
   ngOnInit() {

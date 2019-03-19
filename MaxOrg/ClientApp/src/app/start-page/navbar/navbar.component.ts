@@ -28,7 +28,6 @@ export class NavbarComponent implements OnInit {
               private router: Router,
               private snackBar: MatSnackBar) {
     this.notifications = userService.getUserNotifications();
-    this.notifications.subscribe(result => console.debug(result));
   }
 
   ngOnInit() {
@@ -49,14 +48,6 @@ export class NavbarComponent implements OnInit {
     this.userService.markNotificationAsRead(notification).subscribe();
     this.router.navigate([notification.context])
       .catch(() => this.snackBar.open('Error al intentar navegar a la notificación', 'OK', {duration: 1500}));
-  }
-
-  getNumberOfUnreadNotifications(notification: UserNotification[]): number {
-    if (notification === null) {
-      return null;
-    }
-    const length = notification.filter(not => not.read === false).length;
-    return length > 0 ? length : null;
   }
 }
 

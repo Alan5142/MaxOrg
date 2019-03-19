@@ -1,0 +1,14 @@
+<div style="width: 280px; height: 300px; overflow-x: hidden;" *ngIf="notifications | async as notifications$">
+  <div *ngFor="let notification of notifications$">
+    <div fxLayout="row" fxLayoutAlign="center center" matRipple class="no-select"
+         (click)="navigateToContext(notification)">
+      <div>
+        <img class="image" src='https://material.angular.io/assets/img/examples/shiba1.jpg'>
+      </div>
+      <p class="mat-body-2">
+        {{notification.message}}
+      </p>
+    </div>
+    <mat-divider></mat-divider>
+  </div>
+</div>

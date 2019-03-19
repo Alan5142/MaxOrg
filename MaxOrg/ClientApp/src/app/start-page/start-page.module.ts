@@ -42,6 +42,7 @@ import {RegisterComponent} from './register/register.component';
 import {ServicesModule} from '../services/services.module';
 import {GithubLoginComponent} from './github-login/github-login.component';
 import {NotFoundComponent} from './not-found/not-found.component';
+import {CommonComponentsModule} from "../common-components/common-components.module";
 
 @NgModule({
   providers: [],
@@ -101,7 +102,8 @@ import {NotFoundComponent} from './not-found/not-found.component';
     MatProgressBarModule,
     MatSnackBarModule,
     MatSliderModule,
-    MatGridListModule
+    MatGridListModule,
+    CommonComponentsModule
   ],
   bootstrap: [StartPageComponent]
 })

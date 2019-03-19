@@ -8,3 +8,24 @@
   width: 100%;
   height: 100%;
 }
+
+.ghost-lines {
+  h2, h3, p {
+
+    background-color: #ccc;
+    border-bottom: 2px solid white;
+    border-radius: 4px 4px 4px 4px;
+  }
+
+  h2 {
+    width: 50%;
+  }
+
+  h3 {
+    width: 85%;
+  }
+
+  p {
+    width: 70%;
+  }
+}

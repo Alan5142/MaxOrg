@@ -1,13 +1,19 @@
 import {Injectable} from '@angular/core';
 import * as signalR from '@aspnet/signalr';
+import {Observable, Subscriber} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
   connection: signalR.HubConnection;
+  notificationsUpdate$: Observable<void>;
+  private subscriber: Subscriber<void>;
 
   constructor() {
+    this.notificationsUpdate$ = new Observable<void>(logic => {
+      this.subscriber = logic;
+    });
   }
 
   public connect() {
@@ -21,7 +27,7 @@ export class NotificationService {
 
     this.connection.on('notificationReceived', (message: string) => {
       const notification = new Notification(message, {icon: '/favicon.ico', requireInteraction: false, silent: true});
-      console.log('Se recibio notificación :D');
+      this.subscriber.next();
     });
   }
 

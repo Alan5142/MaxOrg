@@ -2,7 +2,7 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ProjectComponent} from './project.component';
 import {
-  GestureConfig,
+  GestureConfig, MatBadgeModule,
   MatButtonModule,
   MatCardModule,
   MatCheckboxModule,
@@ -21,7 +21,7 @@ import {
   MatRippleModule,
   MatSelectModule,
   MatSidenavModule,
-  MatSlideToggleModule,
+  MatSlideToggleModule, MatSnackBarModule,
   MatSortModule,
   MatTableModule,
   MatTabsModule,
@@ -123,7 +123,9 @@ import {ReportsComponent} from './tests/reports/reports.component';
     VirtualScrollerModule,
     MatTreeModule,
     MatIconModule,
-    CommonComponentsModule
+    CommonComponentsModule,
+    MatSnackBarModule,
+    MatBadgeModule
   ],
   declarations: [
     ProjectComponent,
