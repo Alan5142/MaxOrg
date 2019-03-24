@@ -20,7 +20,7 @@ export class NotificationsComponent implements OnInit {
               private router: Router,
               private notificationService: NotificationService) {
     this.notifications = this.userService.getUserNotifications().pipe(shareReplay(1));
-    this.notifications.subscribe(_ => {}, _ => this.notifications = null);
+    this.notifications.subscribe(_ => {}, _ => this.notifications = new Observable<UserNotification[]>());
     notificationService.notificationsUpdate$.subscribe(_ => {
       this.fetchNotifications();
     });

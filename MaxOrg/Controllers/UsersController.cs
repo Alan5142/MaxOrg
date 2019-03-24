@@ -251,6 +251,26 @@ namespace MaxOrg.Controllers
                 return Ok(new{Preferences = user.NotificationPreference});
             }
         }
+
+        [Authorize]
+        [HttpPost("notifications/preferences")]
+        public async Task<IActionResult> SetUserNotificationPreferences([FromBody] NotificationPreference newPreference)
+        {
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                var user = await (from u in db.Query<User>()
+                    where u.Key == HttpContext.User.Identity.Name
+                    select u).FirstOrDefaultAsync();
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                user.NotificationPreference = newPreference;
+                await db.UpdateByIdAsync<User>(user.Key, user);
+                return Ok();
+            }
+        }
         
         [Authorize]
         [HttpPut("notifications/{notificationId}/mark-as-read")]
