@@ -8,12 +8,15 @@ import { Component, OnInit,Input } from '@angular/core';
 export class PostComponent implements OnInit {
   @Input() content:string;
   @Input() id;
-  newContent;
+  newComment;
+  newPost;
+  deleted=false;
   comments=[];
+  mod=false;
   constructor() {
     
    }
-  Reload(){
+  ReloadComments(){
     const Http = new XMLHttpRequest();
     const url='https://127.0.0.1/selectComments.php?post='+this.id;
     console.log(url);
@@ -24,19 +27,37 @@ export class PostComponent implements OnInit {
       console.log("reload comments Finished");
     }
   }
-  onClick(){
-    const url='https://127.0.0.1/instertComment.php?post='+this.id+'&&content='+'"'+this.newContent+'"';
+  comment(){
+    const url='https://127.0.0.1/instertComment.php?post='+this.id+'&content='+'"'+this.newComment+'"';
     const Http = new XMLHttpRequest();
     Http.open("GET", url);
     Http.send();
-    this.Reload();
-    this.Reload();
-    this.Reload();
-    this.newContent="";
+    this.ReloadComments();
+    this.ReloadComments();
+    this.ReloadComments();
+    this.newComment="";
     console.log(url);
   }
+  modd(){
+    const url='https://127.0.0.1/updatePost.php?ID='+this.id+'&content='+'"'+this.newPost+'"';
+    const Http = new XMLHttpRequest();
+    Http.open("GET", url);
+    Http.send();
+    console.log(url);
+    this.content=this.newPost;
+    this.newPost="";
+    this.mod=!this.mod;
+  }
+  delete(){
+    const url='https://127.0.0.1/deletePost.php?ID='+this.id;
+    const Http = new XMLHttpRequest();
+    Http.open("GET", url);
+    Http.send();
+    console.log(url);
+    this.deleted=true;
+  }
   ngOnInit() {
-    this.Reload();
+    this.ReloadComments();
   }
 
 }

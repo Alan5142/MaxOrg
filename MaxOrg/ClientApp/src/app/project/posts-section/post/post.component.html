@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card *ngIf="!deleted">
   <mat-card-header>
     <div mat-card-avatar matRipple class="example-header-image"></div>
     <mat-card-title class="no-select" matRipple>[Nombre de usuario]</mat-card-title>
@@ -8,14 +8,27 @@
     <p>
       {{id}}{{content}}
     </p>
+    <div *ngIf="mod">
+      <form fxLayout="column">
+        <mat-form-field fxFlex appearance="outline">
+          <textarea matInput cdkTextareaAutosize cdkAutosizeMaxRows="5" [(ngModel)]="newPost" name="contenido"></textarea>
+          <mat-label>Post</mat-label>
+          <mat-hint>Puedes utilizar markdown y HTML</mat-hint>
+        </mat-form-field>
+      </form>
+      <button mat-button color="warn" (click)="mod=!mod">Cancelar</button>
+      <button mat-button color="primary" (click)="modd()">Modificar</button>
+    </div>
+    <button mat-button color="primary" (click)="mod=!mod" *ngIf="!mod">Modificar</button>
+    <button mat-button color="warn" (click)="delete()">Eliminar</button>
     <mat-divider></mat-divider>
     <h5>comentarios</h5>
     <ul><li *ngFor="let comment of comments">{{comment.contenido}}</li></ul>
     <form fxLayout="column">
       <mat-form-field fxFlex appearance="outline">
-        <textarea matInput cdkTextareaAutosize cdkAutosizeMaxRows="5" [(ngModel)]="newContent" name="contenido"></textarea>
+        <textarea matInput cdkTextareaAutosize cdkAutosizeMaxRows="5" [(ngModel)]="newComment" name="contenido"></textarea>
       </mat-form-field>
-      <button mat-flat-button color="primary" (click)="onClick()">comentar</button>
+      <button mat-flat-button color="primary" (click)="comment()">comentar</button>
     </form>
   </mat-card-content>
 </mat-card>
