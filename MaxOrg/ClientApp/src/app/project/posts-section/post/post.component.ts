@@ -14,7 +14,7 @@ export class PostComponent implements OnInit {
   comments=[];
   mod=false;
   constructor() {
-    
+
    }
   ReloadComments(){
     const Http = new XMLHttpRequest();
@@ -60,4 +60,20 @@ export class PostComponent implements OnInit {
     this.ReloadComments();
   }
 
+  deleteComment(id: any, newContent: string) {
+    const url = `https://127.0.0.1/deleteComments.php?id=${id}`;
+    const Http = new XMLHttpRequest();
+    Http.open("GET", url);
+    Http.send();
+    console.log(url);
+  }
+
+  modifyComment(id: any, value: string) {
+    console.log(value);
+    const url = `https://127.0.0.1/modifyComments.php?id=${id}&newContent='${value}'`;
+    const Http = new XMLHttpRequest();
+    Http.open("GET", url);
+    Http.send();
+    console.log(url);
+  }
 }

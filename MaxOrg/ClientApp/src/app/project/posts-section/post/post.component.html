@@ -23,7 +23,17 @@
     <button mat-button color="warn" (click)="delete()">Eliminar</button>
     <mat-divider></mat-divider>
     <h5>comentarios</h5>
-    <ul><li *ngFor="let comment of comments">{{comment.contenido}}</li></ul>
+    <ul>
+      <li *ngFor="let comment of comments">
+        {{comment.contenido}}
+        <button mat-button (click)="deleteComment(comment.id)">ELIMINAR COMENTARIO</button>
+        <form>
+          <mat-form-field>
+            <input matInput #editComment type="text">
+          </mat-form-field>
+        </form>
+        <button mat-button (click)="modifyComment(comment.id, editComment.value)">MODIFICAR COMENTARIO</button>
+      </li></ul>
     <form fxLayout="column">
       <mat-form-field fxFlex appearance="outline">
         <textarea matInput cdkTextareaAutosize cdkAutosizeMaxRows="5" [(ngModel)]="newComment" name="contenido"></textarea>
