@@ -1,12 +1,11 @@
 <div class="tree">
   <ul>
-    <li *ngIf="admin">
+    <li *ngIf="isAdmin">
       <button mat-fab>+</button>
     </li>
     <li *ngFor="let node of treeData">
-      <button (click)="openDialog(node);" color="{{user.memberOf==node.name?'accent':null}}"
-              mat-raised-button>{{node.name}}</button>
-      <app-tree [admin]="user.admin&&user.memberOf==node.name" [treeData]="node.subgroups"></app-tree>
+      <app-node [userId]="userId" [nodeData]="node"></app-node>
+      <app-tree [parentId]="node.groupOwner" [treeData]="node.subgroups" [userId]="userId"></app-tree>
     </li>
   </ul>
 </div>

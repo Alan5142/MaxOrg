@@ -72,6 +72,7 @@ import {CreateTestComponent} from './tests/create-test/create-test.component';
 import {CreateTestDialogComponent} from './tests/create-test/create-test-dialog/create-test-dialog.component';
 import {CreateReportDialogComponent} from './tests/record/create-report-dialog/create-report-dialog.component';
 import {ReportsComponent} from './tests/reports/reports.component';
+import { NodeComponent } from './org-chart/tree/node/node.component';
 
 @NgModule({
   entryComponents: [
@@ -159,7 +160,8 @@ import {ReportsComponent} from './tests/reports/reports.component';
     CreateTestComponent,
     CreateTestDialogComponent,
     CreateReportDialogComponent,
-    ReportsComponent
+    ReportsComponent,
+    NodeComponent
   ],
   bootstrap: [
     ProjectComponent

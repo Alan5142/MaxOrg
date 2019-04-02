@@ -6,6 +6,6 @@
 
   <h2>Miembros</h2>
   <ul>
-    <li *ngFor="let member of data.group.members">{{member.username}}</li>
+    <li *ngFor="let member of data.group.members">{{member.username}}         {{data.group.groupOwner==member.key ? '*ADMIN*':''}}</li>
   </ul>
 </mat-dialog-content>
