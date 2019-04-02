@@ -45,7 +45,7 @@
                [mode]="mobileQuery.matches ? 'over' : 'side'"
                [opened]="!mobileQuery.matches" #sidenav>
     <mat-nav-list class="no-select" (click)="sidenav.toggle(!mobileQuery.matches)">
-      <h3>[Nombre del proyecto]</h3>
+      <h3>{{projectName}}</h3>
       <mat-list-item routerLink="./">
         <mat-icon matListIcon>home</mat-icon>
         Inicio

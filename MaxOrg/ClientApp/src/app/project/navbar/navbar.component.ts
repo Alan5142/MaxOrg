@@ -3,6 +3,7 @@ import {MediaMatcher} from '@angular/cdk/layout';
 import {ActivatedRoute} from '@angular/router';
 import {MatIconRegistry, MatSidenav} from '@angular/material';
 import {DomSanitizer} from '@angular/platform-browser';
+import { Project, ProjectsService } from 'src/app/services/projects.service';
 
 @Component({
   selector: 'app-project-navbar',
@@ -11,7 +12,8 @@ import {DomSanitizer} from '@angular/platform-browser';
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   notifications: number[];
-
+  project:Project;
+  projectName:string='';
   mobileQuery: MediaQueryList;
   route: ActivatedRoute;
   @ViewChildren(MatSidenav) sidenav: MatSidenav;
@@ -22,7 +24,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
               media: MediaMatcher,
               route: ActivatedRoute,
               iconRegistry: MatIconRegistry,
-              sanitizer: DomSanitizer) {
+              sanitizer: DomSanitizer,
+              public projectService:ProjectsService) {
     iconRegistry.addSvgIcon(
       'github',
       sanitizer.bypassSecurityTrustResourceUrl('/icons/github.svg'));
@@ -35,6 +38,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
 
+    this.route.parent.params.subscribe(params => {
+      this.projectService.getProject(params['id']).subscribe(project => {
+        this.project=project;
+        this.projectName=project.name;
+      })
+    });
   }
 
   ngOnInit() {
