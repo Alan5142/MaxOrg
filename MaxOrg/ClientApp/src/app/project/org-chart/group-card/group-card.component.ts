@@ -8,8 +8,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
   styleUrls: ['./group-card.component.scss']
 })
 export class GroupCardComponent implements OnInit {
-  members: any = [{name: 'Alan'}, {name: 'Manuel'}];
-  description = '';
+  
 
   constructor(
     public dialogRef: MatDialogRef<GroupCardComponent>,

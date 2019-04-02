@@ -11,7 +11,7 @@ export class TreeComponent implements OnInit {
 
   @Input() treeData: [];
   @Input() admin: boolean;
-  user: any = {admin: 'true', memberOf: 'trabajo'};
+  user: any = {admin: 'true', memberOf: 'hola'};
 
   constructor(public dialog: MatDialog) {
   }
@@ -23,7 +23,7 @@ export class TreeComponent implements OnInit {
     const dialogRef = this.dialog.open(GroupCardComponent, {
       width: '50%',
       minWidth: '300px',
-      data: {name: group}
+      data: {group}
     });
   }
 }

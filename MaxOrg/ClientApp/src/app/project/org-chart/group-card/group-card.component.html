@@ -1,11 +1,11 @@
-<h1 class="center" mat-dialog-title>{{data.name}}</h1>
+<h1 class="center" mat-dialog-title>{{data.group.name}}</h1>
 <mat-dialog-content>
   <h2>Descripción</h2>
-  <p>{{description}}</p>
+  <p>{{data.group.description}}</p>
   <mat-divider></mat-divider>
 
   <h2>Miembros</h2>
   <ul>
-    <li *ngFor="let member of members">{{member.name}}</li>
+    <li *ngFor="let member of data.group.members">{{member.username}}</li>
   </ul>
 </mat-dialog-content>

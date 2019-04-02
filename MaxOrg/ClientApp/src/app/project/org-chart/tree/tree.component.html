@@ -4,9 +4,9 @@
       <button mat-fab>+</button>
     </li>
     <li *ngFor="let node of treeData">
-      <button (click)="openDialog(node.name);" color="{{user.memberOf==node.name?'accent':null}}"
+      <button (click)="openDialog(node);" color="{{user.memberOf==node.name?'accent':null}}"
               mat-raised-button>{{node.name}}</button>
-      <app-tree [admin]="user.admin&&user.memberOf==node.name" [treeData]="node.subnodes"></app-tree>
+      <app-tree [admin]="user.admin&&user.memberOf==node.name" [treeData]="node.subgroups"></app-tree>
     </li>
   </ul>
 </div>

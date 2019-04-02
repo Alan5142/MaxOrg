@@ -1,4 +1,6 @@
 import {Component, OnInit} from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ProjectsService } from 'src/app/services/projects.service';
 
 @Component({
   selector: 'app-org-chart',
@@ -8,40 +10,27 @@ import {Component, OnInit} from '@angular/core';
 })
 export class OrgChartComponent implements OnInit {
 
-  treeWidth = 75;
-  myTree = [
-    {
-      name: 'MaxOrg', subnodes: [
-        {
-          name: 'Inicio', subnodes: [
-            {name: 'Mi perfil'},
-            {name: 'Mis pendientes'},
-            {name: 'Mis notificaciones'},
-            {name: 'Mis proyectos'}
-          ]
-        },
-        {
-          name: 'proyecto', subnodes: [
-            {name: 'trabajo'},
-            {name: 'codigo'},
-            {name: 'test'}
-          ]
-        }
-      ]
-    }
-  ];
+  treeWidth = 80;
+  myTree =[];
 
-  constructor() {
+  constructor(public route:ActivatedRoute, public projectService:ProjectsService) {
+    this.route.parent.params.subscribe(params => {
+      this.projectService.getProject(params['id']).subscribe(project => {
+        this.myTree.push(project);
+        console.log(this.myTree);
+        this.calcLeafs(this.myTree);
+      })
+    });
   }
 
   ngOnInit() {
-    this.calcLeafs(this.myTree);
+  
   }
 
   calcLeafs(tree: any) {
 
     tree.forEach(node => {
-      if (!node.subnodes) {
+      if (!node.subgroups||node.subgroups==[]) {
         this.treeWidth += (node.name.length > 9) ? node.name.length * 11 + 10 : 75;
       } else {
         this.calcLeafs(node.subnodes);

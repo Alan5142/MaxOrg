@@ -40,7 +40,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
     this.route.parent.params.subscribe(params => {
       this.projectService.getProject(params['id']).subscribe(project => {
-        this.project=project;
         this.projectName=project.name;
       })
     });
