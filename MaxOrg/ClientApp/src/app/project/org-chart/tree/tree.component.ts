@@ -1,4 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
+import { NewSubgroupComponent } from '../new-subgroup/new-subgroup.component';
+import { MatDialog } from '@angular/material';
 
 @Component({
   selector: 'app-tree',
@@ -10,16 +12,23 @@ export class TreeComponent implements OnInit {
   @Input() treeData: [];
   @Input() parentId: string=null;
   @Input() userId;
+  @Input() adminId: string=null;
   isAdmin:boolean=false;
-  constructor() {
+  constructor(public dialog: MatDialog) {
     
   }
 
   ngOnInit() {
-    if (this.parentId!=null){
-      if(this.userId==this.parentId)
+    if (this.adminId!=null){
+      if(this.userId==this.adminId)
         this.isAdmin=true;
     }
-
+  }
+  openDialog(parentId): void {
+    const dialogRef = this.dialog.open(NewSubgroupComponent, {
+      width: '50%',
+      minWidth: '300px',
+      data: {parentId}
+    });
   }
 }

@@ -207,7 +207,7 @@ namespace MaxOrg.Controllers
             foreach (var subgroup in subgroups)
             {
                 subgroup.Subgroups = GetSubgroupHierarchy(subgroup.Id);
-                subgroup.Users = GetGroupMembers(subgroup.Id);
+                subgroup.Members = GetGroupMembers(subgroup.Id);
             }
 
             return subgroups;
@@ -228,7 +228,7 @@ namespace MaxOrg.Controllers
                 var members = from u in traversal.Visited.Vertices
                     select new UserGroupView
                     {
-                        Id = u.Key,
+                        Key = u.Key,
                         Username = u.Username
                     };
                 return members.ToArray();

@@ -5,9 +5,11 @@ import {
   GestureConfig,
   MatButtonModule,
   MatCardModule,
+  MatAutocompleteModule,
   MatCheckboxModule,
   MatDialogModule,
   MatDividerModule,
+  MatChipsModule,
   MatExpansionModule,
   MatFormFieldModule,
   MatGridListModule,
@@ -73,6 +75,7 @@ import {CreateTestDialogComponent} from './tests/create-test/create-test-dialog/
 import {CreateReportDialogComponent} from './tests/record/create-report-dialog/create-report-dialog.component';
 import {ReportsComponent} from './tests/reports/reports.component';
 import { NodeComponent } from './org-chart/tree/node/node.component';
+import { NewSubgroupComponent } from './org-chart/new-subgroup/new-subgroup.component';
 
 @NgModule({
   entryComponents: [
@@ -82,6 +85,7 @@ import { NodeComponent } from './org-chart/tree/node/node.component';
     DeleteTaskDialogComponent,
     EditTaskComponent,
     GroupCardComponent,
+    NewSubgroupComponent,
     ChangeDescriptionComponent,
     CreateCardComponent,
     CreateReportDialogComponent,
@@ -92,7 +96,9 @@ import { NodeComponent } from './org-chart/tree/node/node.component';
     MatButtonModule,
     MatSidenavModule,
     ProjectRoutingModule,
+    MatChipsModule,
     MatExpansionModule,
+    MatAutocompleteModule,
     MatIconModule,
     MatMenuModule,
     MatDividerModule,
@@ -161,7 +167,8 @@ import { NodeComponent } from './org-chart/tree/node/node.component';
     CreateTestDialogComponent,
     CreateReportDialogComponent,
     ReportsComponent,
-    NodeComponent
+    NodeComponent,
+    NewSubgroupComponent
   ],
   bootstrap: [
     ProjectComponent

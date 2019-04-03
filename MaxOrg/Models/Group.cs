@@ -100,7 +100,7 @@ namespace MaxOrg.Models
         /// <summary>
         /// Id del usuario que esta en el grupo
         /// </summary>
-        public string Id { get; set; }
+        public string Key { get; set; }
 
         /// <summary>
         /// Nombre de usuario que esta en el grupo
@@ -146,7 +146,7 @@ namespace MaxOrg.Models
         /// <summary>
         /// Vista de los usuarios compuesta por id y nombre de usuario
         /// </summary>
-        public UserGroupView[] Users { get; set; }
+        public UserGroupView[] Members { get; set; }
     }
 
     /// <summary>

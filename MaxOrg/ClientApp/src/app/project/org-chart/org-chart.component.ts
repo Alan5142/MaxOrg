@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnChanges} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProjectsService } from 'src/app/services/projects.service';
 
@@ -8,15 +8,19 @@ import { ProjectsService } from 'src/app/services/projects.service';
   styleUrls: ['./org-chart.component.scss']
 
 })
-export class OrgChartComponent implements OnInit {
+export class OrgChartComponent implements OnInit,OnChanges {
+  
 
-  treeWidth = 80;
+  treeWidth = 100;
   myTree =[];
   userId;
+  observable;
   constructor(public route:ActivatedRoute, public projectService:ProjectsService) {
     this.userId=localStorage.getItem('userId');
     this.route.parent.params.subscribe(params => {
-      this.projectService.getProject(params['id']).subscribe(project => {
+      this.observable = this.projectService.getProject(params['id']);
+      this.observable.subscribe(project => {
+        console.log(project);
         this.myTree.push(project);
         this.calcLeafs(this.myTree);
       })
@@ -24,12 +28,14 @@ export class OrgChartComponent implements OnInit {
   }
 
   ngOnInit() {
-  
   }
 
   calcLeafs(tree: any) {
-
+    if (tree === undefined) {
+      return;
+    }
     tree.forEach(node => {
+      console.log(node.subgroups);
       if (!node.subgroups||node.subgroups==[]) {
         this.treeWidth += (node.name.length > 9) ? node.name.length * 11 + 10 : 75;
       } else {
@@ -37,5 +43,7 @@ export class OrgChartComponent implements OnInit {
       }
 
     });
+  }
+  ngOnChanges(): void {
   }
 }

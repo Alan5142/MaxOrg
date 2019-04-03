@@ -24,6 +24,7 @@ export class NodeComponent implements OnInit {
     });
   }
   ngOnInit() {
+    console.log(this.nodeData);
     this.nodeData.members.forEach(member => {
       if(member.key==this.userId){
         this.isMember=true;
