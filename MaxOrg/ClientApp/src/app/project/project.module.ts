@@ -5,9 +5,11 @@ import {
   GestureConfig, MatBadgeModule,
   MatButtonModule, MatButtonToggleModule,
   MatCardModule,
+  MatAutocompleteModule,
   MatCheckboxModule,
   MatDialogModule,
   MatDividerModule,
+  MatChipsModule,
   MatExpansionModule,
   MatFormFieldModule,
   MatGridListModule,
@@ -73,6 +75,8 @@ import {CreateTestDialogComponent} from './tests/create-test/create-test-dialog/
 import {CreateReportDialogComponent} from './tests/record/create-report-dialog/create-report-dialog.component';
 import {ReportsComponent} from './tests/reports/reports.component';
 import {ChatService} from "./services/chat.service";
+import { NodeComponent } from './org-chart/tree/node/node.component';
+import { NewSubgroupComponent } from './org-chart/new-subgroup/new-subgroup.component';
 
 @NgModule({
   entryComponents: [
@@ -82,6 +86,7 @@ import {ChatService} from "./services/chat.service";
     DeleteTaskDialogComponent,
     EditTaskComponent,
     GroupCardComponent,
+    NewSubgroupComponent,
     ChangeDescriptionComponent,
     CreateCardComponent,
     CreateReportDialogComponent,
@@ -92,7 +97,9 @@ import {ChatService} from "./services/chat.service";
     MatButtonModule,
     MatSidenavModule,
     ProjectRoutingModule,
+    MatChipsModule,
     MatExpansionModule,
+    MatAutocompleteModule,
     MatIconModule,
     MatMenuModule,
     MatDividerModule,
@@ -164,7 +171,9 @@ import {ChatService} from "./services/chat.service";
     CreateTestComponent,
     CreateTestDialogComponent,
     CreateReportDialogComponent,
-    ReportsComponent
+    ReportsComponent,
+    NodeComponent,
+    NewSubgroupComponent
   ],
   bootstrap: [
     ProjectComponent

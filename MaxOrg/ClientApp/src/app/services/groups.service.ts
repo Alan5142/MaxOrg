@@ -13,6 +13,14 @@ export interface GroupInfo {
   members: User[];
 }
 
+export interface CreateGroupData {
+  currentGroupId:string;
+  name: string;
+  description:string;
+  members: string[];
+  subgroupAdminId:string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -40,4 +48,14 @@ export class GroupsService {
     this.http.post(url, {newDescription: newDescription}, {headers: headers}).subscribe(val => {
     });
   }
+
+  createGroup(newGroupData: CreateGroupData): Observable<boolean> {
+    let headers = new HttpHeaders();
+    headers = headers.append('Content-Type', 'application/json');
+    headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+    return this.http.post(environment.apiUrl + 'groups', newGroupData, {headers: headers}).pipe(map<any, boolean>(response => {
+      return response;
+    }));
+  }
+
 }

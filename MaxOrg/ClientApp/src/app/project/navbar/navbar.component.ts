@@ -36,7 +36,6 @@ export class NavbarComponent implements OnInit {
       'flask',
       sanitizer.bypassSecurityTrustResourceUrl('/icons/flask.svg'));
     this.notifications = Array(10).fill(4);
-
     this.user = userService.getCurrentUser();
 
     this.router.paramMap.subscribe(params => {
