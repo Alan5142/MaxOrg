@@ -18,7 +18,7 @@ export class NotificationsService {
 
   constructor(private userService: UserService) {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl('/chatHub', {accessTokenFactory: () => userService.getUserToken()})
+      .withUrl('/notification-hub', {accessTokenFactory: () => userService.getUserToken()})
       .build();
 
     this.notificationObservable = new Observable<Notification>(observer => {

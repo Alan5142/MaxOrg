@@ -5,7 +5,46 @@
   <mat-divider></mat-divider>
 
   <h2>Miembros</h2>
-  <ul>
-    <li *ngFor="let member of members">{{member.name}}</li>
-  </ul>
+  <mat-tab-group #tabGroup [selectedIndex]="selected">
+    <mat-tab label="Activos">
+      <form class="width-100">
+        <mat-form-field class="width-100">
+          <input matInput type="text">
+          <mat-label>Buscar</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+      </form>
+      <mat-list>
+        <div *ngFor="let member of members">
+          <mat-list-item fxLayout="column">
+            <p>{{member.name}}</p>
+            <div fxFlex></div>
+            <mat-slide-toggle color="warn">Activo</mat-slide-toggle>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+        </div>
+      </mat-list>
+    </mat-tab>
+
+    <mat-tab label="Inactivos">
+      <form class="width-100">
+        <mat-form-field class="width-100">
+          <input matInput type="text">
+          <mat-label>Buscar</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+      </form>
+      <mat-list>
+        <div *ngFor="let member of members">
+          <mat-list-item fxLayout="column">
+            <p>{{member.name}}</p>
+            <div fxFlex></div>
+            <mat-slide-toggle color="warn">Activo</mat-slide-toggle>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+        </div>
+      </mat-list>
+    </mat-tab>
+  </mat-tab-group>
+
 </mat-dialog-content>

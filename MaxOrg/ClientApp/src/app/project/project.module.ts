@@ -3,7 +3,7 @@ import {CommonModule} from '@angular/common';
 import {ProjectComponent} from './project.component';
 import {
   GestureConfig, MatBadgeModule,
-  MatButtonModule,
+  MatButtonModule, MatButtonToggleModule,
   MatCardModule,
   MatCheckboxModule,
   MatDialogModule,
@@ -17,7 +17,7 @@ import {
   MatMenuModule,
   MatPaginatorModule,
   MatProgressBarModule,
-  MatProgressSpinnerModule,
+  MatProgressSpinnerModule, MatRadioModule,
   MatRippleModule,
   MatSelectModule,
   MatSidenavModule,
@@ -72,6 +72,7 @@ import {CreateTestComponent} from './tests/create-test/create-test.component';
 import {CreateTestDialogComponent} from './tests/create-test/create-test-dialog/create-test-dialog.component';
 import {CreateReportDialogComponent} from './tests/record/create-report-dialog/create-report-dialog.component';
 import {ReportsComponent} from './tests/reports/reports.component';
+import {ChatService} from "./services/chat.service";
 
 @NgModule({
   entryComponents: [
@@ -125,7 +126,9 @@ import {ReportsComponent} from './tests/reports/reports.component';
     MatIconModule,
     CommonComponentsModule,
     MatSnackBarModule,
-    MatBadgeModule
+    MatBadgeModule,
+    MatButtonToggleModule,
+    MatRadioModule
   ],
   declarations: [
     ProjectComponent,
@@ -166,7 +169,9 @@ import {ReportsComponent} from './tests/reports/reports.component';
   bootstrap: [
     ProjectComponent
   ],
-  providers: [{provide: HAMMER_GESTURE_CONFIG, useClass: GestureConfig}
+  providers: [
+    {provide: HAMMER_GESTURE_CONFIG, useClass: GestureConfig},
+    ChatService
   ]
 })
 export class ProjectModule {

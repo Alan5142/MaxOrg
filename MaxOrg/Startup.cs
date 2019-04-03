@@ -171,7 +171,11 @@ namespace MaxOrg
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
-            app.UseSignalR(routes => { routes.MapHub<NotificationHub>("/notification-hub"); });
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<NotificationHub>("/notification-hub");
+                routes.MapHub<ChatHub>("/chat-hub");
+            });
 
             app.UseMvc(routes =>
             {

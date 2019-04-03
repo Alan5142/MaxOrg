@@ -5,7 +5,7 @@
         <mat-icon>arrow_back</mat-icon>
       </button>
       <div fxFlex fxLayout="column" fxLayoutAlign="center stretch">
-        <h3 class="text-center">Nombre</h3>
+        <h3 class="text-center">{{(chat | async)?.name}}</h3>
       </div>
       <button fxFlexAlign="center" mat-icon-button>
         <mat-icon>more_vert</mat-icon>
@@ -16,11 +16,15 @@
 
   <mat-divider></mat-divider>
 
-  <virtual-scroller #scroll [bufferAmount]="100" [enableUnequalChildrenSizes]="true" [items]="items" class="height-100">
+  <virtual-scroller #scroll
+                    [bufferAmount]="100"
+                    [enableUnequalChildrenSizes]="true"
+                    [items]="(chat | async)?.messages"
+                    class="height-100">
 
-    <app-chat-message *ngFor="let item of scroll.viewPortItems;" class="chat-element chat-view" fxLayout="column"
-                      message="{{item}}"></app-chat-message>
-
+    <app-chat-message *ngFor="let message of scroll?.viewPortItems;" class="chat-element chat-view" fxLayout="column"
+                      [message]="message.data" [sender]="message.remitent"
+                      [selfMessage]="message.remitent === (userService.getCurrentUser() | async)?.username"></app-chat-message>
 
   </virtual-scroller>
 
@@ -35,8 +39,8 @@
   </cdk-virtual-scroll-viewport>
 -->
   <mat-form-field appearance="outline" class="width-100" fxFlexAlign="end">
-    <textarea cdkTextareaAutosize matInput placeholder="mensaje"></textarea>
-    <button color="primary" fxFlexAlign="top" mat-fab matSuffix>
+    <textarea #message cdkTextareaAutosize matInput placeholder="mensaje"></textarea>
+    <button color="primary" fxFlexAlign="top" mat-fab matSuffix (click)="sendMessage(message.value)">
       <mat-icon>message</mat-icon>
     </button>
   </mat-form-field>

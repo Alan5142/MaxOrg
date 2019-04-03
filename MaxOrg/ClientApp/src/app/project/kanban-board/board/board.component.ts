@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import {ActivatedRoute} from '@angular/router';
-import {KanbanBoard, KanbanCardsService, KanbanGroup} from '../../../services/kanban-cards.service';
+import {KanbanBoard, KanbanCard, KanbanCardsService, KanbanGroup} from '../../../services/kanban-cards.service';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {MatDialog} from '@angular/material';
@@ -79,5 +79,9 @@ export class BoardComponent implements OnInit {
         }));
       });
     });
+  }
+
+  trackUsingId(index, task: KanbanCard): string {
+    return task.id;
   }
 }

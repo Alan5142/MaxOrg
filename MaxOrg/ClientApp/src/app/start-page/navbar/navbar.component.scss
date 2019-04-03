@@ -4,3 +4,20 @@
   height: 3rem;
 }
 
+.mat-menu-panel.notifications-dropdown {
+  max-width:none;
+  margin-left: -8px;
+  overflow: visible;
+}
+
+@media screen and (min-width: 1280px) {
+  .notifications-dropdown {
+    width: 400px;
+    height: 500px;
+  }
+}
+@media screen and (max-width: 1279px) {
+  .notifications-dropdown {
+    width: 280px;
+  }
+}

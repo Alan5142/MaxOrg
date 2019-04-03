@@ -1,7 +1,7 @@
-import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChildren} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {MediaMatcher} from '@angular/cdk/layout';
-import {ActivatedRoute, Router} from '@angular/router';
-import {MatIconRegistry, MatSidenav} from '@angular/material';
+import {ActivatedRoute} from '@angular/router';
+import {MatIconRegistry} from '@angular/material';
 import {DomSanitizer} from '@angular/platform-browser';
 import {GroupInfo, GroupsService} from "../../services/groups.service";
 import {Observable} from "rxjs";
@@ -12,7 +12,8 @@ import {MediaObserver} from "@angular/flex-layout";
 @Component({
   selector: 'app-project-navbar',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+  styleUrls: ['./navbar.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class NavbarComponent implements OnInit {
   notifications: number[];

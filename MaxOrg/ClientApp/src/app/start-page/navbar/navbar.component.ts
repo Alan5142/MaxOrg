@@ -1,11 +1,10 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, ViewEncapsulation} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar} from '@angular/material';
 import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
-import {UserService} from '../../services/user.service';
+import {Notification as UserNotification, UserService} from '../../services/user.service';
 import {environment} from '../../../environments/environment';
 import {Observable} from "rxjs";
-import {Notification as UserNotification} from '../../services/user.service';
 
 export interface DialogData {
   username: string;
@@ -15,7 +14,8 @@ export interface DialogData {
 @Component({
   selector: 'app-start-page-navbar',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+  styleUrls: ['./navbar.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 
 export class NavbarComponent implements OnInit {
@@ -53,7 +53,7 @@ export class NavbarComponent implements OnInit {
 
 @Component({
   selector: 'app-navbar-dialog',
-  templateUrl: 'navbar.dialog.html',
+  templateUrl: 'navbar.dialog.html'
 })
 export class NavbarDialogComponent {
 
