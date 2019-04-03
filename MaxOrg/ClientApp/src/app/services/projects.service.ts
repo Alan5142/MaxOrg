@@ -42,7 +42,15 @@ export class ProjectsService {
         return [];
       }));
   }
-
+  getProject(projectId:string): Observable<Project> {
+    let headers = new HttpHeaders();
+    headers = headers.append('Content-Type', 'application/json');
+    headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+    return this.http.get(environment.apiUrl + 'Projects/' + projectId, {headers: headers})
+      .pipe(map<any, Project>(value => {
+        return value;
+      }));
+  }
   createProject(newProjectData: CreateProjectData): Observable<boolean> {
     let headers = new HttpHeaders();
     headers = headers.append('Content-Type', 'application/json');

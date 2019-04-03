@@ -154,13 +154,13 @@ namespace MaxOrg.Controllers
 
 
         [HttpGet("{userId}")]
-        public async Task<ActionResult> Get(string userId)
+        public async Task<ActionResult> GetUserInfo(string userId)
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var user = await (from u in db.Query<User>()
                         where u.Key == userId
-                        select new {u.Username, u.RealName, u.Email, u.Description, u.Birthday, u.Occupation})
+                        select new {u.Username, u.RealName, u.Email, u.Description, u.Birthday, u.Occupation, u.Key})
                     .FirstOrDefaultAsync();
                 if (user == null)
                 {
@@ -207,14 +207,6 @@ namespace MaxOrg.Controllers
             }
         }
 
-        [Authorize]
-        [HttpGet("projects")]
-        public ActionResult Projects()
-        {
-            var claim = HttpContext.User.Claims.FirstOrDefault();
-            return Ok(new {projects = new string[] {"hello", "world"}, claim = claim?.Value});
-        }
-
         #region Notifications
         
         [Authorize]
@@ -236,9 +228,50 @@ namespace MaxOrg.Controllers
                     .Take(queryOptions.Limit.Value);
             }
 
+            notifications = notifications.OrderByDescending(not => not.TriggerDate);
+
             return Ok(notifications);
         }
 
+        [Authorize]
+        [HttpGet("notifications/preferences")]
+        public async Task<IActionResult> GetUserNotificationPreferences()
+        {
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                var user = await (from u in db.Query<User>()
+                    where u.Key == HttpContext.User.Identity.Name
+                    select u).FirstOrDefaultAsync();
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                
+                return Ok(new{Preferences = user.NotificationPreference});
+            }
+        }
+
+        [Authorize]
+        [HttpPost("notifications/preferences")]
+        public async Task<IActionResult> SetUserNotificationPreferences([FromBody] NotificationPreference newPreference)
+        {
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                var user = await (from u in db.Query<User>()
+                    where u.Key == HttpContext.User.Identity.Name
+                    select u).FirstOrDefaultAsync();
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                user.NotificationPreference = newPreference;
+                await db.UpdateByIdAsync<User>(user.Key, user);
+                return Ok();
+            }
+        }
+        
         [Authorize]
         [HttpPut("notifications/{notificationId}/mark-as-read")]
         public async Task<IActionResult> MarkNotificationAsRead(string notificationId)
@@ -260,7 +293,6 @@ namespace MaxOrg.Controllers
             await UpdateUser(user);
             return Ok();
         }
-        
         #endregion
 
         #region Common

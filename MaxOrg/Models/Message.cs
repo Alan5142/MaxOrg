@@ -1,4 +1,5 @@
 ﻿using System;
+using ArangoDB.Client;
 
 namespace MaxOrg.Models
 {
@@ -12,6 +13,7 @@ namespace MaxOrg.Models
     /// <summary>
     /// Representa un mensaje dentro de un chat
     /// </summary>
+    [CollectionProperty(Naming = NamingConvention.ToCamelCase)]
     public class Message
     {
         /// <summary>

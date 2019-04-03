@@ -9,13 +9,14 @@ namespace MaxOrg.Models
     /// <summary>
     /// Chat dentro de la base de datos
     /// </summary>
+    [CollectionProperty(Naming = NamingConvention.ToCamelCase)]
     public class Chat
     {
         /// <summary>
         /// Identificador del chat
         /// </summary>
         [DocumentProperty(Identifier = IdentifierType.Key)]
-        public string Key;
+        public string Key { get; set; }
 
         /// <summary>
         /// Identificador completo del chat, esta representado en ArangoDB como: "Chat/Key", siendo Key el campo de arriba, el
@@ -30,14 +31,14 @@ namespace MaxOrg.Models
         public List<Message> Messages { get; set; } = new List<Message>();
 
         /// <summary>
+        /// Identificador del proyecto, sirve para hacer la relación entre el chat y el proyecto al que pertenece
+        /// </summary>
+        public string ProjectId { get; set; }
+        
+        /// <summary>
         /// Booleano que indica si el chat es un grupo
         /// </summary>
         public bool IsGroup { get; set; } = false;
-
-        /// <summary>
-        /// Participantes del chat, son identificados por el ID de usuarios
-        /// </summary>
-        public List<string> Participants { get; set; }
 
         /// <summary>
         /// Nombre del grupo, en caso de que este chat no sea un grupo su valor será "null" y se mostrará el nombre del otro usuario

@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {MatDialog} from '@angular/material';
-import {GroupCardComponent} from '../group-card/group-card.component';
+import { NewSubgroupComponent } from '../new-subgroup/new-subgroup.component';
+import { MatDialog } from '@angular/material';
 
 @Component({
   selector: 'app-tree',
@@ -10,20 +10,25 @@ import {GroupCardComponent} from '../group-card/group-card.component';
 export class TreeComponent implements OnInit {
 
   @Input() treeData: [];
-  @Input() admin: boolean;
-  user: any = {admin: 'true', memberOf: 'trabajo'};
-
+  @Input() parentId: string=null;
+  @Input() userId;
+  @Input() adminId: string=null;
+  isAdmin:boolean=false;
   constructor(public dialog: MatDialog) {
+    
   }
 
   ngOnInit() {
+    if (this.adminId!=null){
+      if(this.userId==this.adminId)
+        this.isAdmin=true;
+    }
   }
-
-  openDialog(group): void {
-    const dialogRef = this.dialog.open(GroupCardComponent, {
+  openDialog(parentId): void {
+    const dialogRef = this.dialog.open(NewSubgroupComponent, {
       width: '50%',
       minWidth: '300px',
-      data: {name: group}
+      data: {parentId}
     });
   }
 }

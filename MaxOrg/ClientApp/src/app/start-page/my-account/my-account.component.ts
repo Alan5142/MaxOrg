@@ -1,6 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {MatBottomSheet, MatBottomSheetRef} from '@angular/material';
-import {User, UserService} from '../../services/user.service';
+import {NotificationPreference, User, UserService} from '../../services/user.service';
+import {Observable} from "rxjs";
+import {shareReplay} from "rxjs/operators";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 @Component({
   selector: 'app-my-account',
@@ -9,13 +12,27 @@ import {User, UserService} from '../../services/user.service';
 })
 export class MyAccountComponent implements OnInit {
 
+
   passwordChanged = false;
   currentUser: User | null = null;
   fileData: string = null;
+  userNotificationPreference: Observable<NotificationPreference>;
+  userDataForm: FormGroup;
 
-  constructor(private bottomSheet: MatBottomSheet, private userService: UserService) {
+  constructor(private bottomSheet: MatBottomSheet,
+              private userService: UserService,
+              private formBuilder: FormBuilder) {
     userService.getCurrentUser().subscribe(user => {
       this.currentUser = user;
+    });
+    this.userNotificationPreference = userService.userPreferences.pipe(shareReplay(1));
+    this.userNotificationPreference.subscribe(r => console.log(r.toString()));
+
+    this.userDataForm = this.formBuilder.group({
+      description: '',
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      repeatPassword: '',
+      preferences: ''
     });
   }
 

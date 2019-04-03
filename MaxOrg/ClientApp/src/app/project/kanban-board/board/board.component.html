@@ -22,7 +22,7 @@
            [id]="group.id"
            [cdkDropListData]="group.cards"
            (cdkDropListDropped)="onTaskDrop($event)" style="background-color: cornflowerblue;">
-        <mat-card style="margin: 2%;" *ngFor="let task of group.cards" cdkDrag>
+        <mat-card style="margin: 2%;" *ngFor="let task of group.cards; trackBy: trackUsingId" cdkDrag>
           <mat-card-content>
             <h2>{{task.title}}</h2>
             <p>{{task.description}}</p>

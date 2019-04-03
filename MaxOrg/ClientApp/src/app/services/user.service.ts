@@ -5,6 +5,7 @@ import {Observable} from 'rxjs';
 import {LoginResponse, RegisterResponse, User} from './user.service';
 import {map} from 'rxjs/operators';
 import {Router} from '@angular/router';
+import {JwtHelperService} from "@auth0/angular-jwt";
 
 export interface User {
   key: string;
@@ -42,9 +43,15 @@ export interface GitHubLogin {
 }
 
 export enum NotificationPriority {
-  Low,
-  Medium,
-  High
+  low,
+  medium,
+  high
+}
+
+export enum NotificationPreference {
+  allowEverything = 1,
+  allowMediumAndHigh = 2,
+  allowHigh = 3
 }
 
 export interface Notification {
@@ -88,12 +95,47 @@ export class UserService {
     });
   }
 
-  isUserLoggedIn(): boolean {
-    return localStorage.getItem('token') !== null;
+  isUserLoggedIn(): Observable<boolean> | boolean {
+    const token = localStorage.getItem('token');
+    const jwtHelper = new JwtHelperService();
+
+    if (token === null || token === 'null' || jwtHelper.isTokenExpired(token)) {
+      const refreshToken = localStorage.getItem('refresh');
+      if (refreshToken === null || refreshToken === 'null') {
+        return false;
+      }
+      return this.getNewTokenWithRefresh()
+        .pipe(
+          map<string, boolean>(newToken =>{
+            if (newToken) {
+              localStorage.setItem('token', newToken);
+              return true;
+            }
+            return false;
+          })
+        );
+    }
+    else {
+      return true;
+    }
   }
 
   getUserToken(): string {
     return localStorage.getItem('token');
+  }
+
+  get userPreferences(): Observable<NotificationPreference> {
+    let headers = new HttpHeaders();
+    headers = headers.append('Content-Type', 'application/json');
+    headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+    return this.http.get<NotificationPreference>(`${environment.apiUrl}users/notifications/preferences`, {headers: headers})
+      .pipe(map<any, NotificationPreference>(response => response.preferences));
+  }
+
+  private getNewTokenWithRefresh(): Observable<string> {
+    return this.http.post(`${environment.apiUrl}login/refresh-token`,
+      {refreshToken: localStorage.getItem('refresh')})
+      .pipe(map<any, string>(response => response.token));
   }
 
   getUsersByName(username: string, maxElements: number = -1): Observable<User[]> {
@@ -172,10 +214,10 @@ export class UserService {
     return this.http.get<Notification[]>(`${environment.apiUrl}users/notifications`, {headers: headers});
   }
 
-  public markNotificationAsReaded(notification: Notification) {
+  public markNotificationAsRead(notification: Notification) {
     let headers = new HttpHeaders();
     headers = headers.append('Content-Type', 'application/json');
-    headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+    headers = headers.append('Authorization',  `Bearer ${localStorage.getItem('token')}`);
 
     return this.http.put<HttpResponse<any>>(`${environment.apiUrl}users/notifications/${notification.id}/mark-as-read`,
       null, {headers: headers, observe: 'response'}).pipe(map<HttpResponse<any>, boolean>(result => result.ok));

@@ -13,25 +13,22 @@
       <button i18n mat-menu-item routerLink="/start/my_account">Opciones</button>
     </mat-menu>
 
-    <mat-menu #notificationMenu="matMenu">
-      <div fxLayout="column" style="width: 280px; height: 300px; overflow-x: hidden;">
-        <div *ngFor="let notification of notifications">
-          <div fxLayout="row">
-            <div>
-              <img class="image" src='https://material.angular.io/assets/img/examples/shiba1.jpg'>
-            </div>
-            <button fxFill mat-button>
-              Ha publicado...
-            </button>
-          </div>
-          <mat-divider></mat-divider>
-        </div>
-      </div>
+    <mat-menu #notificationMenu="matMenu" class="mat-elevation-z24 notifications-dropdown">
+      <app-notifications #notificationsComponent></app-notifications>
     </mat-menu>
 
     <button [matMenuTriggerFor]="notificationMenu" mat-icon-button>
-      <mat-icon matBadge="3" matBadgeColor="warn" matBadgePosition="above after">notifications</mat-icon>
+      <mat-icon [matBadge]="notificationsComponent.getNumberOfUnreadNotifications() | async" matBadgeColor="warn"
+                matBadgePosition="above after">notifications
+      </mat-icon>
     </button>
+
+    <div fxFlex="2" fxFlex.gt-md="1"></div>
+
+    <button mat-icon-button routerLink="messages">
+      <mat-icon matListIcon>message</mat-icon>
+    </button>
+
     <div fxFlex="2" fxFlex.gt-md="1"></div>
     <button [matMenuTriggerFor]="accountMenu" mat-icon-button>
       <mat-icon>account_circle</mat-icon>
@@ -42,23 +39,19 @@
 
 <mat-sidenav-container id="container">
   <mat-sidenav ngClass="sidenav" ngClass.lt-md="sidenav-mobile" #sideNav
-               [mode]="mobileQuery.matches ? 'over' : 'side'"
-               [opened]="!mobileQuery.matches" #sidenav>
-    <mat-nav-list class="no-select" (click)="sidenav.toggle(!mobileQuery.matches)">
-      <h3>[Nombre del proyecto]</h3>
+               [mode]="mediaObserver.isActive('lt-md') ? 'over' : 'side'"
+               [opened]="!mediaObserver.isActive('lt-md')" #sidenav>
+    <mat-nav-list class="no-select" (click)="sidenav.toggle(!mediaObserver.isActive('lt-md'))">
+      <h3>{{(projectInfo | async)?.name}}</h3>
       <mat-list-item routerLink="./">
         <mat-icon matListIcon>home</mat-icon>
         Inicio
       </mat-list-item>
       <mat-divider></mat-divider>
       <h3 mat-subheader>Proyecto</h3>
-      <mat-list-item routerLink="./dashboard">
+      <mat-list-item routerLink="./dashboard" *ngIf="(user | async)?.key === (projectInfo | async)?.groupOwner">
         <mat-icon matListIcon>dashboard</mat-icon>
         Panel de administrador
-      </mat-list-item>
-      <mat-list-item routerLink="./messages">
-        <mat-icon matListIcon>message</mat-icon>
-        Mensajes
       </mat-list-item>
       <mat-list-item routerLink="posts">
         <mat-icon matListIcon>description</mat-icon>

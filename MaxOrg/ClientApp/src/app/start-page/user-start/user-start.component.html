@@ -1,6 +1,6 @@
 <div fxLayout="column" fxLayoutGap="50px">
-  <h1 class="mat-display-1" fxFlexAlign="center" i18n style="text-align: center;">Bienvenido de nuevo {{ currentUser ===
-  null ? '' : currentUser.username}}</h1>
+  <h1 class="mat-display-1" fxFlexAlign="center" i18n style="text-align: center;" *ngIf="user | async as currentUser">
+    Bienvenido de nuevo {{ currentUser?.username }}</h1>
   <div fxLayout="row wrap" fxLayoutAlign="center">
     <button (click)="openDialog()" i18n mat-stroked-button>Crear nuevo proyecto</button>
   </div>
@@ -19,21 +19,28 @@
         <mat-divider></mat-divider>
 
         <mat-card-content style="margin: 16px;">
-          <mat-form-field fxFill>
-            <mat-icon class="no-select" matPrefix>search</mat-icon>
-            <input #searchBar (keyup)="searchContent(searchBar.value)" matInput placeholder="Buscar..." type="text">
-          </mat-form-field>
+          <div *ngIf="projectsView | async as projects; else loading">
 
-          <mat-list>
-            <div *ngFor="let project of projectsView | async">
-              <mat-list-item fxFill>
-                <mat-icon class="no-select" matPrefix>folder</mat-icon>
-                <button (click)="goToProject(project.id)" fxFill mat-button>{{project.projectOwner}}
-                  /{{project.name}}</button>
-              </mat-list-item>
-              <mat-divider></mat-divider>
-            </div>
-          </mat-list>
+
+            <mat-form-field fxFill>
+              <mat-icon class="no-select" matPrefix>search</mat-icon>
+              <input #searchBar (keyup)="searchContent(searchBar.value)" matInput placeholder="Buscar..." type="text">
+            </mat-form-field>
+
+            <mat-list>
+              <div *ngFor="let project of projects">
+                <mat-list-item fxFill>
+                  <mat-icon class="no-select" matPrefix>folder</mat-icon>
+                  <button (click)="goToProject(project.id)" fxFill mat-button>{{project.projectOwner}}
+                    /{{project.name}}</button>
+                </mat-list-item>
+                <mat-divider></mat-divider>
+              </div>
+            </mat-list>
+          </div>
+          <ng-template #loading>
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          </ng-template>
 
         </mat-card-content>
 
@@ -42,7 +49,8 @@
 
     <div fxFlex="50">
       <mat-card ngStyle.gt-sm="margin-top: 16px;"
-                ngStyle.lt-md="margin-top: 90px;" style="min-height: 300px; max-height: 400px; padding: 0; margin: 16px;">
+                ngStyle.lt-md="margin-top: 90px;"
+                style="min-height: 300px; max-height: 400px; padding: 0; margin: 16px;">
         <mat-card-header style="background-color: #484848;">
           <mat-card-title i18n style="color: white; margin: 10px">Actividad reciente</mat-card-title>
         </mat-card-header>

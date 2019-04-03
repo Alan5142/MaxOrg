@@ -35,7 +35,7 @@ namespace MaxOrg.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult> Post([FromBody] Login userLoginData)
+        public async Task<ActionResult> Login([FromBody] Login userLoginData)
         {
             if (userLoginData.password == null || userLoginData.username == null)
             {
@@ -72,7 +72,8 @@ namespace MaxOrg.Controllers
             }
         }
 
-        [HttpPost("refreshToken")]
+        [HttpPost("refresh-token")]
+        [AllowAnonymous]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest token)
         {
             using (var db = ArangoDatabase.CreateWithSetting())
@@ -84,7 +85,7 @@ namespace MaxOrg.Controllers
                     select new {token = t, user = u}).FirstOrDefaultAsync();
 
                 var expirationDate = userTokenPair.token.Expires;
-                // refresh token is not valid :(
+                // El token de refresco no es valido :(
                 if (expirationDate <= dateNow)
                 {
                     return BadRequest(new {message = "Token expired"});
@@ -96,7 +97,7 @@ namespace MaxOrg.Controllers
                 {
                     token = newToken,
                     userId = userTokenPair.user.Key,
-                    message = $"Successfull created token"
+                    message = $"Successful created token"
                 });
             }
         }
@@ -259,7 +260,7 @@ namespace MaxOrg.Controllers
                     new Claim(ClaimTypes.Surname, user.Username)
                 }),
                 NotBefore = nowDate,
-                Expires = nowDate.AddDays(1),
+                Expires = nowDate.AddHours(3),
                 Issuer = Configuration["AppSettings:DefaultURL"],
                 Audience = Configuration["AppSettings:Jwt:Audience"],
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),

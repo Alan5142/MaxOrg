@@ -188,7 +188,7 @@ namespace MaxOrg.Controllers
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var group = await (from g in db.Query<Group>()
-                    where g.Key == groupId && g.IsRoot == false
+                    where g.Key == groupId
                     select g).FirstOrDefaultAsync();
                 if (group == null)
                 {

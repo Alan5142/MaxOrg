@@ -5,6 +5,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MaxOrg.Models
 {
+    public enum NotificationPreference
+    {
+        AllowEverything = 1,
+        AllowMediumAndHigh = 2,
+        AllowHigh = 3
+    }
+    
     [CollectionProperty(Naming = NamingConvention.ToCamelCase)]
     public class User
     {
@@ -47,6 +54,8 @@ namespace MaxOrg.Models
         /// Notificaciones que le han llegado al usuario, estan ordenadas de forma cronologica
         /// </summary>
         public List<Notification> Notifications { get; set; } = new List<Notification>();
+
+        public NotificationPreference NotificationPreference { get; set; } = NotificationPreference.AllowEverything;
     }
 
     public class UserForm

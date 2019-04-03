@@ -77,4 +77,19 @@ namespace MaxOrg.Models
         /// </summary>
         public bool Read { get; set; }
     }
+
+    public enum NotificationType
+    {
+        ProjectCreation,
+        Message,
+        
+    }
+    
+    public class NotificationPush
+    {
+        public string Message { get; set; }
+        
+        public string Context { get; set; }
+        
+    }
 }

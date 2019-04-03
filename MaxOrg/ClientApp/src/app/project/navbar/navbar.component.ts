@@ -1,46 +1,49 @@
-import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChildren} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {MediaMatcher} from '@angular/cdk/layout';
 import {ActivatedRoute} from '@angular/router';
-import {MatIconRegistry, MatSidenav} from '@angular/material';
+import {MatIconRegistry} from '@angular/material';
 import {DomSanitizer} from '@angular/platform-browser';
+import {GroupInfo, GroupsService} from "../../services/groups.service";
+import {Observable} from "rxjs";
+import {User, UserService} from "../../services/user.service";
+import {shareReplay} from "rxjs/operators";
+import {MediaObserver} from "@angular/flex-layout";
 
 @Component({
   selector: 'app-project-navbar',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+  styleUrls: ['./navbar.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
-export class NavbarComponent implements OnInit, OnDestroy {
+export class NavbarComponent implements OnInit {
   notifications: number[];
-
-  mobileQuery: MediaQueryList;
-  route: ActivatedRoute;
-  @ViewChildren(MatSidenav) sidenav: MatSidenav;
-  SWIPE_ACTION = {LEFT: 'swipeleft', RIGHT: 'swiperight'};
-  private _mobileQueryListener: () => void;
+  user: Observable<User>;
+  projectInfo: Observable<GroupInfo>;
 
   constructor(changeDetectorRef: ChangeDetectorRef,
               media: MediaMatcher,
-              route: ActivatedRoute,
               iconRegistry: MatIconRegistry,
-              sanitizer: DomSanitizer) {
+              sanitizer: DomSanitizer,
+              private route: ActivatedRoute,
+              private groupsService: GroupsService,
+              private router: ActivatedRoute,
+              private userService: UserService,
+              public mediaObserver: MediaObserver) {
     iconRegistry.addSvgIcon(
       'github',
       sanitizer.bypassSecurityTrustResourceUrl('/icons/github.svg'));
     iconRegistry.addSvgIcon(
       'flask',
       sanitizer.bypassSecurityTrustResourceUrl('/icons/flask.svg'));
-    this.route = route;
     this.notifications = Array(10).fill(4);
-    this.mobileQuery = media.matchMedia('(max-width: 960px)');
-    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
-    this.mobileQuery.addListener(this._mobileQueryListener);
+    this.user = userService.getCurrentUser();
 
+    this.router.paramMap.subscribe(params => {
+      this.projectInfo = this.groupsService.getGroupInfo(params.get('id')).pipe(shareReplay(1));
+    });
   }
+
 
   ngOnInit() {
-  }
-
-  ngOnDestroy() {
-    this.mobileQuery.removeListener(this._mobileQueryListener);
   }
 }

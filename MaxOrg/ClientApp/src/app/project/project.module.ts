@@ -2,12 +2,14 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ProjectComponent} from './project.component';
 import {
-  GestureConfig,
-  MatButtonModule,
+  GestureConfig, MatBadgeModule,
+  MatButtonModule, MatButtonToggleModule,
   MatCardModule,
+  MatAutocompleteModule,
   MatCheckboxModule,
   MatDialogModule,
   MatDividerModule,
+  MatChipsModule,
   MatExpansionModule,
   MatFormFieldModule,
   MatGridListModule,
@@ -17,11 +19,11 @@ import {
   MatMenuModule,
   MatPaginatorModule,
   MatProgressBarModule,
-  MatProgressSpinnerModule,
+  MatProgressSpinnerModule, MatRadioModule,
   MatRippleModule,
   MatSelectModule,
   MatSidenavModule,
-  MatSlideToggleModule,
+  MatSlideToggleModule, MatSnackBarModule,
   MatSortModule,
   MatTableModule,
   MatTabsModule,
@@ -72,6 +74,9 @@ import {CreateTestComponent} from './tests/create-test/create-test.component';
 import {CreateTestDialogComponent} from './tests/create-test/create-test-dialog/create-test-dialog.component';
 import {CreateReportDialogComponent} from './tests/record/create-report-dialog/create-report-dialog.component';
 import {ReportsComponent} from './tests/reports/reports.component';
+import {ChatService} from "./services/chat.service";
+import { NodeComponent } from './org-chart/tree/node/node.component';
+import { NewSubgroupComponent } from './org-chart/new-subgroup/new-subgroup.component';
 
 @NgModule({
   entryComponents: [
@@ -81,6 +86,7 @@ import {ReportsComponent} from './tests/reports/reports.component';
     DeleteTaskDialogComponent,
     EditTaskComponent,
     GroupCardComponent,
+    NewSubgroupComponent,
     ChangeDescriptionComponent,
     CreateCardComponent,
     CreateReportDialogComponent,
@@ -91,7 +97,9 @@ import {ReportsComponent} from './tests/reports/reports.component';
     MatButtonModule,
     MatSidenavModule,
     ProjectRoutingModule,
+    MatChipsModule,
     MatExpansionModule,
+    MatAutocompleteModule,
     MatIconModule,
     MatMenuModule,
     MatDividerModule,
@@ -123,7 +131,11 @@ import {ReportsComponent} from './tests/reports/reports.component';
     VirtualScrollerModule,
     MatTreeModule,
     MatIconModule,
-    CommonComponentsModule
+    CommonComponentsModule,
+    MatSnackBarModule,
+    MatBadgeModule,
+    MatButtonToggleModule,
+    MatRadioModule
   ],
   declarations: [
     ProjectComponent,
@@ -159,12 +171,16 @@ import {ReportsComponent} from './tests/reports/reports.component';
     CreateTestComponent,
     CreateTestDialogComponent,
     CreateReportDialogComponent,
-    ReportsComponent
+    ReportsComponent,
+    NodeComponent,
+    NewSubgroupComponent
   ],
   bootstrap: [
     ProjectComponent
   ],
-  providers: [{provide: HAMMER_GESTURE_CONFIG, useClass: GestureConfig}
+  providers: [
+    {provide: HAMMER_GESTURE_CONFIG, useClass: GestureConfig},
+    ChatService
   ]
 })
 export class ProjectModule {

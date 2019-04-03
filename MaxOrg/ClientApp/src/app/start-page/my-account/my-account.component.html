@@ -10,19 +10,19 @@
   </div>
 
   <mat-divider></mat-divider>
-  <form fxLayout="column">
-    <mat-form-field>
-      <input [value]="currentUser === null ? '' : currentUser.username" i18n-placeholder matInput placeholder="Nombre de usuario"
-             type="text">
-    </mat-form-field>
-    <mat-form-field>
-      <textarea [value]="currentUser !== null ? currentUser.description : ''" cdkTextareaAutosize i18n-placeholder matInput
-                placeholder="Descripción"></textarea>
+  <form fxLayout="column" [formGroup]="userDataForm">
+    <h2>{{currentUser === null ? '' : currentUser.username}}</h2>
+    <mat-form-field >
+      <textarea [value]="currentUser !== null ? currentUser.description : ''" cdkTextareaAutosize
+                i18n-placeholder
+                matInput
+                placeholder="Descripción"
+                formControlName="description"></textarea>
     </mat-form-field>
 
     <mat-form-field>
       <div fxLayout="row">
-        <input i18n-placeholder matInput placeholder="contraseña" type="password">
+        <input i18n-placeholder matInput placeholder="contraseña" type="password" formControlName="password">
         <button (click)="passwordChanged = true" mat-icon-button>
           <mat-icon>edit</mat-icon>
         </button>
@@ -30,15 +30,17 @@
     </mat-form-field>
     <mat-form-field *ngIf="passwordChanged">
       <div fxLayout="row">
-        <input i18n-placeholder matInput placeholder="repetir contraseña" type="password">
+        <input i18n-placeholder matInput placeholder="repetir contraseña" type="password" formControlName="repeatPassword">
       </div>
     </mat-form-field>
-    <mat-form-field>
-
-      <mat-select i18n-placeholder placeholder="Sonido de notificaciones">
-        <mat-option i18n value="all">Todas las prioridades</mat-option>
-        <mat-option i18n value="medium-high">Media y alta prioridad</mat-option>
-        <mat-option i18n value="high-only">Solo alta prioridad</mat-option>
+    <mat-form-field *ngIf="userNotificationPreference | async as userNotPreference">
+      <mat-select i18n-placeholder
+                  placeholder="Sonido de notificaciones"
+                  [value]="userNotPreference.toString()"
+                  formControlName="preferences">
+        <mat-option i18n value="1">Todas las prioridades</mat-option>
+        <mat-option i18n value="2">Media y alta prioridad</mat-option>
+        <mat-option i18n value="3">Solo alta prioridad</mat-option>
       </mat-select>
 
     </mat-form-field>

@@ -1,5 +1,5 @@
-<div [style.width.px]="treeWidth">
-  <app-tree [treeData]="myTree">
+<div [style.width.px]="treeWidth" class="tree">
+  <app-tree [treeData]="myTree" [userId]="userId" *ngIf="observable | async">
 
   </app-tree>
 </div>

@@ -28,27 +28,16 @@
       </button>
     </div>
     <mat-list>
-      <h3 mat-subheader>Con el administrador</h3>
-      <mat-list-item matRipple routerLink="./" [queryParams]="{chatId: 1}">
-        <!-- TODO change image to user image -->
-        <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
-        <h5 class="no-select" mat-line style="font-weight: bold;">Nombre del admin</h5>
-        <p class="no-select" mat-line>Ultimo mensaje</p>
-      </mat-list-item>
-      <mat-divider></mat-divider>
-      <!-- TODO display group conversations-->
       <h3 mat-subheader>Grupos</h3>
       <div>
-        <mat-list-item matRipple>
-          <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
-          <h5 class="no-select" mat-line style="font-weight: bold;">Nombre del grupo</h5>
-          <p class="no-select" mat-line>Usuario: Ultimo mensaje</p>
-        </mat-list-item>
-        <mat-list-item matRipple>
-          <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
-          <h5 class="no-select" mat-line style="font-weight: bold;">Nombre del grupo</h5>
-          <p class="no-select" mat-line>Usuario: Ultimo mensaje</p>
-        </mat-list-item>
+        <div *ngIf="chats | async as chats">
+          <mat-list-item matRipple *ngFor="let groupChat of chats.groupChats" routerLink="./" [queryParams]="{chatId: groupChat.key}">
+            <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
+            <h5 class="no-select" mat-line style="font-weight: bold;">{{groupChat.name}}</h5>
+            <p class="no-select" mat-line>
+              {{groupChat.messages[groupChat.messages.length - 1].remitent}}: {{groupChat.messages[groupChat.messages.length - 1].data}}</p>
+          </mat-list-item>
+        </div>
       </div>
       <mat-divider></mat-divider>
       <h3 mat-subheader>Conversaciones</h3>
@@ -90,16 +79,15 @@
         <mat-divider></mat-divider>
         <h3 mat-subheader>Grupos</h3>
         <div>
-          <mat-list-item matRipple>
-            <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
-            <h5 class="no-select" mat-line style="font-weight: bold;">Nombre del grupo</h5>
-            <p class="no-select" mat-line>Usuario: Ultimo mensaje</p>
-          </mat-list-item>
-          <mat-list-item matRipple>
-            <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
-            <h5 class="no-select" mat-line style="font-weight: bold;">Nombre del grupo</h5>
-            <p class="no-select" mat-line>Usuario: Ultimo mensaje</p>
-          </mat-list-item>
+          <div *ngIf="chats | async as chats">
+            <mat-list-item matRipple *ngFor="let groupChat of chats.groupChats" routerLink="./" [queryParams]="{chatId: groupChat.key}">
+              <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
+              <h5 class="no-select" mat-line style="font-weight: bold;">{{groupChat.name}}</h5>
+              <p class="no-select" mat-line>
+                {{groupChat.messages[groupChat.messages.length - 1].remitent}}: {{groupChat.messages[groupChat.messages.length - 1].data}}</p>
+            </mat-list-item>
+          </div>
+
         </div>
         <mat-divider></mat-divider>
         <h3 mat-subheader>Conversaciones</h3>

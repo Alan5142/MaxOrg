@@ -1,4 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnChanges} from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ProjectsService } from 'src/app/services/projects.service';
 
 @Component({
   selector: 'app-org-chart',
@@ -6,47 +8,40 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./org-chart.component.scss']
 
 })
-export class OrgChartComponent implements OnInit {
+export class OrgChartComponent implements OnInit,OnChanges {
+  
 
-  treeWidth = 75;
-  myTree = [
-    {
-      name: 'MaxOrg', subnodes: [
-        {
-          name: 'Inicio', subnodes: [
-            {name: 'Mi perfil'},
-            {name: 'Mis pendientes'},
-            {name: 'Mis notificaciones'},
-            {name: 'Mis proyectos'}
-          ]
-        },
-        {
-          name: 'proyecto', subnodes: [
-            {name: 'trabajo'},
-            {name: 'codigo'},
-            {name: 'test'}
-          ]
-        }
-      ]
-    }
-  ];
-
-  constructor() {
+  treeWidth = 100;
+  myTree =[];
+  userId;
+  observable;
+  constructor(public route:ActivatedRoute, public projectService:ProjectsService) {
+    this.userId=localStorage.getItem('userId');
+    this.route.parent.params.subscribe(params => {
+      this.observable = this.projectService.getProject(params['id']);
+      this.observable.subscribe(project => {
+        this.myTree.push(project);
+        this.calcLeafs(this.myTree);
+      })
+    });
   }
 
   ngOnInit() {
-    this.calcLeafs(this.myTree);
   }
 
   calcLeafs(tree: any) {
-
     tree.forEach(node => {
-      if (!node.subnodes) {
-        this.treeWidth += (node.name.length > 9) ? node.name.length * 11 + 10 : 75;
+      console.log(node);
+      if (!node.subgroups || node.subgroups===[] || node.subgroups.length === 0) {
+        console.log(this.treeWidth);
+        this.treeWidth += (node.name.length > 9) ? node.name.length * 11 + 10 : 150;
+        console.log(this.treeWidth);
       } else {
-        this.calcLeafs(node.subnodes);
+        this.calcLeafs(node.subgroups);
       }
 
     });
+  }
+  ngOnChanges(): void {
   }
 }

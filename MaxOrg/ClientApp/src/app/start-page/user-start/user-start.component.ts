@@ -6,7 +6,7 @@ import {User, UserService} from '../../services/user.service';
 import {Project, ProjectsService} from '../../services/projects.service';
 import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
-import {map} from 'rxjs/operators';
+import {map, share, shareReplay} from 'rxjs/operators';
 import {NotificationService} from '../../services/notification.service';
 
 @Component({
@@ -15,7 +15,7 @@ import {NotificationService} from '../../services/notification.service';
   styleUrls: ['./user-start.component.scss']
 })
 export class UserStartComponent implements OnInit {
-  currentUser: User | null = null;
+  user: Observable<User>;
   projectsView: Observable<Project[]>;
   projects: Observable<Project[]>;
 
@@ -27,11 +27,9 @@ export class UserStartComponent implements OnInit {
               private snackBar: MatSnackBar,
               private notificationService: NotificationService) {
     notificationService.connect();
-    userService.getCurrentUser().subscribe(user => {
-      this.currentUser = user;
-      this.projects = this.projectsService.getProjects();
-      this.projectsView = this.projects;
-    });
+    this.user = this.userService.getCurrentUser();
+    this.projects = this.projectsService.getProjects().pipe(shareReplay(1));
+    this.projectsView = this.projects;
   }
 
   openDialog(): void {
