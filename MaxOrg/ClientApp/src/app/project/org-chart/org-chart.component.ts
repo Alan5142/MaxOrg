@@ -20,7 +20,6 @@ export class OrgChartComponent implements OnInit,OnChanges {
     this.route.parent.params.subscribe(params => {
       this.observable = this.projectService.getProject(params['id']);
       this.observable.subscribe(project => {
-        console.log(project);
         this.myTree.push(project);
         this.calcLeafs(this.myTree);
       })
@@ -31,13 +30,12 @@ export class OrgChartComponent implements OnInit,OnChanges {
   }
 
   calcLeafs(tree: any) {
-    if (tree === undefined) {
-      return;
-    }
     tree.forEach(node => {
-      console.log(node.subgroups);
-      if (!node.subgroups||node.subgroups==[]) {
-        this.treeWidth += (node.name.length > 9) ? node.name.length * 11 + 10 : 75;
+      console.log(node);
+      if (!node.subgroups || node.subgroups===[] || node.subgroups.length === 0) {
+        console.log(this.treeWidth);
+        this.treeWidth += (node.name.length > 9) ? node.name.length * 11 + 10 : 150;
+        console.log(this.treeWidth);
       } else {
         this.calcLeafs(node.subgroups);
       }
