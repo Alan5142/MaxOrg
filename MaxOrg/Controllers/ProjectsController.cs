@@ -88,6 +88,7 @@ namespace MaxOrg.Controllers
                     Name = data.Name,
                     GroupOwner = HttpContext.User.Identity.Name,
                     IsRoot = true,
+                    Description = $"# {data.Name}\nEsta descripción es generada automaticamente, si eres el administrador puedes cambiarla en el panel de administrador"
                 };
 
                 // Default kanban creation

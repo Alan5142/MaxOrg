@@ -16,6 +16,8 @@ using System;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace MaxOrg
 {
@@ -30,6 +32,24 @@ namespace MaxOrg
         }
 
         public IConfiguration Configuration { get; }
+
+        private void ConfigureAzure(IServiceCollection services)
+        {
+            services.AddTransient<CloudBlobContainer>(provider =>
+            {
+                var storage = CloudStorageAccount.Parse(Configuration["AppSettings:AzureFiles:ConnectionString"]);
+            
+                var blobClient = storage.CreateCloudBlobClient();
+                
+                CloudBlobContainer container = blobClient.GetContainerReference("maxorgfiles");
+            
+                container.SetPermissionsAsync(new BlobContainerPermissions
+                {
+                    PublicAccess = BlobContainerPublicAccessType.Off
+                }).Wait();
+                return container;
+            });
+        }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -145,6 +165,8 @@ namespace MaxOrg
             services.AddSingleton<IScheduledTask, RemoveExpiredTokens>();
             services.AddScheduler((sender, args) => { args.SetObserved(); });
             services.AddSignalR();
+            
+            ConfigureAzure(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

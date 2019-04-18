@@ -1,7 +1,7 @@
 <h1 class="center" mat-dialog-title>{{data.group.name}}</h1>
 <mat-dialog-content>
   <h2>Descripción</h2>
-  <p>{{data.group.description}}</p>
+  <div [innerHTML]="description"></div>
   <mat-divider></mat-divider>
 
   <h2>Miembros</h2>

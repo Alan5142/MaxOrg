@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatBottomSheet, MatBottomSheetRef} from '@angular/material';
+import {MatBottomSheet, MatBottomSheetRef, MatSnackBar} from '@angular/material';
 import {NotificationPreference, User, UserService} from '../../services/user.service';
 import {Observable} from "rxjs";
 import {shareReplay} from "rxjs/operators";
@@ -39,6 +39,7 @@ export class MyAccountComponent implements OnInit {
   constructor(private bottomSheet: MatBottomSheet,
               private userService: UserService,
               private formBuilder: FormBuilder,
+              private snackBar: MatSnackBar,
               mediaObserver: MediaObserver) {
 
     this.cropperSettings = new CropperSettings();
@@ -123,7 +124,12 @@ export class MyAccountComponent implements OnInit {
     if (this.data.image !== undefined) {
       formData.append('profilePictureAsBase64', this.data.image.substring(this.data.image.indexOf(',') + 1));
     }
-    this.userService.updateUserInfo(formData).subscribe(() => { });
+    this.userService.updateUserInfo(formData).subscribe(() =>
+      this.snackBar.open('Información actualizada con exito', 'OK', {
+      duration: 2000,
+    }), error => this.snackBar.open('No se pudo actualizar la información', 'OK', {
+      duration: 2000,
+    }));
   }
 }
 

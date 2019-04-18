@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -15,6 +16,7 @@ using System.Threading.Tasks;
 using FluentFTP;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace MaxOrg.Controllers
 {
@@ -40,9 +42,10 @@ namespace MaxOrg.Controllers
     {
         private PasswordHasher<User> m_passwordHasher;
         private readonly IConfiguration m_configuration;
-        
-        public UsersController(IConfiguration configuration)
+        private readonly CloudBlobContainer Container;
+        public UsersController(IConfiguration configuration, CloudBlobContainer container)
         {
+            Container = container;
             m_configuration = configuration;
             m_passwordHasher = new PasswordHasher<User>();
         }
@@ -110,6 +113,31 @@ namespace MaxOrg.Controllers
             }
         }
 
+        [Authorize]
+        [HttpGet("current")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                var user = await db.Query<User>()
+                    .Where(u => u.Key == HttpContext.User.Identity.Name)
+                    .Select(u => u)
+                    .FirstOrDefaultAsync();
+                
+                return Ok(new
+                {
+                    user.Username,
+                    user.RealName,
+                    user.Email,
+                    user.Description,
+                    user.Birthday,
+                    user.Occupation,
+                    user.Key,
+                    ProfilePicture = $"{m_configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
+                });
+            }
+        }
+        
         /// <summary>
         /// Crea un nuevo usuario
         /// </summary>
@@ -201,20 +229,13 @@ namespace MaxOrg.Controllers
         [HttpGet("{userId}/profile.jpeg")]
         public async Task<IActionResult> GetUserProfilePicture(string userId)
         {
-            using (var client = new FtpClient(m_configuration["AppSettings:Ftp:Host"]))
+            var blob = Container.GetBlockBlobReference($"users/{userId}/profile.jpeg");
+            if (!await blob.ExistsAsync())
             {
-                var username = m_configuration["AppSettings:Ftp:User"];
-                var password = m_configuration["AppSettings:Ftp:Password"];
-                client.Credentials = new NetworkCredential(username, password);
-                client.Connect();
-                var path = $"/files/users/{userId}/profile.jpeg";
-                if (!client.FileExists(path))
-                {
-                    return NotFound();
-                }
-                var file = await client.OpenReadAsync(path);
-                return Ok(file);
+                return NotFound();
             }
+            var file = await blob.OpenReadAsync();
+            return Ok(file);
         }
 
         [Authorize]
@@ -239,33 +260,33 @@ namespace MaxOrg.Controllers
                 user.RealName = userData.RealName ?? user.RealName;
                 user.Description = userData.Description ?? user.Description;
                 user.Birthday = userData.Birthday ?? user.Birthday;
+                user.Occupation = userData.Occupation ?? user.Occupation;
                 if (userData.ProfilePicture != null || userData.ProfilePictureAsBase64 != null)
                 {
-                    using (var client = new FtpClient(m_configuration["AppSettings:Ftp:Host"]))
+                    var blob = Container.GetBlockBlobReference($"users/{user.Key}/profile.jpeg");
+                    if (userData.ProfilePicture != null)
                     {
-                        var username = m_configuration["AppSettings:Ftp:User"];
-                        var password = m_configuration["AppSettings:Ftp:Password"];
-                        client.Credentials = new NetworkCredential(username, password);
-                        client.Connect();
-                        dynamic data = null;
-                        if (userData.ProfilePicture != null)
+                        try
                         {
-                            try
-                            {
-                                data = userData.ProfilePicture.OpenReadStream();
-                            }
-                            catch (NullReferenceException e)
-                            {
-                                return BadRequest();
-                            }
+                            await blob.UploadFromStreamAsync(userData.ProfilePicture.OpenReadStream());
                         }
-                        else
+                        catch (Exception e)
                         {
-                            data = System.Convert.FromBase64String(userData.ProfilePictureAsBase64);
+                            Console.Error.WriteLine(e.Message);
                         }
-                        await client.UploadAsync(data,
-                            $"/files/users/{user.Key}/profile.jpeg", FtpExists.Overwrite, createRemoteDir: true);
-
+                    }
+                    else
+                    {
+                        try
+                        {
+                            var data = Convert.FromBase64String(userData.ProfilePictureAsBase64);
+                            await blob.UploadFromByteArrayAsync(data, 0, data.Length);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.Error.WriteLine(e);
+                        }
+                        
                     }
                 }
 
