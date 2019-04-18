@@ -120,7 +120,7 @@ export class MyAccountComponent implements OnInit {
     if (preferences.value !== '') {
       formData.append('preferences', preferences.value);
     }
-    if (this.data.image !== null) {
+    if (this.data.image !== undefined) {
       formData.append('profilePictureAsBase64', this.data.image.substring(this.data.image.indexOf(',') + 1));
     }
     this.userService.updateUserInfo(formData).subscribe(() => { });
