@@ -43,6 +43,20 @@
                [opened]="!mediaObserver.isActive('lt-md')" #sidenav>
     <mat-nav-list class="no-select" (click)="sidenav.toggle(!mediaObserver.isActive('lt-md'))">
       <h3>{{(projectInfo | async)?.name}}</h3>
+
+      <mat-form-field class="width-100">
+        <mat-label>Grupo</mat-label>
+        <mat-select class="width-100">
+          <mat-option value="hola">
+            hola
+          </mat-option>
+          <mat-option value="hola2">
+            hola2
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-divider></mat-divider>
       <mat-list-item routerLink="./">
         <mat-icon matListIcon>home</mat-icon>
         Inicio

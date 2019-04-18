@@ -398,6 +398,9 @@ namespace MaxOrg.Controllers
 
         #endregion
 
+        #region Requirements
+
+        #endregion
 
         /// <summary>
         /// Obtiene un valor de verdadero o falso si un usuario en cuestión es administrador de un grupo definido por un

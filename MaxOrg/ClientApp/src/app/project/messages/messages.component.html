@@ -34,8 +34,8 @@
           <mat-list-item matRipple *ngFor="let groupChat of chats.groupChats" routerLink="./" [queryParams]="{chatId: groupChat.key}">
             <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
             <h5 class="no-select" mat-line style="font-weight: bold;">{{groupChat.name}}</h5>
-            <p class="no-select" mat-line>
-              {{groupChat.messages[groupChat.messages.length - 1].remitent}}: {{groupChat.messages[groupChat.messages.length - 1].data}}</p>
+            <p class="no-select" mat-line *ngIf="groupChat?.messages?.length > 0">
+              {{groupChat.messages[groupChat.messages.length - 1]?.remitent}}: {{groupChat.messages[groupChat.messages.length - 1]?.data}}</p>
           </mat-list-item>
         </div>
       </div>
@@ -83,7 +83,7 @@
             <mat-list-item matRipple *ngFor="let groupChat of chats.groupChats" routerLink="./" [queryParams]="{chatId: groupChat.key}">
               <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
               <h5 class="no-select" mat-line style="font-weight: bold;">{{groupChat.name}}</h5>
-              <p class="no-select" mat-line>
+              <p class="no-select" mat-line *ngIf="groupChat?.messages?.length > 0">
                 {{groupChat.messages[groupChat.messages.length - 1].remitent}}: {{groupChat.messages[groupChat.messages.length - 1].data}}</p>
             </mat-list-item>
           </div>
