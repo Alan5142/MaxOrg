@@ -16,6 +16,7 @@ export interface User {
   description?: string;
   occupation?: string;
   birthday?: Date;
+  profilePicture?: string;
 }
 
 export interface RegisterResponse {
@@ -130,6 +131,12 @@ export class UserService {
     headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
     return this.http.get<NotificationPreference>(`${environment.apiUrl}users/notifications/preferences`, {headers: headers})
       .pipe(map<any, NotificationPreference>(response => response.preferences));
+  }
+
+  updateUserInfo(userInfo) {
+    const headers = new HttpHeaders({'Accept': 'application/json'})
+      .append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+    return this.http.put(`${environment.apiUrl}users`, userInfo, {headers: headers});
   }
 
   private getNewTokenWithRefresh(): Observable<string> {

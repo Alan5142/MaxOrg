@@ -26,8 +26,19 @@ export class NotificationService {
       .then(ok => this.connection.send('connectToHub'));
 
     this.connection.on('notificationReceived', (message: string) => {
-      const notification = new Notification(message, {icon: '/favicon.ico', requireInteraction: false, silent: true});
-      this.subscriber.next();
+      try {
+        const notification = new Notification(message, {icon: '/favicon.ico', requireInteraction: false, silent: true});
+        this.subscriber.next();
+      } catch (exception) {
+        navigator.serviceWorker.getRegistration().then(reg => {
+          console.log(reg);
+          reg.showNotification('MaxOrg', {
+            body: message,
+            icon: '/favicon.ico',
+            vibrate: [200, 100, 200, 100, 200, 100, 200]
+          }).then(res => {}, err => {});
+        });
+      }
     });
   }
 
