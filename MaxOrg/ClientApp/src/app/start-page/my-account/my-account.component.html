@@ -1,18 +1,30 @@
-<div [ngClass.lt-md]="['mobile-view']" fxLayout="column" fxLayoutAlign="center stretch" ngClass.gt-md='desktop-view'>
+<div [ngClass.lt-md]="['mobile-view']" fxLayout="column" fxLayoutAlign="center stretch" ngClass.gt-md='desktop-view'
+     *ngIf="currentUser !== null">
   <h1 class="text-center" i18n>Mi cuenta</h1>
 
   <div fxLayout="row" fxLayoutAlign="center stretch">
-    <img [src]="fileData == null ? 'https://material.angular.io/assets/img/examples/shiba1.jpg' : fileData" ngClass="image"
+    <img-cropper #imageCropper *ngIf="fileData !== null" [image]="data" [settings]="cropperSettings"></img-cropper>
+
+    <img *ngIf="fileData === null" [src]="!newUserImage ? profileUrl : data.image" ngClass="image"
          ngClass.xs="image-small">
-    <button (click)="selectImage()" fxFlexAlign="end" mat-icon-button>
+    <button *ngIf="fileData === null" (click)="selectImage()" fxFlexAlign="end" mat-icon-button>
       <mat-icon>edit</mat-icon>
+    </button>
+    <button (click)="fileData = null" *ngIf="fileData !== null" fxFlexAlign="end" mat-icon-button>
+      <mat-icon>check</mat-icon>
     </button>
   </div>
 
   <mat-divider></mat-divider>
   <form fxLayout="column" [formGroup]="userDataForm">
     <h2>{{currentUser === null ? '' : currentUser.username}}</h2>
-    <mat-form-field >
+
+    <mat-form-field>
+      <mat-label>Nombre</mat-label>
+      <input type="text" matInput value="{{currentUser.realName}}" formControlName="realName">
+    </mat-form-field>
+
+    <mat-form-field>
       <textarea [value]="currentUser !== null ? currentUser.description : ''" cdkTextareaAutosize
                 i18n-placeholder
                 matInput
@@ -21,22 +33,34 @@
     </mat-form-field>
 
     <mat-form-field>
-      <div fxLayout="row">
-        <input i18n-placeholder matInput placeholder="contraseña" type="password" formControlName="password">
-        <button (click)="passwordChanged = true" mat-icon-button>
-          <mat-icon>edit</mat-icon>
-        </button>
-      </div>
+      <mat-label>Ocupación</mat-label>
+      <input matInput type="text" formControlName="occupation">
     </mat-form-field>
-    <mat-form-field *ngIf="passwordChanged">
-      <div fxLayout="row">
-        <input i18n-placeholder matInput placeholder="repetir contraseña" type="password" formControlName="repeatPassword">
-      </div>
+
+    <mat-form-field>
+      <input i18n-placeholder matInput placeholder="contraseña" type="password" formControlName="password">
+      <mat-error *ngIf="userDataForm.get('password').errors?.length">
+        La longitud minima es de 8 caracteres
+      </mat-error>
+
+      <mat-error *ngIf="userDataForm.get('password').errors?.mismatch">
+        Las contraseñas no coinciden
+      </mat-error>
+
     </mat-form-field>
-    <mat-form-field *ngIf="userNotificationPreference | async as userNotPreference">
+
+    <mat-form-field>
+        <input i18n-placeholder
+               matInput
+               placeholder="repetir contraseña"
+               type="password"
+               (keyup)="checkPasswords()"
+               formControlName="repeatPassword">
+    </mat-form-field>
+    <mat-form-field>
       <mat-select i18n-placeholder
-                  placeholder="Sonido de notificaciones"
-                  [value]="userNotPreference.toString()"
+                  placeholder="Sonido de notificaciones"password
+                  value="{{userNotificationPreference | async}}"
                   formControlName="preferences">
         <mat-option i18n value="1">Todas las prioridades</mat-option>
         <mat-option i18n value="2">Media y alta prioridad</mat-option>
@@ -44,6 +68,6 @@
       </mat-select>
 
     </mat-form-field>
-    <button color="accent" i18n mat-flat-button>Guardar cambios</button>
+    <button color="accent" i18n mat-flat-button type="submit" (click)="updateUserData()">GUARDAR CAMBIOS</button>
   </form>
 </div>

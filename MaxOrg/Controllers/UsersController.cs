@@ -6,9 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using FluentFTP;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace MaxOrg.Controllers
 {
@@ -33,9 +37,11 @@ namespace MaxOrg.Controllers
     public class UsersController : ControllerBase
     {
         private PasswordHasher<User> m_passwordHasher;
-
-        public UsersController()
+        private readonly IConfiguration m_configuration;
+        
+        public UsersController(IConfiguration configuration)
         {
+            m_configuration = configuration;
             m_passwordHasher = new PasswordHasher<User>();
         }
 
@@ -108,7 +114,7 @@ namespace MaxOrg.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult> PostAsync([FromBody] UserForm user)
+        public async Task<ActionResult> CreateUser([FromBody] UserForm user)
         {
             if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password) ||
                 string.IsNullOrEmpty(user.Email))
@@ -160,30 +166,63 @@ namespace MaxOrg.Controllers
             {
                 var user = await (from u in db.Query<User>()
                         where u.Key == userId
-                        select new {u.Username, u.RealName, u.Email, u.Description, u.Birthday, u.Occupation, u.Key})
+                        select new
+                        {
+                            u.Username, 
+                            u.RealName,
+                            u.Email,
+                            u.Description,
+                            u.Birthday,
+                            u.Occupation,
+                            u.Key
+                        })
                     .FirstOrDefaultAsync();
                 if (user == null)
                 {
                     return NotFound();
                 }
 
-                return Ok(user);
+                return Ok(new
+                {
+                    user.Username,
+                    user.RealName,
+                    user.Email,
+                    user.Description,
+                    user.Birthday,
+                    user.Occupation,
+                    user.Key,
+                    ProfilePicture = $"{m_configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
+                });
+            }
+        }
+
+        [HttpGet("{userId}/profile.jpeg")]
+        public async Task<IActionResult> GetUserProfilePicture(string userId)
+        {
+            using (var client = new FtpClient(m_configuration["AppSettings:Ftp:Host"]))
+            {
+                var username = m_configuration["AppSettings:Ftp:User"];
+                var password = m_configuration["AppSettings:Ftp:Password"];
+                client.Credentials = new NetworkCredential(username, password);
+                client.Connect();
+                var path = $"/files/users/{userId}/profile.jpeg";
+                if (!client.FileExists(path))
+                {
+                    return NotFound();
+                }
+                var file = await client.OpenReadAsync(path);
+                return Ok(file);
             }
         }
 
         [Authorize]
-        [HttpPatch("{userId}")]
-        public async Task<ActionResult> ChangeUserInformation(string userId, [FromBody] UserUpdateInfo userData)
+        [HttpPut]
+        public async Task<ActionResult> ChangeUserInformation([FromForm] UserUpdateInfo userData)
         {
-            if (userId != HttpContext.User.Claims.FirstOrDefault()?.Value)
-            {
-                return Unauthorized();
-            }
-
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var user = await (from u in db.Query<User>()
-                    where u.Key == userId
+                    where u.Key == HttpContext.User.Identity.Name
                     select u).FirstOrDefaultAsync();
 
                 // no user exists
@@ -192,16 +231,43 @@ namespace MaxOrg.Controllers
                     return NotFound();
                 }
 
-                user.Password = userData.password != null
-                    ? m_passwordHasher.HashPassword(user, userData.password)
+                user.Password = userData.Password != null
+                    ? m_passwordHasher.HashPassword(user, userData.Password)
                     : user.Password;
-                user.Username = userData.username ?? user.Username;
-                user.Email = userData.email ?? userData.email;
-                user.RealName = userData.realName ?? user.RealName;
-                user.Description = userData.description ?? user.Description;
-                user.Birthday = userData.birthday ?? user.Birthday;
+                user.RealName = userData.RealName ?? user.RealName;
+                user.Description = userData.Description ?? user.Description;
+                user.Birthday = userData.Birthday ?? user.Birthday;
+                if (userData.ProfilePicture != null || userData.ProfilePictureAsBase64 != null)
+                {
+                    using (var client = new FtpClient(m_configuration["AppSettings:Ftp:Host"]))
+                    {
+                        var username = m_configuration["AppSettings:Ftp:User"];
+                        var password = m_configuration["AppSettings:Ftp:Password"];
+                        client.Credentials = new NetworkCredential(username, password);
+                        client.Connect();
+                        dynamic data = null;
+                        if (userData.ProfilePicture != null)
+                        {
+                            try
+                            {
+                                data = userData.ProfilePicture.OpenReadStream();
+                            }
+                            catch (NullReferenceException e)
+                            {
+                                return BadRequest();
+                            }
+                        }
+                        else
+                        {
+                            data = System.Convert.FromBase64String(userData.ProfilePictureAsBase64);
+                        }
+                        await client.UploadAsync(data,
+                            $"/files/users/{user.Key}/profile.jpeg", FtpExists.Overwrite, createRemoteDir: true);
 
-                await db.UpdateByIdAsync<User>(userId, user);
+                    }
+                }
+
+                await db.UpdateByIdAsync<User>(user.Key, user);
 
                 return Ok();
             }

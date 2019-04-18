@@ -1,4 +1,4 @@
-<div *ngIf="notifications | async as notifications$">
+<div *ngIf="notifications | async as notifications$" style="overflow-y: hidden">
   <div *ngFor="let notification of notifications$">
     <div fxLayout="row" fxLayoutAlign="start center" matRipple class="no-select"
          (click)="navigateToContext(notification)">
