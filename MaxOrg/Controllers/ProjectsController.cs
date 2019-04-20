@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MaxOrg.Models.Requirements;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace MaxOrg.Controllers
 {
@@ -18,9 +20,11 @@ namespace MaxOrg.Controllers
     public class ProjectsController : ControllerBase
     {
         private IHubContext<NotificationHub> m_notificationHub;
+        private readonly IArangoDatabase Database;
 
-        public ProjectsController(IHubContext<NotificationHub> notificationHub)
+        public ProjectsController(IHubContext<NotificationHub> notificationHub, IArangoDatabase database)
         {
+            Database = database;
             m_notificationHub = notificationHub;
         }
 
@@ -54,7 +58,7 @@ namespace MaxOrg.Controllers
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
-                var currentDate = DateTime.Now;
+                var currentDate = DateTime.UtcNow;
 
                 var currentUser = await (from u in db.Query<User>()
                     where u.Key == HttpContext.User.Identity.Name
@@ -88,16 +92,16 @@ namespace MaxOrg.Controllers
                     Name = data.Name,
                     GroupOwner = HttpContext.User.Identity.Name,
                     IsRoot = true,
-                    Description = $"# {data.Name}\nEsta descripción es generada automaticamente, si eres el administrador puedes cambiarla en el panel de administrador"
+                    Description =
+                        $"# {data.Name}\nEsta descripción es generada automaticamente, si eres el administrador puedes cambiarla en el panel de administrador",
+                    KanbanBoards = new List<KanbanBoard> {new KanbanBoard(data.Name)}
                 };
 
                 // Default kanban creation
-                projectGroup.KanbanBoards = new List<KanbanBoard> {new KanbanBoard(data.Name)};
                 projectGroup.KanbanBoards[0].Members = await usersToAdd.Select(u => u.Key).ToListAsync();
                 projectGroup.KanbanBoards[0].Members.Add(currentUser.Key);
 
                 var createdGroup = await db.InsertAsync<Group>(projectGroup);
-                ;
 
                 var admin = new UsersInGroup
                 {
@@ -123,8 +127,8 @@ namespace MaxOrg.Controllers
                     await groupGraph.InsertEdgeAsync<UsersInGroup>(userToAdd);
 
                     var notificationMessage = string.Format($"{currentUser.Username} te ha agregado " +
-                                                               $"al proyecto '{projectGroup.Name}'", projectGroup.Name);
-                    
+                                                            $"al proyecto '{projectGroup.Name}'", projectGroup.Name);
+
                     // enviar la notificación
                     await m_notificationHub.Clients
                         .Group("Users/" + user.Key)
@@ -132,8 +136,8 @@ namespace MaxOrg.Controllers
 
                     var notification = new Notification
                     {
-                        Read = false, 
-                        Message = notificationMessage, 
+                        Read = false,
+                        Message = notificationMessage,
                         // TODO checar prioridad
                         Priority = NotificationPriority.Medium,
                         Context = $"project/{createdGroup.Key}"
@@ -259,5 +263,192 @@ namespace MaxOrg.Controllers
                 return subgroups.ToArray();
             }
         }
+
+        #region Requirements
+
+        [Authorize]
+        [HttpGet("{projectId}/requirements")]
+        public async Task<IActionResult> GetRequirements(string projectId)
+        {
+            var userIsInProject = (await Database.CreateStatement<dynamic>(
+                                      $"FOR vertex IN 1..1 INBOUND 'Group/{projectId}' " +
+                                      $"GRAPH 'GroupUsersGraph' FILTER vertex._key == '{HttpContext.User.Identity.Name}'" +
+                                      " return vertex._key").ToListAsync()).Count == 1;
+            if (!userIsInProject)
+            {
+                return Unauthorized();
+            }
+
+            var isProject = await Database
+                .CreateStatement<bool>($"FOR group in Group FILTER group._key == '{projectId}' RETURN group.isRoot")
+                .ToListAsync();
+            if (isProject.Count == 0 || isProject[0] == false)
+            {
+                return NotFound();
+            }
+
+            var requirements = await Database.CreateStatement<Requirement>(
+                $"FOR vertex, edge, p IN 1..1 INBOUND 'Group/{projectId}'" +
+                $" GRAPH 'GroupRequirementsGraph' FILTER p.vertices[0].isRoot == true" +
+                $" return vertex").ToListAsync();
+            return Ok(requirements.Select(r => new
+            {
+                Id = r.Key,
+                r.Description,
+                r.CreationDate,
+                r.RequirementType
+            }));
+        }
+
+        [Authorize]
+        [HttpPost("{projectId}/requirements")]
+        public async Task<IActionResult> CreateRequirement(string projectId,
+            [FromBody] CreateRequirementRequest request)
+        {
+            var isProject = await Database
+                .CreateStatement<bool>($"FOR group in Group FILTER group._key == '{projectId}' RETURN group.isRoot")
+                .ToListAsync();
+
+            if (isProject.Count == 0 || isProject[0] == false)
+            {
+                return NotFound();
+            }
+
+            var userIsAdminQuery = $"FOR vertex, edge, p IN 1..1 INBOUND 'Group/{projectId}'" +
+                                   $" GRAPH 'GroupUsersGraph' FILTER vertex._key == '{HttpContext.User.Identity.Name}' " +
+                                   $"FILTER p.vertices[0].groupOwner == '{HttpContext.User.Identity.Name}'" +
+                                   " return vertex._key";
+            var isUserAdmin = (await Database.CreateStatement<dynamic>(userIsAdminQuery).ToListAsync()).Count == 1;
+            if (!isUserAdmin)
+            {
+                return NotFound();
+            }
+
+            var requirement = new Requirement
+            {
+                Description = request.Description,
+                RequirementType = request.Type
+            };
+            var createdRequirement = await Database.InsertAsync<Requirement>(requirement);
+
+            var graph = Database.Graph("GroupRequirementsGraph");
+            var groupRequirement = new GroupRequirement()
+            {
+                Group = $"Group/{projectId}",
+                Requirement = createdRequirement.Id
+            };
+            await graph.InsertEdgeAsync<GroupRequirement>(groupRequirement);
+            return Created($"./api/projects/{projectId}/requirements/{createdRequirement.Key}", new
+            {
+                Id = requirement.Key,
+                requirement.Description,
+                requirement.CreationDate,
+                requirement.RequirementType
+            });
+        }
+
+        [Authorize]
+        [HttpGet("{projectId}/requirements/{requirementId}")]
+        public async Task<IActionResult> GetProjectRequirement(string projectId, string requirementId)
+        {
+            var userIsInProject = (await Database.CreateStatement<dynamic>(
+                                      $"FOR vertex IN 1..1 INBOUND 'Group/{projectId}' " +
+                                      $"GRAPH 'GroupUsersGraph' FILTER vertex._key == '{HttpContext.User.Identity.Name}'" +
+                                      " return vertex._key").ToListAsync()).Count == 1;
+            if (!userIsInProject)
+            {
+                return Unauthorized();
+            }
+
+            var isProject = await Database
+                .CreateStatement<bool>($"FOR group in Group FILTER group._key == '{projectId}' RETURN group.isRoot")
+                .ToListAsync();
+
+            if (isProject.Count == 0 || isProject[0] == false)
+            {
+                return NotFound();
+            }
+
+            var requirementQuery = $"FOR vertex, edge, p IN 1..1 INBOUND 'Group/{projectId}'" +
+                                   $" GRAPH 'GroupRequirementsGraph' FILTER p.vertices[0].isRoot == true" +
+                                   $" FILTER vertex._key == '{requirementId}'" +
+                                   $" return vertex";
+            var requirement = (await Database.CreateStatement<Requirement>(requirementQuery).ToListAsync())
+                .FirstOrDefault();
+            if (requirement == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new
+            {
+                Id = requirement.Key,
+                requirement.Description,
+                requirement.CreationDate,
+                requirement.RequirementType
+            });
+        }
+
+        [Authorize]
+        [HttpDelete("{projectId}/requirements/{requirementId}")]
+        public async Task<IActionResult> DeleteProjectRequirement(string projectId, string requirementId)
+        {
+            var userIsAdminQuery = $"FOR vertex, edge, p IN 1..1 INBOUND 'Group/{projectId}'" +
+                                   $" GRAPH 'GroupUsersGraph' FILTER vertex._key == '{HttpContext.User.Identity.Name}' " +
+                                   $"FILTER p.vertices[0].groupOwner == '{HttpContext.User.Identity.Name}'" +
+                                   " return vertex._key";
+            var isUserAdmin = (await Database.CreateStatement<dynamic>(userIsAdminQuery).ToListAsync()).Count == 1;
+            if (!isUserAdmin)
+            {
+                return NotFound();
+            }
+
+            var groupContainsRequirementWithIdQuery = $"return (FOR v in 1..1 INBOUND " +
+                                                      $"'Group/{projectId}' GRAPH 'GroupRequirementsGraph' " +
+                                                      $"FILTER v._key == '{requirementId}' return v) != []";
+            if (Database.CreateStatement<bool>(groupContainsRequirementWithIdQuery).ToList().FirstOr(false) == false)
+            {
+                return NotFound();
+            }
+
+            var graph = Database.Graph("GroupRequirementsGraph");
+
+            await graph.RemoveVertexByIdAsync<Requirement>($"Requirements/{requirementId}");
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpPut("{projectId}/requirements/{requirementId}")]
+        public async Task<IActionResult> ModifyProjectRequirement(string projectId,
+            string requirementId,
+            [FromBody] ModifyRequirementRequest request)
+        {
+            var userIsAdminQuery = $"FOR vertex, edge, p IN 1..1 INBOUND 'Group/{projectId}'" +
+                                   $" GRAPH 'GroupUsersGraph' FILTER vertex._key == '{HttpContext.User.Identity.Name}' " +
+                                   $"FILTER p.vertices[0].groupOwner == '{HttpContext.User.Identity.Name}'" +
+                                   " return vertex._key";
+            var isUserAdmin = (await Database.CreateStatement<dynamic>(userIsAdminQuery).ToListAsync()).Count == 1;
+            if (!isUserAdmin)
+            {
+                return NotFound();
+            }
+
+            var groupContainsRequirementWithIdQuery = $"return (FOR v in 1..1 INBOUND " +
+                                                      $"'Group/{projectId}' GRAPH 'GroupRequirementsGraph' " +
+                                                      $"FILTER v._key == '{requirementId}' return v) != []";
+            if (Database.CreateStatement<bool>(groupContainsRequirementWithIdQuery).ToList().FirstOr(false) == false)
+            {
+                return NotFound();
+            }
+
+            var requirement = await (from r in Database.Query<Requirement>()
+                where r.Key == requirementId
+                select r).FirstOrDefaultAsync();
+            requirement.Description = request.Description;
+            await Database.UpdateByIdAsync<Requirement>(requirement.Id, requirement);
+            return Ok();
+        }
+
+        #endregion
     }
 }

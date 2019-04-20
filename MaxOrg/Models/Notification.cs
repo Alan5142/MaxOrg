@@ -60,7 +60,7 @@ namespace MaxOrg.Models
         /// Fecha en la que se creo la notificación, se presenta al usuario para que tenga en cuenta cuando sucedio
         /// un evento determinado
         /// </summary>
-        public DateTime TriggerDate { get; set; } = DateTime.Now;
+        public DateTime TriggerDate { get; set; } = DateTime.UtcNow;
 
         /// <summary>
         /// Prioridad de la notificación, indica cual es la prioridad de la notificación, los posibles valores

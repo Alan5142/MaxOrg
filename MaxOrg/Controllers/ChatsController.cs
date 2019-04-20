@@ -247,7 +247,7 @@ namespace MaxOrg.Controllers
                     Type = MessageType.Text,
                     Data = request.Message,
                     Remitent = HttpContext.User.Identity.Name,
-                    Date =  DateTime.Now
+                    Date =  DateTime.UtcNow
                 });
 
                 await _chatHub.Clients.Group(chat.Id).SendAsync("receiveMessage", request.Message);

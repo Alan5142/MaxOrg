@@ -8,7 +8,7 @@ namespace MaxOrg.Models
     {
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public DateTime CreationDate { get; set; } = DateTime.Now;
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow;
         public DateTime? AssignedDate { get; set; } = null;
         public short Progress { get; set; } = 0;
     }

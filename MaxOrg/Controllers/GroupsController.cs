@@ -35,7 +35,7 @@ namespace MaxOrg.Controllers
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
-                var currentDate = DateTime.Now;
+                var currentDate = DateTime.UtcNow;
 
                 // El usuario no es administrador del grupo que se planea hacer un subgrupo
                 if (!await IsGroupAdmin(createGroup.CurrentGroupId, HttpContext.User.Identity.Name))

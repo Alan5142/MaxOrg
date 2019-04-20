@@ -234,8 +234,15 @@ namespace MaxOrg.Controllers
             {
                 return NotFound();
             }
-            var file = await blob.OpenReadAsync();
-            return Ok(file);
+            var sasConstraints = new SharedAccessBlobPolicy
+            {
+                SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5),
+                SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(10),
+                Permissions = SharedAccessBlobPermissions.Read
+            };
+
+            var sasBlobToken = blob.GetSharedAccessSignature(sasConstraints);
+            return Redirect(blob.Uri + sasBlobToken);
         }
 
         [Authorize]
