@@ -595,8 +595,59 @@ namespace MaxOrg.Controllers
         }
 
         [HttpPost("{groupId}/tasks/{taskId}")]
-        public async Task<IActionResult> AssignTaskToSubGroup(string groupId, string taskId)
+        public async Task<IActionResult> AssignTaskToSubGroup(string groupId, string taskId, [FromBody] AssignTaskRequest request)
         {
+            if (!await IsGroupAdmin(groupId, HttpContext.User.Identity.Name))
+            {
+                return Unauthorized();
+            }
+
+            if (request.GroupId != null && request.UserId == null)
+            {
+                if (!Database.CreateStatement<bool>($"return (FOR v IN 1 OUTBOUND " +
+                $"'Group/{groupId}' GRAPH 'SubgroupGraph' FILTER v._key == '{request.GroupId}' return v) != []").ToList().FirstOr(false))
+                {
+                    return BadRequest(new { Message = $"Group with id {request.GroupId} doesn't exist" });
+                }
+                // intentamos insertar, si uno de los 2 no existe entonces regresamos un bad request
+                try
+                {
+                    await Database.Graph("AssignedGroupTasksGraph").InsertEdgeAsync<AssignedGroupTask>(new AssignedGroupTask
+                    {
+                        Group = $"Group/{request.GroupId}",
+                        ToDoTask = $"ToDoTasks/{taskId}"
+                    });
+                }
+                catch (Exception)
+                {
+                    return BadRequest();
+                }
+                
+            }
+            else if (request.GroupId == null && request.UserId != null)
+            {
+                if (!Database.CreateStatement<bool>($"return (FOR v IN 1 INBOUND " +
+                    $"'Group/{groupId}' GRAPH 'GroupUsersGraph' " +
+                    $"FILTER v._key == '{request.UserId}' return v) != []").ToList().FirstOr(false))
+                {
+                    return BadRequest(new { Message = $"User with id {request.GroupId} is not a member of this group or doesn't exist" });
+                }
+
+                try
+                {
+                    await Database.Graph("AssignedUserTasksGraph").InsertEdgeAsync<AssignedUserTask>(new AssignedUserTask
+                    {
+                        User = $"User/{request.UserId}",
+                        ToDoTask = $"ToDoTasks/{taskId}"
+                    });
+                }
+                catch (Exception)
+                {
+                    return BadRequest();
+                }
+            }
+            else return BadRequest();
+
             return Ok();
         }
 
