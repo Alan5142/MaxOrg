@@ -27,11 +27,10 @@ export class NewSubgroupComponent {
 
   createGroup(): void {
    const itf = {currentGroupId:((this.parentGroupId as any).parentId as string),name:this.groupName,description:this.groupDescription,members:this.selectedUsers,subgroupAdminId:localStorage.getItem('userId')};
-   console.log(itf)
+   // console.log(itf)
    const returnPromise = this.groupService.createGroup(itf);
    //this.dialogRef.close(returnPromise);
-   returnPromise.subscribe(r => console.log(r));
-   console.log(returnPromise);
+   returnPromise.subscribe(r => this.dialogRef.close());
   }
 
   /**

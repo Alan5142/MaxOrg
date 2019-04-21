@@ -18,7 +18,7 @@ namespace MaxOrg.Services.Tasks
             {
                 using (var db = ArangoDatabase.CreateWithSetting())
                 {
-                    var dateTimeNow = DateTime.Now;
+                    var dateTimeNow = DateTime.UtcNow;
                     db.Query<RefreshToken>()
                         .Where(t => t.Expires <= dateTimeNow)
                         .Remove()

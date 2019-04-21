@@ -1,4 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {ProjectsService, Requirement, RequirementType} from "../../services/projects.service";
+import {ActivatedRoute} from "@angular/router";
+import {merge, Observable} from "rxjs";
+import {map, shareReplay} from "rxjs/operators";
+import {MatDialog, MatSnackBar, MatSort, MatTableDataSource, Sort, SortDirection} from "@angular/material";
+import {EditRequirementComponent} from "./edit-requirement/edit-requirement.component";
+import {RemoveRequirementComponent} from "./remove-requirement/remove-requirement.component";
 
 @Component({
   selector: 'app-requirements',
@@ -6,25 +13,152 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./requirements.component.scss']
 })
 export class RequirementsComponent implements OnInit {
-  displayedColumns: string[] = ['number', 'description', 'createdAt', 'isCompleted'];
+  displayedColumns: string[] = ['description', 'creationDate', 'actions'];
+
+  projectId = '';
 
   dataSource = [
-    {number: 1, description: 'Requerimiento 1', createdAt: new Date(), isCompleted: true},
-    {number: 2, description: 'Requerimiento 2', createdAt: new Date(), isCompleted: true},
-    {number: 3, description: 'Requerimiento 3', createdAt: new Date(), isCompleted: true},
-    {number: 4, description: 'Requerimiento 4', createdAt: new Date(), isCompleted: false},
-    {number: 5, description: 'Requerimiento 5', createdAt: new Date(), isCompleted: true},
-    {number: 6, description: 'Requerimiento 6', createdAt: new Date(), isCompleted: false},
-    {number: 7, description: 'Requerimiento 7', createdAt: new Date(), isCompleted: false},
-    {number: 8, description: 'Requerimiento 8', createdAt: new Date(), isCompleted: false},
-    {number: 9, description: 'Requerimiento 9', createdAt: new Date(), isCompleted: false},
-    {number: 10, description: 'Requerimiento 10', createdAt: new Date(), isCompleted: false},
+    {description: 'Requerimiento 1', creationDate: new Date()},
+    {description: 'Requerimiento 2', creationDate: new Date()},
+    {description: 'Requerimiento 3', creationDate: new Date()},
+    {description: 'Requerimiento 4', creationDate: new Date()},
+    {description: 'Requerimiento 5', creationDate: new Date()},
+    {description: 'Requerimiento 6', creationDate: new Date()},
+    {description: 'Requerimiento 7', creationDate: new Date()},
+    {description: 'Requerimiento 8', creationDate: new Date()},
+    {description: 'Requerimiento 9', creationDate: new Date()},
+    {description: 'Requerimiento 10', creationDate: new Date()},
   ];
 
-  constructor() {
+  requirements: Observable<Requirement[]>;
+  functionalRequirements: Observable<Requirement[]>;
+  nonFunctionalRequirements: Observable<Requirement[]>;
+
+  constructor(private projectService: ProjectsService,
+              private snackBar: MatSnackBar,
+              private dialog: MatDialog,
+              activatedRouter: ActivatedRoute) {
+    activatedRouter.parent.params.subscribe(params => {
+      this.projectId = params['id'];
+      this.requirements = this.projectService.getProjectRequirements(this.projectId).pipe(shareReplay(1));
+
+      this.functionalRequirements = this.requirements.pipe(map<Requirement[], Requirement[]>(values => {
+        return values.filter(value => value.requirementType == RequirementType.Functional);
+      }));
+
+      this.nonFunctionalRequirements = this.requirements.pipe(map<Requirement[], Requirement[]>(values => {
+        return values.filter(value => value.requirementType == RequirementType.NonFunctional);
+      }));
+    });
   }
 
   ngOnInit() {
   }
 
+  createRequirement(name: string, requirementType: RequirementType) {
+    if (name.length === 0) {
+      return;
+    }
+    this.projectService.createRequirement(this.projectId, {
+      description: name,
+      type: requirementType
+    }).subscribe(() => {
+      this.snackBar.open('Requerimiento creado con exito', 'OK', {
+        duration: 2000
+      });
+      const newRequirements = this.projectService.getProjectRequirements(this.projectId).pipe(shareReplay(1));
+      this.requirements = merge(this.requirements, newRequirements);
+
+      this.functionalRequirements = this.requirements.pipe(map<Requirement[], Requirement[]>(values => {
+        return values.filter(value => value.requirementType == RequirementType.Functional);
+      }));
+
+      this.nonFunctionalRequirements = this.requirements.pipe(map<Requirement[], Requirement[]>(values => {
+        return values.filter(value => value.requirementType == RequirementType.NonFunctional);
+      }));
+
+    }, error => {
+      this.snackBar.open('No se pudo crear el requerimiento', 'OK', {duration: 2000});
+    });
+  }
+
+  sortFunctional(sort: Sort) {
+    switch (sort.direction) {
+      case 'asc':
+        this.functionalRequirements = this.functionalRequirements.pipe(map<Requirement[], Requirement[]>(values => {
+          return values.sort((a, b) => new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime());
+        }));
+        break;
+      case 'desc':
+        this.functionalRequirements = this.functionalRequirements.pipe(map<Requirement[], Requirement[]>(values => {
+          return values.sort((a, b) => new Date(a.creationDate).getTime() - new Date(b.creationDate).getTime());
+        }));
+        break;
+    }
+  }
+
+  sortNonFunctional(sort: Sort) {
+    switch (sort.direction) {
+      case 'asc':
+        this.nonFunctionalRequirements = this.nonFunctionalRequirements.pipe(map<Requirement[], Requirement[]>(values => {
+          return values.sort((a, b) => new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime());
+        }));
+        break;
+      case 'desc':
+        this.nonFunctionalRequirements = this.nonFunctionalRequirements.pipe(map<Requirement[], Requirement[]>(values => {
+          return values.sort((a, b) => new Date(a.creationDate).getTime() - new Date(b.creationDate).getTime());
+        }));
+        break;
+    }
+  }
+
+  editRequirement(id: string) {
+    const dialogRef = this.dialog.open(EditRequirementComponent, {width: '300px'});
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === null || result === undefined)
+        return;
+      this.projectService.modifyProjectRequirement(this.projectId, id, result.description).subscribe(() => {
+        this.snackBar.open('Modificado con exito', 'OK', {duration: 2000});
+
+        const newRequirements = this.projectService.getProjectRequirements(this.projectId).pipe(shareReplay(1));
+        this.requirements = merge(this.requirements, newRequirements);
+
+        this.functionalRequirements = this.requirements.pipe(map<Requirement[], Requirement[]>(values => {
+          return values.filter(value => value.requirementType == RequirementType.Functional);
+        }));
+
+        this.nonFunctionalRequirements = this.requirements.pipe(map<Requirement[], Requirement[]>(values => {
+          return values.filter(value => value.requirementType == RequirementType.NonFunctional);
+        }));
+
+      }, () => {
+        this.snackBar.open('No se pudo modificar', 'OK', {duration: 2000});
+      });
+    });
+  }
+
+  deleteRequirement(id: string) {
+    const dialogRef = this.dialog.open(RemoveRequirementComponent, {width: '300px'});
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === null || result === undefined)
+        return;
+      this.projectService.deleteProjectRequirement(this.projectId, id).subscribe(() => {
+        this.snackBar.open('Eliminado con exito', 'OK', {duration: 2000});
+
+        const newRequirements = this.projectService.getProjectRequirements(this.projectId).pipe(shareReplay(1));
+        this.requirements = merge(this.requirements, newRequirements);
+
+        this.functionalRequirements = this.requirements.pipe(map<Requirement[], Requirement[]>(values => {
+          return values.filter(value => value.requirementType == RequirementType.Functional);
+        }));
+
+        this.nonFunctionalRequirements = this.requirements.pipe(map<Requirement[], Requirement[]>(values => {
+          return values.filter(value => value.requirementType == RequirementType.NonFunctional);
+        }));
+
+      }, () => {
+        this.snackBar.open('No se pudo eliminar', 'OK', {duration: 2000});
+      });
+    });
+  }
 }

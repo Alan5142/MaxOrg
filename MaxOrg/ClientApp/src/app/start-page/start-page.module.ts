@@ -43,6 +43,7 @@ import {ServicesModule} from '../services/services.module';
 import {GithubLoginComponent} from './github-login/github-login.component';
 import {NotFoundComponent} from './not-found/not-found.component';
 import {CommonComponentsModule} from "../common-components/common-components.module";
+import {ImageCropperComponent} from "ngx-img-cropper";
 
 @NgModule({
   providers: [],
@@ -65,7 +66,8 @@ import {CommonComponentsModule} from "../common-components/common-components.mod
     TodosComponent,
     RegisterComponent,
     GithubLoginComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    ImageCropperComponent
   ],
   imports: [
     CommonModule,

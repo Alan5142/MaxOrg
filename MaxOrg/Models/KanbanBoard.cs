@@ -31,7 +31,7 @@ namespace MaxOrg.Models
         /// <summary>
         /// Fecha de creación de la tarjeta
         /// </summary>
-        public DateTime CreationDate { get; set; } = DateTime.Now;
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow;
     }
 
     /// <summary>
@@ -106,7 +106,7 @@ namespace MaxOrg.Models
         /// <summary>
         /// Fecha de creación del tablero
         /// </summary>
-        public DateTime CreationDate { get; set; } = DateTime.Now;
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow;
     }
 
     /// <summary>

@@ -5,8 +5,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using MaxOrg.Models.Tasks;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace MaxOrg.Controllers
 {
@@ -18,8 +21,11 @@ namespace MaxOrg.Controllers
     [ApiController]
     public class GroupsController : ControllerBase
     {
-        public GroupsController()
+        private readonly IArangoDatabase Database;
+
+        public GroupsController(IArangoDatabase database)
         {
+            Database = database;
         }
 
         /// <summary>
@@ -35,7 +41,7 @@ namespace MaxOrg.Controllers
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
-                var currentDate = DateTime.Now;
+                var currentDate = DateTime.UtcNow;
 
                 // El usuario no es administrador del grupo que se planea hacer un subgrupo
                 if (!await IsGroupAdmin(createGroup.CurrentGroupId, HttpContext.User.Identity.Name))
@@ -398,6 +404,254 @@ namespace MaxOrg.Controllers
 
         #endregion
 
+        #region Requirements
+
+        #endregion
+
+        #region To do tasks
+
+        [HttpPost("{groupId}/tasks")]
+        public async Task<IActionResult> CreateTask(string groupId, [FromBody] CreateTaskRequest request)
+        {
+            // si no es administrador en ese grupo no puede crear tareas
+            if (!await IsGroupAdmin(groupId, HttpContext.User.Identity.Name))
+            {
+                return Unauthorized();
+            }
+
+            // creamos una nueva tarea y la insertamos en la BD
+            var task = new ToDoTask
+            {
+                Name = request.Name,
+                Description = request.Description
+            };
+            await Database.InsertAsync<ToDoTask>(task);
+
+            // Si no referencia a un requerimiento o a una tarea terminamos, de lo contrario debemos referenciar al requerimiento
+            if (request.ReferenceRequirement == null && request.ReferenceTask == null)
+                return Created($"api/groups/{groupId}/tasks/{task.Key}", new
+                {
+                    Id = task.Key,
+                    task.Name,
+                    task.Description,
+                    task.CreationDate
+                });
+            else if (request.ReferenceRequirement != null && request.ReferenceTask == null)
+            {
+                // Checamos si ese requerimiento esta en algún lugar del grupo raíz, en caso de que no simplemente le decimos
+                // que se creo el requerimiento pero hubo un error con el requerimiento
+                if (!Database.CreateStatement<bool>(
+                    $"LET rootGroup = (FOR v in 0..100 INBOUND 'Group/{groupId}' GRAPH 'SubgroupGraph' PRUNE v.isRoot == true FILTER v.isRoot == true return v)" +
+                    $"LET requirements = (FOR v in 1 INBOUND rootGroup[0]._id GRAPH 'GroupRequirementsGraph' FILTER v._key == '{request.ReferenceRequirement}' return v)" +
+                    $"return requirements == []").ToList().FirstOr(false))
+                {
+                    return Created($"api/groups/{groupId}/tasks/{task.Key}", new
+                    {
+                        Id = task.Key,
+                        task.Name,
+                        task.Description,
+                        task.CreationDate,
+                        error = "Specified requirement cannot be found"
+                    });
+                }
+
+                // creamos la referencia y especificamos algunos datos
+                var referenceToRequirement = new TaskReferencingRequirement
+                {
+                    ReferencingDate = DateTime.UtcNow,
+                    Requirement = $"Requirements/{request.ReferenceRequirement}",
+                    ToDoTask = task.Id,
+                    ContributionPercentage = request.ContributionPercentage
+                };
+
+                // Insertamos y listo
+                var graph = Database.Graph("TasksReferencingRequirementGraph");
+                await graph.InsertEdgeAsync<TaskReferencingRequirement>(referenceToRequirement);
+            }
+            else if (request.ReferenceRequirement == null && request.ReferenceTask != null)
+            {
+                var graph = Database.Graph("SubTasksGraph");
+                var subTask = new SubTask
+                {
+                    ParentTask = request.ReferenceTask,
+                    ChildTask = task.Id
+                };
+                await graph.InsertEdgeAsync<SubTask>(subTask);
+            }
+
+            // asociamos la tarea con el grupo
+            await Database.Graph("GroupTasksGraph").InsertEdgeAsync<GroupTask>(new GroupTask
+            {
+                Group = $"Group/{groupId}",
+                ToDoTask = task.Id
+            });
+
+            return Created($"api/groups/{groupId}/tasks/{task.Key}", new
+            {
+                Id = task.Key,
+                task.Name,
+                task.Description,
+                task.CreationDate
+            });
+        }
+
+        [HttpGet("{groupId}/tasks")]
+        public async Task<IActionResult> GetTasksOfProject(string groupId)
+        {
+            // Checamos si el grupo existe
+            if (!Database.CreateStatement<bool>(
+                    $"return (FOR g in " +
+                    $"Group FILTER g._key == '{groupId}' " +
+                    $"return g) != []").ToList().FirstOr(false))
+            {
+                return NotFound();
+            }
+
+            // checamos si el usuario es miembro del grupo
+            if (!Database.CreateStatement<bool>($"return (FOR v in 1 INBOUND " +
+                                               $"'Group/{groupId}' GRAPH 'GroupUsersGraph' " +
+                                               $"FILTER v._key == '{HttpContext.User.Identity.Name}' " +
+                                               $"return v) != []").ToList().FirstOr(false))
+            {
+                return NotFound();
+            }
+
+            var groupTasks = await
+                Database.CreateStatement<ToDoTask>(
+                    $"FOR v in 1 INBOUND 'Group/{groupId}' " +
+                    $"GRAPH 'GroupTasksGraph' return v").ToListAsync();
+            return Ok(groupTasks.Select(t => new
+            {
+                Id = t.Key,
+                t.Name,
+                t.Description,
+                t.CreationDate,
+                t.Progress
+            }));
+        }
+
+        [HttpGet("{groupId}/tasks/{taskId}")]
+        public async Task<IActionResult> GetTaskInfo(string groupId, string taskId)
+        {
+            if (!Database.CreateStatement<bool>($"return (FOR v in 1 INBOUND " +
+                                               $"'Group/{groupId}' GRAPH 'GroupUsersGraph' " +
+                                               $"FILTER v._key == '{HttpContext.User.Identity.Name}' " +
+                                               $"return v) != []").ToList().FirstOr(false))
+            {
+                return NotFound();
+            }
+
+            var task = (await Database.CreateStatement<ToDoTask>($"FOR v in 1 INBOUND " +
+                $"'Group/{groupId}' GRAPH 'GroupTasksGraph' FILTER v._key == '{taskId}' return v").ToListAsync()).FirstOr(null);
+            if (task == null) return NotFound();
+            return Ok(new
+            {
+                Id = task.Key,
+                task.CreationDate,
+                task.Description,
+                task.Name,
+                task.Progress
+            });
+        }
+
+        [HttpPut("{groupId}/tasks/{taskId}")]
+        public async Task<IActionResult> ModifyTask(string groupId, string taskId, [FromBody] ModifyTaskRequest request)
+        {
+            var task = (await Database.CreateStatement<ToDoTask>($"FOR v in 1 INBOUND " +
+                $"'Group/{groupId}' GRAPH 'GroupTasksGraph' FILTER v._key == '{taskId}' return v").ToListAsync()).FirstOr(null);
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            if (await IsGroupAdmin(groupId, HttpContext.User.Identity.Name))
+            {
+                task.Description = request.NewDescription ?? task.Description;
+                task.Name = request.NewName ?? task.Name;
+            }
+            task.Progress = request.NewProgress ?? task.Progress;
+
+            await Database.UpdateByIdAsync<ToDoTask>(task.Id, task);
+
+            return Ok();
+        }
+
+        [HttpDelete("{groupId}/tasks/{taskId}")]
+        public async Task<IActionResult> DeleteTask(string groupId, string taskId)
+        {
+            if (!await IsGroupAdmin(groupId, HttpContext.User.Identity.Name))
+            {
+                return Unauthorized();
+            }
+            var task = (await Database.CreateStatement<ToDoTask>($"FOR v in 1 INBOUND " +
+                $"'Group/{groupId}' GRAPH 'GroupTasksGraph' FILTER v._key == '{taskId}' return v").ToListAsync()).FirstOr(null);
+            if (task == null)
+            {
+                return NotFound();
+            }
+            var tasksGraph = Database.Graph("TasksGraph");
+            if (!await tasksGraph.RemoveVertexByIdAsync<ToDoTask>(task.Id)) return StatusCode(500, new { Message = "Task could not be deleted" });
+            return Ok();
+        }
+
+        [HttpPost("{groupId}/tasks/{taskId}")]
+        public async Task<IActionResult> AssignTaskToSubGroup(string groupId, string taskId, [FromBody] AssignTaskRequest request)
+        {
+            if (!await IsGroupAdmin(groupId, HttpContext.User.Identity.Name))
+            {
+                return Unauthorized();
+            }
+
+            if (request.GroupId != null && request.UserId == null)
+            {
+                if (!Database.CreateStatement<bool>($"return (FOR v IN 1 OUTBOUND " +
+                $"'Group/{groupId}' GRAPH 'SubgroupGraph' FILTER v._key == '{request.GroupId}' return v) != []").ToList().FirstOr(false))
+                {
+                    return BadRequest(new { Message = $"Group with id {request.GroupId} doesn't exist" });
+                }
+                // intentamos insertar, si uno de los 2 no existe entonces regresamos un bad request
+                try
+                {
+                    await Database.Graph("AssignedGroupTasksGraph").InsertEdgeAsync<AssignedGroupTask>(new AssignedGroupTask
+                    {
+                        Group = $"Group/{request.GroupId}",
+                        ToDoTask = $"ToDoTasks/{taskId}"
+                    });
+                }
+                catch (Exception)
+                {
+                    return BadRequest();
+                }
+                
+            }
+            else if (request.GroupId == null && request.UserId != null)
+            {
+                if (!Database.CreateStatement<bool>($"return (FOR v IN 1 INBOUND " +
+                    $"'Group/{groupId}' GRAPH 'GroupUsersGraph' " +
+                    $"FILTER v._key == '{request.UserId}' return v) != []").ToList().FirstOr(false))
+                {
+                    return BadRequest(new { Message = $"User with id {request.GroupId} is not a member of this group or doesn't exist" });
+                }
+
+                try
+                {
+                    await Database.Graph("AssignedUserTasksGraph").InsertEdgeAsync<AssignedUserTask>(new AssignedUserTask
+                    {
+                        User = $"User/{request.UserId}",
+                        ToDoTask = $"ToDoTasks/{taskId}"
+                    });
+                }
+                catch (Exception)
+                {
+                    return BadRequest();
+                }
+            }
+            else return BadRequest();
+
+            return Ok();
+        }
+
+        #endregion
 
         /// <summary>
         /// Obtiene un valor de verdadero o falso si un usuario en cuestión es administrador de un grupo definido por un

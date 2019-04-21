@@ -1,14 +1,18 @@
 ﻿using ArangoDB.Client;
+using FluentFTP;
 using MaxOrg.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
+using System.Net;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace MaxOrg.Controllers
 {
@@ -33,9 +37,12 @@ namespace MaxOrg.Controllers
     public class UsersController : ControllerBase
     {
         private PasswordHasher<User> m_passwordHasher;
-
-        public UsersController()
+        private readonly IConfiguration m_configuration;
+        private readonly CloudBlobContainer Container;
+        public UsersController(IConfiguration configuration, CloudBlobContainer container)
         {
+            Container = container;
+            m_configuration = configuration;
             m_passwordHasher = new PasswordHasher<User>();
         }
 
@@ -102,13 +109,38 @@ namespace MaxOrg.Controllers
             }
         }
 
+        [Authorize]
+        [HttpGet("current")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            using (var db = ArangoDatabase.CreateWithSetting())
+            {
+                var user = await db.Query<User>()
+                    .Where(u => u.Key == HttpContext.User.Identity.Name)
+                    .Select(u => u)
+                    .FirstOrDefaultAsync();
+                
+                return Ok(new
+                {
+                    user.Username,
+                    user.RealName,
+                    user.Email,
+                    user.Description,
+                    user.Birthday,
+                    user.Occupation,
+                    user.Key,
+                    ProfilePicture = $"{m_configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
+                });
+            }
+        }
+        
         /// <summary>
         /// Crea un nuevo usuario
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult> PostAsync([FromBody] UserForm user)
+        public async Task<ActionResult> CreateUser([FromBody] UserForm user)
         {
             if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password) ||
                 string.IsNullOrEmpty(user.Email))
@@ -160,30 +192,63 @@ namespace MaxOrg.Controllers
             {
                 var user = await (from u in db.Query<User>()
                         where u.Key == userId
-                        select new {u.Username, u.RealName, u.Email, u.Description, u.Birthday, u.Occupation, u.Key})
+                        select new
+                        {
+                            u.Username, 
+                            u.RealName,
+                            u.Email,
+                            u.Description,
+                            u.Birthday,
+                            u.Occupation,
+                            u.Key
+                        })
                     .FirstOrDefaultAsync();
                 if (user == null)
                 {
                     return NotFound();
                 }
 
-                return Ok(user);
+                return Ok(new
+                {
+                    user.Username,
+                    user.RealName,
+                    user.Email,
+                    user.Description,
+                    user.Birthday,
+                    user.Occupation,
+                    user.Key,
+                    ProfilePicture = $"{m_configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
+                });
             }
         }
 
-        [Authorize]
-        [HttpPatch("{userId}")]
-        public async Task<ActionResult> ChangeUserInformation(string userId, [FromBody] UserUpdateInfo userData)
+        [HttpGet("{userId}/profile.jpeg")]
+        public async Task<IActionResult> GetUserProfilePicture(string userId)
         {
-            if (userId != HttpContext.User.Claims.FirstOrDefault()?.Value)
+            var blob = Container.GetBlockBlobReference($"users/{userId}/profile.jpeg");
+            if (!await blob.ExistsAsync())
             {
-                return Unauthorized();
+                return NotFound();
             }
+            var sasConstraints = new SharedAccessBlobPolicy
+            {
+                SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5),
+                SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(10),
+                Permissions = SharedAccessBlobPermissions.Read
+            };
 
+            var sasBlobToken = blob.GetSharedAccessSignature(sasConstraints);
+            return Redirect(blob.Uri + sasBlobToken);
+        }
+
+        [Authorize]
+        [HttpPut]
+        public async Task<ActionResult> ChangeUserInformation([FromForm] UserUpdateInfo userData)
+        {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var user = await (from u in db.Query<User>()
-                    where u.Key == userId
+                    where u.Key == HttpContext.User.Identity.Name
                     select u).FirstOrDefaultAsync();
 
                 // no user exists
@@ -192,16 +257,43 @@ namespace MaxOrg.Controllers
                     return NotFound();
                 }
 
-                user.Password = userData.password != null
-                    ? m_passwordHasher.HashPassword(user, userData.password)
+                user.Password = userData.Password != null
+                    ? m_passwordHasher.HashPassword(user, userData.Password)
                     : user.Password;
-                user.Username = userData.username ?? user.Username;
-                user.Email = userData.email ?? userData.email;
-                user.RealName = userData.realName ?? user.RealName;
-                user.Description = userData.description ?? user.Description;
-                user.Birthday = userData.birthday ?? user.Birthday;
+                user.RealName = userData.RealName ?? user.RealName;
+                user.Description = userData.Description ?? user.Description;
+                user.Birthday = userData.Birthday ?? user.Birthday;
+                user.Occupation = userData.Occupation ?? user.Occupation;
+                if (userData.ProfilePicture != null || userData.ProfilePictureAsBase64 != null)
+                {
+                    var blob = Container.GetBlockBlobReference($"users/{user.Key}/profile.jpeg");
+                    if (userData.ProfilePicture != null)
+                    {
+                        try
+                        {
+                            await blob.UploadFromStreamAsync(userData.ProfilePicture.OpenReadStream());
+                        }
+                        catch (Exception e)
+                        {
+                            Console.Error.WriteLine(e.Message);
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            var data = Convert.FromBase64String(userData.ProfilePictureAsBase64);
+                            await blob.UploadFromByteArrayAsync(data, 0, data.Length);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.Error.WriteLine(e);
+                        }
+                        
+                    }
+                }
 
-                await db.UpdateByIdAsync<User>(userId, user);
+                await db.UpdateByIdAsync<User>(user.Key, user);
 
                 return Ok();
             }
@@ -317,5 +409,46 @@ namespace MaxOrg.Controllers
         }
         
         #endregion
+
+        [HttpPost("hola")]
+        public async Task<IActionResult> UploadFile(IFormFile file)
+        {
+            FtpClient client = new FtpClient("23.96.107.129");
+            client.Credentials = new NetworkCredential("maxorgftp", "AlanManuel123");
+            client.Connect();
+
+            try
+            {
+                var stream = file.OpenReadStream();
+                await client.UploadAsync(stream, $"/files/{file.FileName}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.InnerException.Message);
+                throw;
+            }
+            
+
+            return Ok();
+        }
+
+        [HttpGet("hola/{nombre}")]
+        public async Task<IActionResult> GetFile(string nombre)
+        {
+            FtpClient client = new FtpClient("23.96.107.129");
+            client.Credentials = new NetworkCredential("maxorgftp", "AlanManuel123");
+            client.Connect();
+
+            try
+            {
+                var stream = await client.OpenReadAsync($"/files/{nombre}");
+                return Ok(stream);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.InnerException.Message);
+                throw;
+            }
+        }
     }
 }

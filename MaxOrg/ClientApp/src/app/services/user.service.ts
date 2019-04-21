@@ -16,6 +16,7 @@ export interface User {
   description?: string;
   occupation?: string;
   birthday?: Date;
+  profilePicture?: string;
 }
 
 export interface RegisterResponse {
@@ -68,31 +69,16 @@ export interface Notification {
 })
 export class UserService {
   userLoggedIn: User;
-  http: HttpClient;
 
-  constructor(http: HttpClient, private router: Router) {
+  constructor(private http: HttpClient, private router: Router) {
     this.userLoggedIn = null;
     this.http = http;
   }
 
   getCurrentUser(): Observable<User> {
-    return new Observable<User | null>(observer => {
-      const token = localStorage.getItem('token');
-      if (this.userLoggedIn === null && token === null) {
-        observer.next(null);
-        observer.complete();
-      } else if (this.userLoggedIn === null && token !== null) {
-        const userId = localStorage.getItem('userId');
-        this.getUser(userId).subscribe(user => {
-          this.userLoggedIn = user;
-          observer.next(user);
-          observer.complete();
-        });
-      } else {
-        observer.next(this.userLoggedIn);
-        observer.complete();
-      }
-    });
+    let headers = new HttpHeaders();
+    headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+    return this.http.get<User>(`${environment.apiUrl}users/current`, {headers: headers});
   }
 
   isUserLoggedIn(): Observable<boolean> | boolean {
@@ -130,6 +116,12 @@ export class UserService {
     headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
     return this.http.get<NotificationPreference>(`${environment.apiUrl}users/notifications/preferences`, {headers: headers})
       .pipe(map<any, NotificationPreference>(response => response.preferences));
+  }
+
+  updateUserInfo(userInfo) {
+    const headers = new HttpHeaders({'Accept': 'application/json'})
+      .append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+    return this.http.put(`${environment.apiUrl}users`, userInfo, {headers: headers});
   }
 
   private getNewTokenWithRefresh(): Observable<string> {

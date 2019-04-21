@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://localhost:5001/api/',
+  apiUrl: 'https://maxorg.com:5001/api/',
   githubAuth: {
     clientId: '69a05969e2390923914f'
   }

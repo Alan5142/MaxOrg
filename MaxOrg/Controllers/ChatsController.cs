@@ -13,33 +13,62 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace MaxOrg.Controllers
 {
+    /// <summary>
+    /// Clase que se encarga de gestionar la creación y modificación de chats, así como también de enviar mensajes a determinados chats.
+    /// Para que se puedan acceder a los métodos HTTP de esta clase es necesario que el usuario este autenticado, de lo contrario ASP.NET Core responderá con un mensaje
+    /// vacio y un código de error 401 (Unauthorized). La ruta base de todos los métodos de esta clase es: /api/chats y las rutas de los métodos de la clase son relativas
+    /// a esta ruta
+    /// </summary>
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ChatsController : ControllerBase
     {
+        /// <summary>
+        /// Contiene los datos del Hub SignalR del chat, el hub de chat nos permite mantener una comunicación en tiempo real entre el cliente y el servidor
+        /// </summary>
         private readonly IHubContext<ChatHub> _chatHub;
+        /// <summary>
+        /// Contiene los datos del Hub SignalR de las notificaciones, con esto podemos enviar una notificación en caso de que un usuario haya sido agregado a un chat
+        /// </summary>
         private readonly IHubContext<NotificationHub> _notificationHub;
+
+        /// <summary>
+        /// Constructor de ChatsController, recibe dos parametros, uno de ellos es una referencia al ChatHub de SignalR y el otro una referencia
+        /// al NotificationHub de SignalR, ambos son inyectados por ASP.NET Core
+        /// </summary>
+        /// <param name="chatHub"></param>
+        /// <param name="notificationHub"></param>
         public ChatsController(IHubContext<ChatHub> chatHub, IHubContext<NotificationHub> notificationHub)
         {
             _chatHub = chatHub;
             _notificationHub = notificationHub;
         }
         
+        /// <summary>
+        /// Obtiene los chats a los que pertenece un usuario en determinado proyecto.
+        /// Lo que hace el método es conectarse a la base de datos y buscar al usuario actual, si no existe entonces devuelve un código HTTP 404, en caso de que exista
+        /// procede a buscar los chats grupales e individuales a los que pertenece el usuario actual y los devuelve con un código HTTP 200
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetIdentifiedUserChats([FromQuery] string projectId)
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
+                // Buscamos al usuario
                 var user = await db.Query<User>()
                     .Where(u => u.Key == HttpContext.User.Identity.Name)
                     .Select(u => u).FirstOrDefaultAsync();
                 
+                // Si es nulo entonces retornamos un "NotFound" (Http 404)
                 if (user == null)
                 {
                     return NotFound();
                 }
                 
+                // Busqueda en la base de datos que obtiene los chats grupales a los que pertenece un usuario
                 var groupChats = await db.CreateStatement<Chat>(@"
                     LET chat = (FOR c in 1..1 INBOUND" + $"'{user.Id}'" + @"
                      GRAPH 'ChatsUsersGraph'
@@ -55,7 +84,8 @@ namespace MaxOrg.Controllers
                     )
                     return MERGE(c, {messages: messages})
                 ").ToListAsync();
-                
+
+                // Busqueda en la base de datos que obtiene los chats individuales a los que pertenece un usuario
                 var pairChats = await db.CreateStatement<Chat>(@"
                     LET chat = (FOR c in 1..1 INBOUND" + $"'{user.Id}'" + @"
                      GRAPH 'ChatsUsersGraph'
@@ -72,10 +102,21 @@ namespace MaxOrg.Controllers
                     return MERGE(c, {messages: messages})
                 ").ToListAsync();
                 
+                // Devolvemos un "Ok" (Http 200) junto con los chats grupales y los chats entre 2 personas
                 return Ok(new{groupChats, pairChats});
             }
         }
         
+        /// <summary>
+        /// Crea un chat con los integrantes y el nombre que desee el usuario, además de especificar si es un chat grupal o uno individual.
+        /// Este método recibe un solo parametro, que es el modelo de la petición Http, el modelo esta definido anteriormente, la acción que realiza esté método es
+        /// obtiener el usuario actual, que es el que esta creando el chat y el proyecto en el que se desea crear el chat, en caso de que alguno de los dos
+        /// no exista, el método devolverá un código HTTP 404, en caso contrario creara un nuevo chat y creará un vinculo mediante grafos entre el proyecto y el
+        /// chat y entre el chat y los miembros del chat, una vez hecho esto, se devolverá un código HTTP 200.
+        /// Este método solo soporta POST y se accede desde la ruta de ChatsController
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> CreateChat(CreateChatRequest request)
         {
@@ -134,6 +175,13 @@ namespace MaxOrg.Controllers
             }
         }
         
+        /// <summary>
+        /// Obtiene los datos de determinado chat a través del identificador de ese chat, este método verifica que el usuario que desea acceder a esos datos
+        /// pertenezca al chat, para eso realiza un recorrido por medio de grafos, en caso de que no pertenezca regresa un código HTTP 404, por lo contrario,
+        /// si el usuario pertenece a ese chat, devolverá un código HTTP 200 junto con los datos del chat
+        /// </summary>
+        /// <param name="chatId"></param>
+        /// <returns></returns>
         [HttpGet("{chatId}")]
         public async Task<IActionResult> GetChatById(string chatId)
         {
@@ -178,6 +226,14 @@ namespace MaxOrg.Controllers
             }
         }
 
+        /// <summary>
+        /// Envía un mensaje, definido en la petición, al chat que cuente con el identificador proporcionado por el usuario, este método obtiene el chat y le añade un mensaje,
+        /// posteriormente envía a todos los miembros que esten visualizando ese chat al momento en que se envía el mensaje una señal que indica que recibieron un mensaje y
+        /// actualizan la interfaz para reflejar el cambio
+        /// </summary>
+        /// <param name="chatId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("{chatId}/messages")]
         public async Task<IActionResult> SendMessage(string chatId, SendMessageRequest request)
         {
@@ -191,7 +247,7 @@ namespace MaxOrg.Controllers
                     Type = MessageType.Text,
                     Data = request.Message,
                     Remitent = HttpContext.User.Identity.Name,
-                    Date =  DateTime.Now
+                    Date =  DateTime.UtcNow
                 });
 
                 await _chatHub.Clients.Group(chat.Id).SendAsync("receiveMessage", request.Message);
@@ -201,6 +257,14 @@ namespace MaxOrg.Controllers
             }
         }
 
+        /// <summary>
+        /// Añade un usuario, definido en la petición, al chat que cuente con el identificador proporcionado por el usuario que desea agregar otro miembro al chat,
+        /// este método crea un vinculo a través de grafos entre el chat al que se le desea agregar un miembro y el miembro que será agregado.
+        /// Este método solo acepta POST y esta en la ruta "{chatId}/messages", donde chatId es el identificador del chat.
+        /// </summary>
+        /// <param name="chatId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("{chatId}/users")]
         public async Task<IActionResult> AddUserToChat(string chatId, AddUserToChatRequest request)
         {
@@ -213,6 +277,13 @@ namespace MaxOrg.Controllers
             }
         }
 
+        /// <summary>
+        /// Obtiene todos los miembros del chat con el identificador proporcionado,
+        /// este método realiza un recorrido por medio de grafos y obtiene los vertices que sean usuarios que esten directamente conectados al chat, que también es un
+        /// vertice
+        /// </summary>
+        /// <param name="chatId"></param>
+        /// <returns></returns>
         [HttpGet("{chatId}/users")]
         public async Task<IActionResult> GetUsersOfChat(string chatId)
         {

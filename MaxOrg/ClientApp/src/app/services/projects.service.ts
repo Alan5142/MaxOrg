@@ -17,8 +17,25 @@ export interface CreateProjectData {
   members: string[];
 }
 
-interface ProjectResponse {
+export interface ProjectResponse {
   projects: Project[];
+}
+
+export enum RequirementType {
+  Functional,
+  NonFunctional
+}
+
+export interface Requirement {
+  id: string;
+  description: string;
+  creationDate: Date;
+  requirementType: RequirementType;
+}
+
+export interface CreateRequirementRequest {
+  description: string;
+  type: RequirementType;
 }
 
 @Injectable({
@@ -42,6 +59,7 @@ export class ProjectsService {
         return [];
       }));
   }
+
   getProject(projectId:string): Observable<Project> {
     let headers = new HttpHeaders();
     headers = headers.append('Content-Type', 'application/json');
@@ -51,14 +69,45 @@ export class ProjectsService {
         return value;
       }));
   }
+
   createProject(newProjectData: CreateProjectData): Observable<boolean> {
     let headers = new HttpHeaders();
     headers = headers.append('Content-Type', 'application/json');
     headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
-    console.log(headers);
     return this.http.post(environment.apiUrl + 'projects', newProjectData, {headers: headers}).pipe(map<any, boolean>(response => {
       console.log(response);
       return !!response;
     }));
+  }
+
+  createRequirement(projectId: string, request: CreateRequirementRequest): Observable<void> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json'});
+    return this.http.post<void>(`${environment.apiUrl}projects/${projectId}/requirements`, request, {headers: headers});
+  }
+
+  getProjectRequirements(projectId: string): Observable<Requirement[]> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json'});
+    return this.http.get<Requirement[]>(`${environment.apiUrl}projects/${projectId}/requirements`,  {headers: headers});
+  }
+
+  deleteProjectRequirement(projectId: string, requirementId: string): Observable<void> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json'});
+    return this.http.delete<void>(`${environment.apiUrl}projects/${projectId}/requirements/${requirementId}`,
+      {headers: headers});
+  }
+
+  modifyProjectRequirement(projectId: string, requirementId: string, newDescription: string): Observable<void> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json'});
+    return this.http.put<void>(`${environment.apiUrl}projects/${projectId}/requirements/${requirementId}`,
+      {description: newDescription},
+      {headers: headers});
   }
 }

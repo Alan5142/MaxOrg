@@ -9,7 +9,7 @@ import { ProjectsService } from 'src/app/services/projects.service';
 
 })
 export class OrgChartComponent implements OnInit,OnChanges {
-  
+
 
   treeWidth = 100;
   myTree =[];
@@ -31,11 +31,8 @@ export class OrgChartComponent implements OnInit,OnChanges {
 
   calcLeafs(tree: any) {
     tree.forEach(node => {
-      console.log(node);
       if (!node.subgroups || node.subgroups===[] || node.subgroups.length === 0) {
-        console.log(this.treeWidth);
         this.treeWidth += (node.name.length > 9) ? node.name.length * 11 + 10 : 150;
-        console.log(this.treeWidth);
       } else {
         this.calcLeafs(node.subgroups);
       }

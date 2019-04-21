@@ -34,6 +34,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.route.queryParamMap
       .subscribe(params => {
         this.chatId = params.get('chatId');
+        if (this.chatId === null || this.chatId === '') {
+          return;
+        }
         this.chat = chatService.getChatWithId(this.chatId).pipe(shareReplay(1));
         this.chat.subscribe(c => this.virtualScroll.scrollToIndex(this.items.length - 1, true, 0, 0),
             error => this.router.navigate(['not-found'], {relativeTo: this.route.parent}));

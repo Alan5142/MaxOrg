@@ -78,7 +78,7 @@ namespace MaxOrg.Controllers
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
-                var dateNow = DateTime.Now;
+                var dateNow = DateTime.UtcNow;
                 var userTokenPair = await (from t in db.Query<RefreshToken>()
                     from u in db.Query<Models.User>()
                     where t.UserKey == u.Key
@@ -189,7 +189,7 @@ namespace MaxOrg.Controllers
                         // concat a random number to username if the username exists
                         if (usernameExists != null)
                         {
-                            username = githubUser.Location + new Random(DateTime.Now.Millisecond).Next(100, 10000);
+                            username = githubUser.Location + new Random(DateTime.UtcNow.Millisecond).Next(100, 10000);
                         }
 
                         userToAuth.Username = username;
@@ -249,7 +249,7 @@ namespace MaxOrg.Controllers
             var key = Encoding.ASCII.GetBytes(Configuration["AppSettings:Secret"]);
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            var nowDate = DateTime.Now;
+            var nowDate = DateTime.UtcNow;
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -260,7 +260,7 @@ namespace MaxOrg.Controllers
                     new Claim(ClaimTypes.Surname, user.Username)
                 }),
                 NotBefore = nowDate,
-                Expires = nowDate.AddHours(3),
+                Expires = nowDate.AddDays(1),
                 Issuer = Configuration["AppSettings:DefaultURL"],
                 Audience = Configuration["AppSettings:Jwt:Audience"],
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
@@ -282,13 +282,13 @@ namespace MaxOrg.Controllers
         /// </returns>
         private async Task<(string token, RefreshToken refreshToken)> GenerateRefreshAndJwtToken(Models.User user)
         {
-            var nowDate = DateTime.Now;
+            var nowDate = DateTime.UtcNow;
             var token = GenerateJwtToken(user);
             var refreshToken = new RefreshToken
             {
                 Token = Guid.NewGuid().ToString("N"),
                 IssuedAt = nowDate,
-                Expires = nowDate.AddDays(7),
+                Expires = nowDate.AddDays(14),
                 UserKey = user.Key
             };
 

@@ -77,6 +77,8 @@ import {ReportsComponent} from './tests/reports/reports.component';
 import {ChatService} from "./services/chat.service";
 import { NodeComponent } from './org-chart/tree/node/node.component';
 import { NewSubgroupComponent } from './org-chart/new-subgroup/new-subgroup.component';
+import { EditRequirementComponent } from './requirements/edit-requirement/edit-requirement.component';
+import { RemoveRequirementComponent } from './requirements/remove-requirement/remove-requirement.component';
 
 @NgModule({
   entryComponents: [
@@ -90,7 +92,9 @@ import { NewSubgroupComponent } from './org-chart/new-subgroup/new-subgroup.comp
     ChangeDescriptionComponent,
     CreateCardComponent,
     CreateReportDialogComponent,
-    CreateTestDialogComponent
+    CreateTestDialogComponent,
+    EditRequirementComponent,
+    RemoveRequirementComponent
   ],
   imports: [
     CommonModule,
@@ -173,7 +177,9 @@ import { NewSubgroupComponent } from './org-chart/new-subgroup/new-subgroup.comp
     CreateReportDialogComponent,
     ReportsComponent,
     NodeComponent,
-    NewSubgroupComponent
+    NewSubgroupComponent,
+    EditRequirementComponent,
+    RemoveRequirementComponent
   ],
   bootstrap: [
     ProjectComponent
