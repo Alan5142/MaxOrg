@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using shortid;
+using MaxOrg.Models.Kanban;
 
 namespace MaxOrg.Models
 {
@@ -57,7 +59,7 @@ namespace MaxOrg.Models
         /// <summary>
         /// Color de la sección, es personalizable por el usuario.
         /// </summary>
-        public string Color { get; set; } = "";
+        public string Color { get; set; } = "#6495ed";
     }
 
     /// <summary>
@@ -98,7 +100,7 @@ namespace MaxOrg.Models
         /// <summary>
         /// Identificadores unicos de los usuarios que pertenecen a determinado tablero
         /// </summary>
-        public List<string> Members { get; set; } = new List<string>();
+        public List<KanbanGroupMember> Members { get; set; } = new List<KanbanGroupMember>();
         /// <summary>
         /// Secciones de un tablero, estas secciones son las que almacenan las tarjetas
         /// </summary>

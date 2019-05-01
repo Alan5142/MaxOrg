@@ -79,6 +79,8 @@ import { NodeComponent } from './org-chart/tree/node/node.component';
 import { NewSubgroupComponent } from './org-chart/new-subgroup/new-subgroup.component';
 import { EditRequirementComponent } from './requirements/edit-requirement/edit-requirement.component';
 import { RemoveRequirementComponent } from './requirements/remove-requirement/remove-requirement.component';
+import { EditSectionComponent } from './kanban-board/board/edit-section/edit-section.component';
+import { CreateSectionComponent } from './kanban-board/board/create-section/create-section.component';
 
 @NgModule({
   entryComponents: [
@@ -94,7 +96,9 @@ import { RemoveRequirementComponent } from './requirements/remove-requirement/re
     CreateReportDialogComponent,
     CreateTestDialogComponent,
     EditRequirementComponent,
-    RemoveRequirementComponent
+    RemoveRequirementComponent,
+    CreateSectionComponent,
+    EditSectionComponent
   ],
   imports: [
     CommonModule,
@@ -179,7 +183,9 @@ import { RemoveRequirementComponent } from './requirements/remove-requirement/re
     NodeComponent,
     NewSubgroupComponent,
     EditRequirementComponent,
-    RemoveRequirementComponent
+    RemoveRequirementComponent,
+    EditSectionComponent,
+    CreateSectionComponent
   ],
   bootstrap: [
     ProjectComponent

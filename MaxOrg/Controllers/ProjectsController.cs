@@ -98,8 +98,16 @@ namespace MaxOrg.Controllers
                 };
 
                 // Default kanban creation
-                projectGroup.KanbanBoards[0].Members = await usersToAdd.Select(u => u.Key).ToListAsync();
-                projectGroup.KanbanBoards[0].Members.Add(currentUser.Key);
+                projectGroup.KanbanBoards[0].Members = await usersToAdd.Select(u => new Models.Kanban.KanbanGroupMember
+                {
+                    UserId = u.Key
+                }).ToListAsync();
+
+                projectGroup.KanbanBoards[0].Members.Add(new Models.Kanban.KanbanGroupMember
+                {
+                    UserId = currentUser.Key,
+                    MemberPermissions = Models.Kanban.KanbanMemberPermissions.Admin
+                });
 
                 var createdGroup = await db.InsertAsync<Group>(projectGroup);
 

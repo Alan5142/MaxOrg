@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using MaxOrg.Models.Kanban;
 using MaxOrg.Models.Tasks;
 using Microsoft.EntityFrameworkCore.Internal;
 
@@ -223,7 +224,11 @@ namespace MaxOrg.Controllers
 
                 group.KanbanBoards.Add(new KanbanBoard(request.Name));
                 var createdBoard = group.KanbanBoards.Last();
-                createdBoard.Members.Add(HttpContext.User.Identity.Name);
+                createdBoard.Members.Add(new KanbanGroupMember
+                {
+                    UserId = HttpContext.User.Identity.Name,
+                    MemberPermissions = KanbanMemberPermissions.Admin
+                });
                 await db.UpdateByIdAsync<Group>(group.Id, group);
                 return CreatedAtAction("api/" + groupId + "boards/" + group.KanbanBoards.Last().Id, createdBoard);
             }
@@ -239,7 +244,7 @@ namespace MaxOrg.Controllers
                     where g.Key == groupId
                     select g.KanbanBoards).FirstOrDefaultAsync();
                 kanbanBoards = from kb in kanbanBoards
-                    where kb.Members.Contains(HttpContext.User.Identity.Name)
+                    where kb.Members.Find(km => km.UserId == HttpContext.User.Identity.Name) != null
                     select kb;
                 // send only names and ids
 
@@ -256,24 +261,67 @@ namespace MaxOrg.Controllers
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
-                var boards = await (from g in db.Query<Group>()
-                    from kb in g.KanbanBoards
-                    where g.Key == groupId && kb.Members.Contains(HttpContext.User.Identity.Name) && kb.Id == boardId
-                    select g).FirstOrDefaultAsync();
-                if (boards == null)
+                var group = await (from g in db.Query<Group>() where g.Key == groupId select g).FirstOrDefaultAsync();
+                if (group == null)
                 {
                     return NotFound();
                 }
 
-                var kanbanBoard = boards.KanbanBoards.FirstOrDefault();
-
+                var kanbanBoards = (from kb in @group.KanbanBoards
+                    where kb.Members.Find(km => km.UserId == HttpContext.User.Identity.Name) != null && kb.Id == boardId
+                    select @group.KanbanBoards).FirstOrDefault();
+                if (kanbanBoards == null)
+                {
+                    return NotFound();
+                }
+                var kanbanBoard = kanbanBoards.FirstOr(null);
                 if (kanbanBoard == null)
                 {
                     return NotFound();
                 }
-
-                return Ok(kanbanBoard);
+                return Ok(new
+                {
+                    kanbanBoard.CreationDate,
+                    kanbanBoard.Id,
+                    kanbanBoard.KanbanGroups,
+                    kanbanBoard.Members,
+                    kanbanBoard.Name,
+                    CanEdit = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name).MemberPermissions != KanbanMemberPermissions.Read
+                });
             }
+        }
+
+        [HttpPost("{groupId}/boards/{boardId}/sections")]
+        public async Task<IActionResult> CreateSection(string groupId, string boardId, [FromBody] CreateSectionRequest request)
+        {
+            var group = await (from g in Database.Query<Group>()
+                               where g.Key == groupId
+                               select g).FirstOrDefaultAsync();
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            var kanbanBoard = (from kb in @group.KanbanBoards where kb.Id == boardId select kb).FirstOrDefault();
+            if (kanbanBoard == null)
+            {
+                return NotFound();
+            }
+
+            var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
+            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
+            {
+                return Unauthorized();
+            }
+
+            kanbanBoard.KanbanGroups.Add(new KanbanCardSection
+            {
+                Name = request.Name
+            });
+
+            await Database.UpdateByIdAsync<Group>(group.Id, group);
+
+            return Ok();
         }
 
         /// <summary>
@@ -300,11 +348,21 @@ namespace MaxOrg.Controllers
                     return NotFound();
                 }
 
-                var kanbanSection = (from kb in @group.KanbanBoards
-                    where kb.Id == boardId
-                    from ks in kb.KanbanGroups
+                var kanbanBoard = (from kb in @group.KanbanBoards where kb.Id == boardId select kb).FirstOrDefault();
+                if (kanbanBoard == null)
+                {
+                    return NotFound();
+                }
+
+                var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
+                if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
+                {
+                    return Unauthorized();
+                }
+
+                var kanbanSection = (from ks in kanbanBoard.KanbanGroups
                     where ks.Id == sectionId
-                    select ks).FirstOrDefault();
+                    select ks).FirstOr(null);
                 if (kanbanSection == null)
                 {
                     return NotFound();
@@ -320,6 +378,47 @@ namespace MaxOrg.Controllers
                 await db.UpdateByIdAsync<Group>(group.Id, group);
                 return Ok();
             }
+        }
+
+        [HttpPut("{groupId}/boards/{boardId}/sections/{sectionId}")]
+        public async Task<IActionResult> ModifyKanbanSection(string groupId, string boardId, string sectionId,
+            [FromBody] ModifyKanbanSectionRequest request)
+        {
+            var group = await (from g in Database.Query<Group>()
+                where g.Key == groupId
+                select g).FirstOrDefaultAsync();
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            var kanbanBoard = (from kb in @group.KanbanBoards where kb.Id == boardId select kb).FirstOrDefault();
+            if (kanbanBoard == null)
+            {
+                return NotFound();
+            }
+
+            var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
+            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
+            {
+                return Unauthorized();
+            }
+
+            var kanbanSection = (from ks in kanbanBoard.KanbanGroups
+                where ks.Id == sectionId
+                select ks).FirstOrDefault();
+
+            if (kanbanSection == null)
+            {
+                return NotFound();
+            }
+
+            kanbanSection.Name = request.Name ?? kanbanSection.Name;
+            kanbanSection.Color = request.Color ?? kanbanSection.Color;
+
+            await Database.UpdateByIdAsync<Group>(group.Id, group);
+            
+            return Ok();
         }
 
         /// <summary>
@@ -359,10 +458,20 @@ namespace MaxOrg.Controllers
                     return NotFound();
                 }
 
+                var kanbanBoard = (from kb in @group.KanbanBoards where kb.Id == boardId select kb).FirstOrDefault();
+                if (kanbanBoard == null)
+                {
+                    return NotFound();
+                }
+
+                var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
+                if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
+                {
+                    return Unauthorized();
+                }
+
                 // obtenemos la sección y verificamos si existe
-                var kanbanSection = (from kb in @group.KanbanBoards
-                    where kb.Id == boardId
-                    from ks in kb.KanbanGroups
+                var kanbanSection = (from ks in kanbanBoard.KanbanGroups
                     where ks.Id == sectionId
                     select ks).FirstOrDefault();
 
@@ -382,9 +491,7 @@ namespace MaxOrg.Controllers
                 }
 
                 // obtenemos la nueva sección
-                var newKanbanSection = (from kb in @group.KanbanBoards
-                    where kb.Id == boardId
-                    from nks in kb.KanbanGroups
+                var newKanbanSection = (from nks in kanbanBoard.KanbanGroups
                     where nks.Id == moveKanbanCardRequest.NewSectionId
                     select nks).FirstOrDefault();
 
@@ -500,18 +607,18 @@ namespace MaxOrg.Controllers
         {
             // Checamos si el grupo existe
             if (!Database.CreateStatement<bool>(
-                    $"return (FOR g in " +
-                    $"Group FILTER g._key == '{groupId}' " +
-                    $"return g) != []").ToList().FirstOr(false))
+                $"return (FOR g in " +
+                $"Group FILTER g._key == '{groupId}' " +
+                $"return g) != []").ToList().FirstOr(false))
             {
                 return NotFound();
             }
 
             // checamos si el usuario es miembro del grupo
             if (!Database.CreateStatement<bool>($"return (FOR v in 1 INBOUND " +
-                                               $"'Group/{groupId}' GRAPH 'GroupUsersGraph' " +
-                                               $"FILTER v._key == '{HttpContext.User.Identity.Name}' " +
-                                               $"return v) != []").ToList().FirstOr(false))
+                                                $"'Group/{groupId}' GRAPH 'GroupUsersGraph' " +
+                                                $"FILTER v._key == '{HttpContext.User.Identity.Name}' " +
+                                                $"return v) != []").ToList().FirstOr(false))
             {
                 return NotFound();
             }
@@ -534,15 +641,16 @@ namespace MaxOrg.Controllers
         public async Task<IActionResult> GetTaskInfo(string groupId, string taskId)
         {
             if (!Database.CreateStatement<bool>($"return (FOR v in 1 INBOUND " +
-                                               $"'Group/{groupId}' GRAPH 'GroupUsersGraph' " +
-                                               $"FILTER v._key == '{HttpContext.User.Identity.Name}' " +
-                                               $"return v) != []").ToList().FirstOr(false))
+                                                $"'Group/{groupId}' GRAPH 'GroupUsersGraph' " +
+                                                $"FILTER v._key == '{HttpContext.User.Identity.Name}' " +
+                                                $"return v) != []").ToList().FirstOr(false))
             {
                 return NotFound();
             }
 
             var task = (await Database.CreateStatement<ToDoTask>($"FOR v in 1 INBOUND " +
-                $"'Group/{groupId}' GRAPH 'GroupTasksGraph' FILTER v._key == '{taskId}' return v").ToListAsync()).FirstOr(null);
+                                                                 $"'Group/{groupId}' GRAPH 'GroupTasksGraph' FILTER v._key == '{taskId}' return v")
+                .ToListAsync()).FirstOr(null);
             if (task == null) return NotFound();
             return Ok(new
             {
@@ -558,7 +666,8 @@ namespace MaxOrg.Controllers
         public async Task<IActionResult> ModifyTask(string groupId, string taskId, [FromBody] ModifyTaskRequest request)
         {
             var task = (await Database.CreateStatement<ToDoTask>($"FOR v in 1 INBOUND " +
-                $"'Group/{groupId}' GRAPH 'GroupTasksGraph' FILTER v._key == '{taskId}' return v").ToListAsync()).FirstOr(null);
+                                                                 $"'Group/{groupId}' GRAPH 'GroupTasksGraph' FILTER v._key == '{taskId}' return v")
+                .ToListAsync()).FirstOr(null);
             if (task == null)
             {
                 return NotFound();
@@ -569,6 +678,7 @@ namespace MaxOrg.Controllers
                 task.Description = request.NewDescription ?? task.Description;
                 task.Name = request.NewName ?? task.Name;
             }
+
             task.Progress = request.NewProgress ?? task.Progress;
 
             await Database.UpdateByIdAsync<ToDoTask>(task.Id, task);
@@ -583,19 +693,24 @@ namespace MaxOrg.Controllers
             {
                 return Unauthorized();
             }
+
             var task = (await Database.CreateStatement<ToDoTask>($"FOR v in 1 INBOUND " +
-                $"'Group/{groupId}' GRAPH 'GroupTasksGraph' FILTER v._key == '{taskId}' return v").ToListAsync()).FirstOr(null);
+                                                                 $"'Group/{groupId}' GRAPH 'GroupTasksGraph' FILTER v._key == '{taskId}' return v")
+                .ToListAsync()).FirstOr(null);
             if (task == null)
             {
                 return NotFound();
             }
+
             var tasksGraph = Database.Graph("TasksGraph");
-            if (!await tasksGraph.RemoveVertexByIdAsync<ToDoTask>(task.Id)) return StatusCode(500, new { Message = "Task could not be deleted" });
+            if (!await tasksGraph.RemoveVertexByIdAsync<ToDoTask>(task.Id))
+                return StatusCode(500, new {Message = "Task could not be deleted"});
             return Ok();
         }
 
         [HttpPost("{groupId}/tasks/{taskId}")]
-        public async Task<IActionResult> AssignTaskToSubGroup(string groupId, string taskId, [FromBody] AssignTaskRequest request)
+        public async Task<IActionResult> AssignTaskToSubGroup(string groupId, string taskId,
+            [FromBody] AssignTaskRequest request)
         {
             if (!await IsGroupAdmin(groupId, HttpContext.User.Identity.Name))
             {
@@ -605,41 +720,46 @@ namespace MaxOrg.Controllers
             if (request.GroupId != null && request.UserId == null)
             {
                 if (!Database.CreateStatement<bool>($"return (FOR v IN 1 OUTBOUND " +
-                $"'Group/{groupId}' GRAPH 'SubgroupGraph' FILTER v._key == '{request.GroupId}' return v) != []").ToList().FirstOr(false))
+                                                    $"'Group/{groupId}' GRAPH 'SubgroupGraph' FILTER v._key == '{request.GroupId}' return v) != []")
+                    .ToList().FirstOr(false))
                 {
-                    return BadRequest(new { Message = $"Group with id {request.GroupId} doesn't exist" });
+                    return BadRequest(new {Message = $"Group with id {request.GroupId} doesn't exist"});
                 }
+
                 // intentamos insertar, si uno de los 2 no existe entonces regresamos un bad request
                 try
                 {
-                    await Database.Graph("AssignedGroupTasksGraph").InsertEdgeAsync<AssignedGroupTask>(new AssignedGroupTask
-                    {
-                        Group = $"Group/{request.GroupId}",
-                        ToDoTask = $"ToDoTasks/{taskId}"
-                    });
+                    await Database.Graph("AssignedGroupTasksGraph").InsertEdgeAsync<AssignedGroupTask>(
+                        new AssignedGroupTask
+                        {
+                            Group = $"Group/{request.GroupId}",
+                            ToDoTask = $"ToDoTasks/{taskId}"
+                        });
                 }
                 catch (Exception)
                 {
                     return BadRequest();
                 }
-                
             }
             else if (request.GroupId == null && request.UserId != null)
             {
                 if (!Database.CreateStatement<bool>($"return (FOR v IN 1 INBOUND " +
-                    $"'Group/{groupId}' GRAPH 'GroupUsersGraph' " +
-                    $"FILTER v._key == '{request.UserId}' return v) != []").ToList().FirstOr(false))
+                                                    $"'Group/{groupId}' GRAPH 'GroupUsersGraph' " +
+                                                    $"FILTER v._key == '{request.UserId}' return v) != []").ToList()
+                    .FirstOr(false))
                 {
-                    return BadRequest(new { Message = $"User with id {request.GroupId} is not a member of this group or doesn't exist" });
+                    return BadRequest(new
+                        {Message = $"User with id {request.GroupId} is not a member of this group or doesn't exist"});
                 }
 
                 try
                 {
-                    await Database.Graph("AssignedUserTasksGraph").InsertEdgeAsync<AssignedUserTask>(new AssignedUserTask
-                    {
-                        User = $"User/{request.UserId}",
-                        ToDoTask = $"ToDoTasks/{taskId}"
-                    });
+                    await Database.Graph("AssignedUserTasksGraph").InsertEdgeAsync<AssignedUserTask>(
+                        new AssignedUserTask
+                        {
+                            User = $"User/{request.UserId}",
+                            ToDoTask = $"ToDoTasks/{taskId}"
+                        });
                 }
                 catch (Exception)
                 {

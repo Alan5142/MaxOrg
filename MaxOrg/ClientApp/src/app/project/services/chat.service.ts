@@ -17,7 +17,7 @@ export class ChatService {
 
   constructor(private http: HttpClient, private userService: UserService) {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl('/chat-hub', {accessTokenFactory: () => userService.getUserToken(), logger: LogLevel.None})
+      .withUrl('/chat-hub', {accessTokenFactory: () => userService.userToken, logger: LogLevel.None})
       .build();
     this.onConnected = from(this.hubConnection.start().then(ok => {
       this.chatObservable = new Observable<any>(observer => {

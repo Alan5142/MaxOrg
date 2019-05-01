@@ -106,7 +106,7 @@ export class UserService {
     }
   }
 
-  getUserToken(): string {
+  get userToken(): string {
     return localStorage.getItem('token');
   }
 
