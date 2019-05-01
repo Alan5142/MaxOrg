@@ -3,12 +3,12 @@
     <mat-tab label="Asignación de trabajos">
       <h4>Grupos</h4>
       <mat-divider></mat-divider>
-      <div ngClass="" ngClass.gt-md="group-members-container">
+      <div ngClass="" ngClass.gt-md="group-members-container" *ngFor="let group of adminGroupsFlat">
         <mat-accordion>
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title class="text-bold">
-                Nombre de grupo
+                {{group.name}}
               </mat-panel-title>
             </mat-expansion-panel-header>
             <mat-accordion class="assigned-task-container">
