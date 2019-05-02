@@ -5,7 +5,7 @@
     </li>
     <li *ngFor="let node of treeData">
       <app-node [userId]="userId" [nodeData]="node"></app-node>
-      <app-tree [adminId]="node.groupOwner" [treeData]="node.subgroups" [userId]="userId" [parentId]="node.id"></app-tree>
+      <app-tree [isAdmin]="isAdmin" [adminId]="node.groupOwner" [treeData]="node.subgroups" [userId]="userId" [parentId]="node.id"></app-tree>
     </li>
   </ul>
 </div>

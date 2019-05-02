@@ -4,12 +4,8 @@ import {MatDialog, MatTab, MatTabGroup} from '@angular/material';
 import {AssignWorkComponent} from './assign-work/assign-work.component';
 import { ProjectsService } from 'src/app/services/projects.service';
 import { ActivatedRoute } from '@angular/router';
+import { TasksService, Task } from 'src/app/services/tasks.service';
 
-interface group{
- id:number;
- members:[];
- name:string; 
-}
 @Component({
   selector: 'app-assigned-work',
   templateUrl: './assigned-work.component.html',
@@ -25,9 +21,10 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
   groups;
   adminGroups=[];
   adminGroupsFlat=[];
+  object={};
   userId;
   
-  constructor(public mediaObserver: MediaObserver, public dialog: MatDialog, public route:ActivatedRoute, public projectService:ProjectsService) {
+  constructor(public mediaObserver: MediaObserver, public dialog: MatDialog, public route:ActivatedRoute, public projectService:ProjectsService, private taskService:TasksService) {
     this.userId=localStorage.getItem('userId');
     this.route.parent.params.subscribe(params => {
       this.projectService.getProject(params['id']).subscribe(project => {
@@ -39,6 +36,7 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
             this.getAdminGroups(group);
           });
         this.flat(this.adminGroups);
+        console.log(this.adminGroupsFlat);
       })
     });
     
@@ -55,12 +53,20 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
   }
   flat(toFlat){
     toFlat.forEach(group => {
-      this.adminGroupsFlat.push({name:group.name,id:group.id,members:group.members});
+      let array;
+      this.taskService.getGroupTasks(group.id).subscribe(r=>{array=r});
+      this.adminGroupsFlat.push({
+        name:group.name,
+        id:group.id,
+        members:group.members,
+        tasks: array
+      });
       this.flat(group.subgroups);
     });
-    
   }
+  
   ngOnInit() {
+    
   }
 
   ngAfterViewInit() {
