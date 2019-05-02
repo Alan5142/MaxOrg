@@ -93,12 +93,26 @@ export class KanbanCardsService {
       newData, {headers: headers});
   }
 
-  moveCard(groupId: string, boardId: string, sectionId: string, cardId: string, newSectionId: string) {
+  moveCard(groupId: string, boardId: string, sectionId: string, cardId: string, newSectionId: string, newIndex: number) {
     return this.http.put<void>(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/sections/${sectionId}/cards/${cardId}`,
-      {newSectionId: newSectionId});
+      {
+        newSectionId: newSectionId,
+        newIndex: newIndex
+      });
   }
 
   createSection(groupId: string, boardId: string, name: string) {
-    return this.http.post(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/sections`, {name: name});
+    return this.http.post<void>(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/sections`, {name: name});
+  }
+
+  deleteSection(groupId: string, boardId: string, sectionId: string) {
+    return this.http.delete<void>(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/sections/${sectionId}`);
+  }
+
+  swapCards(groupId: string, boardId: string, sectionId: string, previousIndex: number, newIndex: number) {
+    return this.http.put<void>(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/sections/${sectionId}/cards/swap`, {
+      previousIndex: previousIndex,
+      newIndex: newIndex
+    })
   }
 }

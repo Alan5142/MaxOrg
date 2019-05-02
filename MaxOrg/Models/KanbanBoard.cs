@@ -147,5 +147,6 @@ namespace MaxOrg.Models
     public class MoveKanbanCardRequest
     {
         public string NewSectionId { get; set; }
+        public int NewIndex { get; set; }
     }
 }

@@ -8,8 +8,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using MaxOrg.Hubs;
+using MaxOrg.Hubs.Clients;
 using MaxOrg.Models.Kanban;
 using MaxOrg.Models.Tasks;
+using MaxOrg.Utility;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Internal;
 
 namespace MaxOrg.Controllers
@@ -23,9 +27,11 @@ namespace MaxOrg.Controllers
     public class GroupsController : ControllerBase
     {
         private readonly IArangoDatabase Database;
+        private readonly IHubContext<KanbanHub, IKanbanClient> KanbanHub;
 
-        public GroupsController(IArangoDatabase database)
+        public GroupsController(IArangoDatabase database, IHubContext<KanbanHub, IKanbanClient> kanbanHub)
         {
+            KanbanHub = kanbanHub;
             Database = database;
         }
 
@@ -159,8 +165,7 @@ namespace MaxOrg.Controllers
                 {
                     return Unauthorized();
                 }
-
-                // TODO sanitize c:
+                
                 group.Description = newDescription.NewDescription;
                 await db.UpdateByIdAsync<Group>(group.Id, group);
             }
@@ -171,42 +176,38 @@ namespace MaxOrg.Controllers
         [HttpGet("{groupId}/description")]
         public async Task<IActionResult> GetGroupDescription(string groupId)
         {
-            using (var db = ArangoDatabase.CreateWithSetting())
+            var db = Database;
+            var group = await GetGroup(groupId);
+            if (group == null)
             {
-                var group = await GetGroup(groupId);
-                if (group == null)
-                {
-                    return NotFound();
-                }
-
-                if (GetGroupMembers(groupId).Find(u => u.Key == HttpContext.User.Identity.Name) == null)
-                {
-                    // the user is not in the group
-                    return Unauthorized();
-                }
-
-                return Ok(new {group.Description});
+                return NotFound();
             }
+
+            if (GetGroupMembers(groupId).Find(u => u.Key == HttpContext.User.Identity.Name) == null)
+            {
+                // the user is not in the group
+                return Unauthorized();
+            }
+
+            return Ok(new {@group.Description});
         }
 
         [HttpGet("{groupId}")]
         public async Task<IActionResult> GetGroupInfo(string groupId)
         {
-            using (var db = ArangoDatabase.CreateWithSetting())
+            var db = Database;
+            var group = await (from g in db.Query<Group>()
+                where g.Key == groupId
+                select g).FirstOrDefaultAsync();
+            if (@group == null)
             {
-                var group = await (from g in db.Query<Group>()
-                    where g.Key == groupId
-                    select g).FirstOrDefaultAsync();
-                if (group == null)
-                {
-                    return NotFound();
-                }
-
-                var members = GetGroupMembers(groupId).Select(u => new {u.Key, u.Username, u.Email});
-
-                return Ok(new
-                    {group.Name, group.Key, group.GroupOwner, group.CreationDate, group.Description, members});
+                return NotFound();
             }
+
+            var members = GetGroupMembers(groupId).Select(u => new {u.Key, u.Username, u.Email});
+
+            return Ok(new
+                {@group.Name, @group.Key, @group.GroupOwner, @group.CreationDate, @group.Description, members});
         }
 
         #region Kanban Boards
@@ -214,24 +215,23 @@ namespace MaxOrg.Controllers
         [HttpPost("{groupId}/boards")]
         public async Task<IActionResult> CreateBoard(string groupId, [FromBody] CreateKanbanBoardRequest request)
         {
-            using (var db = ArangoDatabase.CreateWithSetting())
+            var db = Database;
+            var group = await GetGroup(groupId);
+            if (group == null)
             {
-                var group = await GetGroup(groupId);
-                if (group == null)
-                {
-                    return NotFound();
-                }
-
-                group.KanbanBoards.Add(new KanbanBoard(request.Name));
-                var createdBoard = group.KanbanBoards.Last();
-                createdBoard.Members.Add(new KanbanGroupMember
-                {
-                    UserId = HttpContext.User.Identity.Name,
-                    MemberPermissions = KanbanMemberPermissions.Admin
-                });
-                await db.UpdateByIdAsync<Group>(group.Id, group);
-                return CreatedAtAction("api/" + groupId + "boards/" + group.KanbanBoards.Last().Id, createdBoard);
+                return NotFound();
             }
+
+            group.KanbanBoards.Add(new KanbanBoard(request.Name));
+            var createdBoard = @group.KanbanBoards.Last();
+            createdBoard.Members.Add(new KanbanGroupMember
+            {
+                UserId = HttpContext.User.Identity.Name,
+                MemberPermissions = KanbanMemberPermissions.Admin
+            });
+            await db.UpdateByIdAsync<Group>(@group.Id, @group);
+            return Created($"./{createdBoard.Id}", createdBoard);
+            // return Redirect("api/" + groupId + "boards/" + @group.KanbanBoards.Last().Id, createdBoard);
         }
 
         [HttpGet("{groupId}/boards")]
@@ -259,44 +259,47 @@ namespace MaxOrg.Controllers
         [HttpGet("{groupId}/boards/{boardId}")]
         public async Task<IActionResult> GetBoardWithId(string groupId, string boardId)
         {
-            using (var db = ArangoDatabase.CreateWithSetting())
+            var db = Database;
+            var group = await (from g in db.Query<Group>() where g.Key == groupId select g).FirstOrDefaultAsync();
+            if (@group == null)
             {
-                var group = await (from g in db.Query<Group>() where g.Key == groupId select g).FirstOrDefaultAsync();
-                if (group == null)
-                {
-                    return NotFound();
-                }
-
-                var kanbanBoards = (from kb in @group.KanbanBoards
-                    where kb.Members.Find(km => km.UserId == HttpContext.User.Identity.Name) != null && kb.Id == boardId
-                    select @group.KanbanBoards).FirstOrDefault();
-                if (kanbanBoards == null)
-                {
-                    return NotFound();
-                }
-                var kanbanBoard = kanbanBoards.FirstOr(null);
-                if (kanbanBoard == null)
-                {
-                    return NotFound();
-                }
-                return Ok(new
-                {
-                    kanbanBoard.CreationDate,
-                    kanbanBoard.Id,
-                    kanbanBoard.KanbanGroups,
-                    kanbanBoard.Members,
-                    kanbanBoard.Name,
-                    CanEdit = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name).MemberPermissions != KanbanMemberPermissions.Read
-                });
+                return NotFound();
             }
+
+            var kanbanBoards = (from kb in @group.KanbanBoards
+                where kb.Members.Find(km => km.UserId == HttpContext.User.Identity.Name) != null && kb.Id == boardId
+                select @group.KanbanBoards).FirstOrDefault();
+            if (kanbanBoards == null)
+            {
+                return NotFound();
+            }
+
+            var kanbanBoard = kanbanBoards.FirstOr(null);
+            if (kanbanBoard == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new
+            {
+                kanbanBoard.CreationDate,
+                kanbanBoard.Id,
+                kanbanBoard.KanbanGroups,
+                kanbanBoard.Members,
+                kanbanBoard.Name,
+                CanEdit =
+                    kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name).MemberPermissions !=
+                    KanbanMemberPermissions.Read
+            });
         }
 
         [HttpPost("{groupId}/boards/{boardId}/sections")]
-        public async Task<IActionResult> CreateSection(string groupId, string boardId, [FromBody] CreateSectionRequest request)
+        public async Task<IActionResult> CreateSection(string groupId, string boardId,
+            [FromBody] CreateSectionRequest request)
         {
             var group = await (from g in Database.Query<Group>()
-                               where g.Key == groupId
-                               select g).FirstOrDefaultAsync();
+                where g.Key == groupId
+                select g).FirstOrDefaultAsync();
             if (group == null)
             {
                 return NotFound();
@@ -320,6 +323,8 @@ namespace MaxOrg.Controllers
             });
 
             await Database.UpdateByIdAsync<Group>(group.Id, group);
+            
+            await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
 
             return Ok();
         }
@@ -338,46 +343,47 @@ namespace MaxOrg.Controllers
         public async Task<IActionResult> CreateCardInSection(string groupId, string boardId, string sectionId,
             [FromBody] CreateKanbanCardInSectionRequest cardInfo)
         {
-            using (var db = ArangoDatabase.CreateWithSetting())
+            using var db = Database;
+            var group = await (from g in db.Query<Group>()
+                where g.Key == groupId
+                select g).FirstOrDefaultAsync();
+            if (@group == null)
             {
-                var group = await (from g in db.Query<Group>()
-                    where g.Key == groupId
-                    select g).FirstOrDefaultAsync();
-                if (group == null)
-                {
-                    return NotFound();
-                }
-
-                var kanbanBoard = (from kb in @group.KanbanBoards where kb.Id == boardId select kb).FirstOrDefault();
-                if (kanbanBoard == null)
-                {
-                    return NotFound();
-                }
-
-                var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
-                if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
-                {
-                    return Unauthorized();
-                }
-
-                var kanbanSection = (from ks in kanbanBoard.KanbanGroups
-                    where ks.Id == sectionId
-                    select ks).FirstOr(null);
-                if (kanbanSection == null)
-                {
-                    return NotFound();
-                }
-
-                var card = new KanbanCard
-                {
-                    Title = cardInfo.Name,
-                    Description = cardInfo.Description
-                };
-
-                kanbanSection.Cards.Add(card);
-                await db.UpdateByIdAsync<Group>(group.Id, group);
-                return Ok();
+                return NotFound();
             }
+
+            var kanbanBoard = (from kb in @group.KanbanBoards where kb.Id == boardId select kb).FirstOrDefault();
+            if (kanbanBoard == null)
+            {
+                return NotFound();
+            }
+
+            var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
+            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
+            {
+                return Unauthorized();
+            }
+
+            var kanbanSection = (from ks in kanbanBoard.KanbanGroups
+                where ks.Id == sectionId
+                select ks).FirstOr(null);
+            if (kanbanSection == null)
+            {
+                return NotFound();
+            }
+
+            var card = new KanbanCard
+            {
+                Title = cardInfo.Name,
+                Description = cardInfo.Description
+            };
+
+            kanbanSection.Cards.Add(card);
+            await db.UpdateByIdAsync<Group>(@group.Id, @group);
+            
+            await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
+            
+            return Ok();
         }
 
         [HttpPut("{groupId}/boards/{boardId}/sections/{sectionId}")]
@@ -418,9 +424,51 @@ namespace MaxOrg.Controllers
 
             await Database.UpdateByIdAsync<Group>(group.Id, group);
             
+            await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
+
             return Ok();
         }
 
+        [HttpDelete("{groupId}/boards/{boardId}/sections/{sectionId}")]
+        public async Task<IActionResult> DeleteSection(string groupId, string boardId, string sectionId)
+        {
+            var group = await (from g in Database.Query<Group>()
+                where g.Key == groupId
+                select g).FirstOrDefaultAsync();
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            var kanbanBoard = (from kb in @group.KanbanBoards where kb.Id == boardId select kb).FirstOrDefault();
+            if (kanbanBoard == null)
+            {
+                return NotFound();
+            }
+
+            var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
+            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
+            {
+                return Unauthorized();
+            }
+
+            var kanbanSection = (from ks in kanbanBoard.KanbanGroups
+                where ks.Id == sectionId 
+                select ks).FirstOrDefault();
+
+            if (kanbanSection == null)
+            {
+                return NotFound();
+            }
+
+            kanbanBoard.KanbanGroups.RemoveAll(ks => ks.Id == sectionId);
+            await Database.UpdateByIdAsync<Group>(group.Id, group);
+            
+            await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
+            
+            return Ok();
+        }
+        
         /// <summary>
         /// Mueve de sección una tarjeta
         /// </summary>
@@ -447,66 +495,116 @@ namespace MaxOrg.Controllers
         public async Task<IActionResult> MoveCard(string groupId, string boardId, string sectionId, string cardId,
             [FromBody] MoveKanbanCardRequest moveKanbanCardRequest)
         {
-            using (var db = ArangoDatabase.CreateWithSetting())
+            using var db = ArangoDatabase.CreateWithSetting();
+            // obtenemos el grupo y verificamos si existe
+            var group = await (from g in db.Query<Group>()
+                where g.Key == groupId
+                select g).FirstOrDefaultAsync();
+            if (group == null)
             {
-                // obtenemos el grupo y verificamos si existe
-                var group = await (from g in db.Query<Group>()
-                    where g.Key == groupId
-                    select g).FirstOrDefaultAsync();
-                if (group == null)
-                {
-                    return NotFound();
-                }
-
-                var kanbanBoard = (from kb in @group.KanbanBoards where kb.Id == boardId select kb).FirstOrDefault();
-                if (kanbanBoard == null)
-                {
-                    return NotFound();
-                }
-
-                var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
-                if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
-                {
-                    return Unauthorized();
-                }
-
-                // obtenemos la sección y verificamos si existe
-                var kanbanSection = (from ks in kanbanBoard.KanbanGroups
-                    where ks.Id == sectionId
-                    select ks).FirstOrDefault();
-
-                if (kanbanSection == null)
-                {
-                    return NotFound();
-                }
-
-                // obtenemos la tarjeta
-                var kanbanCard = (from kc in kanbanSection.Cards
-                    where kc.Id == cardId
-                    select kc).FirstOrDefault();
-
-                if (kanbanCard == null)
-                {
-                    return NotFound();
-                }
-
-                // obtenemos la nueva sección
-                var newKanbanSection = (from nks in kanbanBoard.KanbanGroups
-                    where nks.Id == moveKanbanCardRequest.NewSectionId
-                    select nks).FirstOrDefault();
-
-                if (newKanbanSection == null)
-                {
-                    return NotFound();
-                }
-
-                // añadimos la tarjeta a la nueva sección y la eliminamos de la anterior
-                newKanbanSection.Cards.Add(kanbanCard);
-                kanbanSection.Cards.Remove(kanbanCard);
-                // actualizamos :)
-                await db.UpdateByIdAsync<Group>(group.Id, group);
-                return Ok();
+                return NotFound();
             }
+
+            var kanbanBoard = (from kb in @group.KanbanBoards where kb.Id == boardId select kb).FirstOrDefault();
+            if (kanbanBoard == null)
+            {
+                return NotFound();
+            }
+
+            var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
+            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
+            {
+                return Unauthorized();
+            }
+
+            // obtenemos la sección y verificamos si existe
+            var kanbanSection = (from ks in kanbanBoard.KanbanGroups
+                where ks.Id == sectionId
+                select ks).FirstOrDefault();
+
+            if (kanbanSection == null)
+            {
+                return NotFound();
+            }
+
+            // obtenemos la tarjeta
+            var kanbanCard = (from kc in kanbanSection.Cards
+                where kc.Id == cardId
+                select kc).FirstOrDefault();
+
+            if (kanbanCard == null)
+            {
+                return NotFound();
+            }
+
+            // obtenemos la nueva sección
+            var newKanbanSection = (from nks in kanbanBoard.KanbanGroups
+                where nks.Id == moveKanbanCardRequest.NewSectionId
+                select nks).FirstOrDefault();
+
+            if (newKanbanSection == null)
+            {
+                return NotFound();
+            }
+
+            // añadimos la tarjeta a la nueva sección y la eliminamos de la anterior
+            newKanbanSection.Cards.Insert(moveKanbanCardRequest.NewIndex, kanbanCard);
+            kanbanSection.Cards.Remove(kanbanCard);
+
+            // actualizamos :)
+            await db.UpdateByIdAsync<Group>(@group.Id, @group);
+            await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
+            return Ok();
+        }
+
+        [HttpPut("{groupId}/boards/{boardId}/sections/{sectionId}/cards/swap")]
+        public async Task<IActionResult> SwapCards(string groupId, string boardId, string sectionId,
+            [FromBody] SwapCardsRequest request)
+        {
+            var group = await (from g in Database.Query<Group>()
+                where g.Key == groupId
+                select g).FirstOrDefaultAsync();
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            var kanbanBoard = (from kb in @group.KanbanBoards where kb.Id == boardId select kb).FirstOrDefault();
+            if (kanbanBoard == null)
+            {
+                return NotFound();
+            }
+
+            var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
+            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
+            {
+                return Unauthorized();
+            }
+
+            // obtenemos la sección y verificamos si existe
+            var kanbanSection = (from ks in kanbanBoard.KanbanGroups
+                where ks.Id == sectionId
+                select ks).FirstOrDefault();
+            if (kanbanSection == null)
+            {
+                return NotFound();
+            }
+
+            var cards = kanbanSection?.Cards;
+
+            if (request.PreviousIndex > cards.Count)
+            {
+                return BadRequest();
+            }
+
+            // Swap
+            var item = cards[request.PreviousIndex];
+            cards.Remove(item);
+            cards.Insert(request.NewIndex, item);
+
+            await Database.UpdateByIdAsync<Group>(group.Id, group);
+            await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
+            return Ok();
         }
 
         #endregion
@@ -788,26 +886,24 @@ namespace MaxOrg.Controllers
         /// </returns>
         private async Task<bool> IsGroupAdmin(string currentGroup, string userId)
         {
-            using (var db = ArangoDatabase.CreateWithSetting())
-            {
-                var graph = db.Graph("GroupUsersGraph");
+            using var db = Database;
+            var graph = db.Graph("GroupUsersGraph");
 
-                var user = await (from u in db.Query<User>()
-                    where u.Key == userId
-                    select u).FirstOrDefaultAsync();
-                var traversal = db.Traverse<User, UsersInGroup>(new TraversalConfig
-                {
-                    StartVertex = "Group/" + currentGroup,
-                    GraphName = graph.Name,
-                    Direction = EdgeDirection.Inbound,
-                    MinDepth = 1,
-                    MaxDepth = 1
-                });
-                return (from u in traversal.Visited.Paths
-                    from e in u.Edges
-                    where e.User == "User/" + userId
-                    select e.IsAdmin).FirstOrDefault();
-            }
+            var user = await (from u in db.Query<User>()
+                where u.Key == userId
+                select u).FirstOrDefaultAsync();
+            var traversal = db.Traverse<User, UsersInGroup>(new TraversalConfig
+            {
+                StartVertex = "Group/" + currentGroup,
+                GraphName = graph.Name,
+                Direction = EdgeDirection.Inbound,
+                MinDepth = 1,
+                MaxDepth = 1
+            });
+            return (from u in traversal.Visited.Paths
+                from e in u.Edges
+                where e.User == "User/" + userId
+                select e.IsAdmin).FirstOrDefault();
         }
 
         private async Task<Group> GetGroup(string groupId)

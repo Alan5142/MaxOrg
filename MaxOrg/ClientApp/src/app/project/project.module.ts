@@ -81,6 +81,7 @@ import { EditRequirementComponent } from './requirements/edit-requirement/edit-r
 import { RemoveRequirementComponent } from './requirements/remove-requirement/remove-requirement.component';
 import { EditSectionComponent } from './kanban-board/board/edit-section/edit-section.component';
 import { CreateSectionComponent } from './kanban-board/board/create-section/create-section.component';
+import { DeleteSectionComponent } from './kanban-board/board/delete-section/delete-section.component';
 
 @NgModule({
   entryComponents: [
@@ -98,7 +99,8 @@ import { CreateSectionComponent } from './kanban-board/board/create-section/crea
     EditRequirementComponent,
     RemoveRequirementComponent,
     CreateSectionComponent,
-    EditSectionComponent
+    EditSectionComponent,
+    DeleteSectionComponent
   ],
   imports: [
     CommonModule,
@@ -185,7 +187,8 @@ import { CreateSectionComponent } from './kanban-board/board/create-section/crea
     EditRequirementComponent,
     RemoveRequirementComponent,
     EditSectionComponent,
-    CreateSectionComponent
+    CreateSectionComponent,
+    DeleteSectionComponent
   ],
   bootstrap: [
     ProjectComponent

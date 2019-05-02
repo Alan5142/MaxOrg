@@ -34,7 +34,7 @@ namespace MaxOrg
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         private void ConfigureAzure(IServiceCollection services)
         {
@@ -44,7 +44,7 @@ namespace MaxOrg
 
                 var blobClient = storage.CreateCloudBlobClient();
 
-                CloudBlobContainer container = blobClient.GetContainerReference("maxorgfiles");
+                var container = blobClient.GetContainerReference("maxorgfiles");
 
                 container.SetPermissionsAsync(new BlobContainerPermissions
                 {
@@ -227,6 +227,7 @@ namespace MaxOrg
             {
                 routes.MapHub<NotificationHub>("/notification-hub");
                 routes.MapHub<ChatHub>("/chat-hub");
+                routes.MapHub<KanbanHub>("/kanban-hub");
             });
 
             app.UseMvc(routes =>

@@ -2,7 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {MediaObserver} from '@angular/flex-layout';
 import {KanbanBoardDescription, KanbanCardsService} from '../../../services/kanban-cards.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Observable} from 'rxjs';
+import {merge, Observable} from 'rxjs';
+import {shareReplay} from "rxjs/operators";
+import {MatSnackBar} from "@angular/material";
 
 @Component({
   selector: 'app-kanban-index',
@@ -16,11 +18,13 @@ export class KanbanIndexComponent implements OnInit {
 
   constructor(private router: Router,
               private route: ActivatedRoute,
+              private snackBar: MatSnackBar,
               public mediaObserver: MediaObserver,
               private kanbanService: KanbanCardsService) {
     route.parent.parent.params.subscribe(params => {
       this.projectId = params['id'];
-      this.boards = this.kanbanService.getBoardsOfGroup(this.projectId);
+      this.boards = this.kanbanService.getBoardsOfGroup(this.projectId).pipe(shareReplay(1));
+      this.boards.subscribe(r => console.log(r));
     });
   }
 
@@ -32,10 +36,12 @@ export class KanbanIndexComponent implements OnInit {
   }
 
   createBoardWithName(value: string) {
+    if (value.length < 6 || value.length > 15) return;
     this.kanbanService.createBoard(this.projectId, value).subscribe(ok => {
-      this.boards = this.kanbanService.getBoardsOfGroup(this.projectId);
+      this.boards = merge(this.boards, this.kanbanService.getBoardsOfGroup(this.projectId).pipe(shareReplay(1)));
+      this.snackBar.open('Creado con exito', 'OK', {duration: 2000});
     }, err => {
-
+      this.snackBar.open('No se pudo crear', 'OK', {duration: 2000});
     });
   }
 }
