@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace MaxOrg.Requests.Chat
 {
     /// <summary>
-    /// Clase utilizada para almacenar la petición HTTP que realiza un cliente cuando desea enviar un mensaje a un chat.
+    /// Clase utilizada para almacenar la peticiÃ³n HTTP que realiza un cliente cuando desea enviar un mensaje a un chat.
     /// </summary>
     public class SendMessageRequest
     {
@@ -17,7 +17,7 @@ namespace MaxOrg.Requests.Chat
     }
 
     /// <summary>
-    /// Clase utilizada para almacenar la petición HTTP que realiza un cliente cuando desea agregar otro miembro a un chat.
+    /// Clase utilizada para almacenar la peticiÃ³n HTTP que realiza un cliente cuando desea agregar otro miembro a un chat.
     /// </summary>
     public class AddUserToChatRequest
     {
@@ -29,7 +29,7 @@ namespace MaxOrg.Requests.Chat
     }
 
     /// <summary>
-    /// Modelo utilizado para almacenar la petición HTTP que realiza un cliente cuando desea crear un chat en determinado proyecto
+    /// Modelo utilizado para almacenar la peticiÃ³n HTTP que realiza un cliente cuando desea crear un chat en determinado proyecto
     /// </summary>
     public class CreateChatRequest
     {
@@ -44,7 +44,7 @@ namespace MaxOrg.Requests.Chat
         [Required]
         public string ProjectId { get; set; }
         /// <summary>
-        /// Lista con los identificadores de los miembros que se desea incluir en el chat, este campo es requerido pero la lista puede estar vacía.
+        /// Lista con los identificadores de los miembros que se desea incluir en el chat, este campo es requerido pero la lista puede estar vacÃ­a.
         /// </summary>
         [Required]
         public List<string> Members { get; set; }

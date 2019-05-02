@@ -23,8 +23,7 @@
                     class="height-100">
 
     <app-chat-message *ngFor="let message of scroll?.viewPortItems;" class="chat-element chat-view" fxLayout="column"
-                      [message]="message.data" [sender]="message.remitent"
-                      [selfMessage]="message.remitent === (userService.getCurrentUser() | async)?.username"></app-chat-message>
+                      [message]="message.data" [sender]="message.remitent"></app-chat-message>
 
   </virtual-scroller>
 

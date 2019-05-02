@@ -4,6 +4,7 @@ import {ActivatedRoute} from '@angular/router';
 import {Observable} from "rxjs";
 import {GetUserChatsResponse} from "../services/chat-model";
 import {ChatService} from "../services/chat.service";
+import {shareReplay} from "rxjs/operators";
 
 @Component({
   selector: 'app-messages',
@@ -23,7 +24,8 @@ export class MessagesComponent implements OnInit {
         this.chatId = params.get('chatId');
       });
     this.route.parent.params.subscribe(params => {
-      this.chats = chatService.userChats(params['id']);
+      this.chats = chatService.userChats(params['id']).pipe(shareReplay(1));
+      this.chats.subscribe(r => console.log(r));
     })
   }
 

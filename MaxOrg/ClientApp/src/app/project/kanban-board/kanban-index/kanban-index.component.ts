@@ -24,7 +24,6 @@ export class KanbanIndexComponent implements OnInit {
     route.parent.parent.params.subscribe(params => {
       this.projectId = params['id'];
       this.boards = this.kanbanService.getBoardsOfGroup(this.projectId).pipe(shareReplay(1));
-      this.boards.subscribe(r => console.log(r));
     });
   }
 

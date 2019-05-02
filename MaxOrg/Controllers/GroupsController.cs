@@ -15,6 +15,7 @@ using MaxOrg.Models.Tasks;
 using MaxOrg.Utility;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore.Scaffolding.Internal;
 
 namespace MaxOrg.Controllers
 {
@@ -237,23 +238,31 @@ namespace MaxOrg.Controllers
         [HttpGet("{groupId}/boards")]
         public async Task<IActionResult> GetBoardsOfGroup(string groupId)
         {
-            using (var db = ArangoDatabase.CreateWithSetting())
+            var db = Database;
+            var group = await (from g in db.Query<Group>()
+                where g.Key == groupId
+                select g).FirstOrDefaultAsync();
+            if (group == null)
             {
-                IEnumerable<KanbanBoard> kanbanBoards = await (from g in db.Query<Group>()
-                    from kb in g.KanbanBoards
-                    where g.Key == groupId
-                    select g.KanbanBoards).FirstOrDefaultAsync();
-                kanbanBoards = from kb in kanbanBoards
-                    where kb.Members.Find(km => km.UserId == HttpContext.User.Identity.Name) != null
-                    select kb;
-                // send only names and ids
-
+                return NotFound();
+            }
+            IEnumerable<KanbanBoard> kanbanBoards = group.KanbanBoards;
+            kanbanBoards = from kb in kanbanBoards
+                where kb.Members.Find(km => km.UserId == HttpContext.User.Identity.Name) != null
+                select kb;
+            // send only names and ids
+            if (kanbanBoards.Count() == 0)
+            {
                 return Ok(new
                 {
-                    boards = from kb in kanbanBoards
-                        select new {kb.Name, kb.Id}
+                    boards = new List<KanbanBoard>()
                 });
             }
+            return Ok(new
+            {
+                boards = from kb in kanbanBoards
+                    select new {kb.Name, kb.Id}
+            });
         }
 
         [HttpGet("{groupId}/boards/{boardId}")]
@@ -633,15 +642,7 @@ namespace MaxOrg.Controllers
             await Database.InsertAsync<ToDoTask>(task);
 
             // Si no referencia a un requerimiento o a una tarea terminamos, de lo contrario debemos referenciar al requerimiento
-            if (request.ReferenceRequirement == null && request.ReferenceTask == null)
-                return Created($"api/groups/{groupId}/tasks/{task.Key}", new
-                {
-                    Id = task.Key,
-                    task.Name,
-                    task.Description,
-                    task.CreationDate
-                });
-            else if (request.ReferenceRequirement != null && request.ReferenceTask == null)
+            if (request.ReferenceRequirement != null && request.ReferenceTask == null)
             {
                 // Checamos si ese requerimiento esta en algún lugar del grupo raíz, en caso de que no simplemente le decimos
                 // que se creo el requerimiento pero hubo un error con el requerimiento
