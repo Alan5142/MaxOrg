@@ -12,6 +12,7 @@ export class NewSubgroupComponent {
   groupName: string;
   groupDescription:string="";
   selectedUsers: string[];
+  selectedAdmin=null;
   autocompleteUsers: User[];
   subgroupAdminId:string;
   parentGroupId:string;
@@ -23,14 +24,21 @@ export class NewSubgroupComponent {
     console.log(parentGroupId);
     this.selectedUsers = [];
     this.autocompleteUsers = [];
+    userService.getCurrentUser().subscribe(user=>this.selectedAdmin=user.username);
   }
 
   createGroup(): void {
-   const itf = {currentGroupId:((this.parentGroupId as any).parentId as string),name:this.groupName,description:this.groupDescription,members:this.selectedUsers,subgroupAdminId:localStorage.getItem('userId')};
-   // console.log(itf)
-   const returnPromise = this.groupService.createGroup(itf);
-   //this.dialogRef.close(returnPromise);
-   returnPromise.subscribe(r => this.dialogRef.close());
+    let adminId;
+    this.userService.getUsersByName(this.selectedAdmin,1).subscribe(admin=>{
+      const itf = {currentGroupId:((this.parentGroupId as any).parentId as string),name:this.groupName,description:this.groupDescription,members:this.selectedUsers,subgroupAdminId:admin[0].key};
+      console.log(itf)
+      const returnPromise = this.groupService.createGroup(itf);
+      //this.dialogRef.close(returnPromise);
+      console.log(returnPromise);
+      returnPromise.subscribe(r => this.dialogRef.close());
+    })
+   
+   
   }
 
   /**
@@ -67,5 +75,15 @@ export class NewSubgroupComponent {
 
     this.selectedUsers.push(username);
     userInput.value = '';
+  }
+  adminSelected(event: MatAutocompleteSelectedEvent, adminInput: HTMLInputElement) {
+    const username: string = event.option.value.username;
+
+    if (this.selectedUsers.indexOf(username) >= 0) {
+      return;
+    }
+
+    this.selectedAdmin=username;
+    console.log(this.selectedAdmin);
   }
 }

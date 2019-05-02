@@ -1,11 +1,15 @@
 <h1 mat-dialog-title>Agregar tarea</h1>
 <div mat-dialog-content>
-  <mat-list>
-    <mat-list-item matRipple>Nombre de tarea</mat-list-item>
-    <mat-list-item matRipple>Nombre de tarea 2</mat-list-item>
-  </mat-list>
+  <form>
+    <mat-form-field>
+      <input matInput type="text" placeholder="Nombre" #taskName>
+    </mat-form-field>
+    <mat-form-field>
+      <textarea matInput cdkTextareaAutosize placeholder="Descripción" #taskDescription></textarea>
+    </mat-form-field>
+  </form>
 </div>
 <div mat-dialog-actions>
   <button mat-button>Cancelar</button>
-  <button mat-flat-button color="primary" [mat-dialog-close]="" cdkFocusInitial>Asignar</button>
+  <button mat-flat-button (click)="createTask(taskName,taskDescription)" color="primary" [mat-dialog-close]="" cdkFocusInitial>Crear</button>
 </div>
