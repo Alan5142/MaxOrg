@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatBottomSheet, MatBottomSheetRef, MatSnackBar} from '@angular/material';
+import {MatBottomSheet, MatBottomSheetRef, MatSlideToggleChange, MatSnackBar} from '@angular/material';
 import {NotificationPreference, User, UserService} from '../../services/user.service';
 import {Observable} from "rxjs";
 import {shareReplay} from "rxjs/operators";
@@ -7,6 +7,7 @@ import {AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators} from "
 import {ImageCropperComponent, CropperSettings} from 'ngx-img-cropper';
 import {MediaObserver} from "@angular/flex-layout";
 import {environment} from "../../../environments/environment";
+import {ThemeService} from "../../services/theme.service";
 
 @Component({
   selector: 'app-my-account',
@@ -39,6 +40,7 @@ export class MyAccountComponent implements OnInit {
   constructor(private bottomSheet: MatBottomSheet,
               private userService: UserService,
               private formBuilder: FormBuilder,
+              public theme: ThemeService,
               private snackBar: MatSnackBar,
               mediaObserver: MediaObserver) {
 
@@ -130,6 +132,10 @@ export class MyAccountComponent implements OnInit {
     }), error => this.snackBar.open('No se pudo actualizar la información', 'OK', {
       duration: 2000,
     }));
+  }
+
+  changeTheme($event: MatSlideToggleChange) {
+    this.theme.darkTheme = $event.checked;
   }
 }
 

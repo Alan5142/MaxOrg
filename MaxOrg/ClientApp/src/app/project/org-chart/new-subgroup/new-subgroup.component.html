@@ -4,6 +4,8 @@
       <input [(ngModel)]="groupName" matInput placeholder="Nombre del Grupo">
     </mat-form-field>
     <br>
+
+
     <mat-form-field class="center">
       <mat-chip-list #chipList>
         <mat-chip (removed)="remove(user)" *ngFor="let user of selectedUsers"
@@ -20,6 +22,26 @@
         </mat-option>
       </mat-autocomplete>
     </mat-form-field>
+
+
+    <mat-form-field class="center half">
+      <mat-chip-list #chipAdmin class="center">
+        <mat-chip (removed)="selectedAdmin=null" *ngIf="selectedAdmin!=null"
+                  [removable]="true" [selectable]="selectable">
+          {{selectedAdmin}}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+      </mat-chip-list>
+      <input #adminInput (input)="valueChanged(adminInput.value)"
+             [matAutocomplete]="adminLists" [matChipInputFor]="chipAdmin" placeholder="Administrador" *ngIf="selectedAdmin==null">
+      <mat-autocomplete #adminLists="matAutocomplete" (optionSelected)="adminSelected($event, adminInput)">
+        <mat-option *ngFor="let user of autocompleteUsers" [value]="user">
+          {{user.username}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+
+
     <br>
     <button (click)="createGroup()" class="center half" color="primary" mat-raised-button>Crear</button>
   </mat-dialog-content>

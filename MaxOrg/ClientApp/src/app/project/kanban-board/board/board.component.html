@@ -1,18 +1,35 @@
-<app-kanban-toolbar></app-kanban-toolbar>
+<app-kanban-toolbar (reload)="updateData()"
+                    (createSection)="createSection()"
+                    [canEdit]="(board | async)?.canEdit"></app-kanban-toolbar>
+<mat-menu #sectionMenu="matMenu">
+  <ng-template let-group="group" matMenuContent>
+    <button mat-menu-item (click)="editSection(group)">
+      <mat-icon>edit</mat-icon>
+      <span>Editar</span></button>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="deleteSection(group)">
+      <mat-icon>delete_forever</mat-icon>
+      <span>Eliminar</span></button>
+  </ng-template>
+</mat-menu>
 <div *ngIf="groups | async;else loading">
-  <div cdkDropListGroup class="board">
-
-
+  <div cdkDropListGroup [cdkDropListGroupDisabled]="!(board | async)?.canEdit" class="board">
     <div class="card-list mat-elevation-z5 card-holder" ngClass="" ngClass.lt-md="card-mobile"
          *ngFor="let group of groups | async">
       <div cdkDragHandle fxLayout="row">
         <h2 class="mat-h2">{{group.name}}
         </h2>
         <div fxFlex></div>
-        <button style="top: -15px;" mat-icon-button fxFlexAlign="baseline" (click)="addCardToSection(group.id)">
+        <button style="top: -15px;"
+                mat-icon-button
+                fxFlexAlign="baseline"
+                *ngIf="(board | async)?.canEdit"
+                (click)="addCardToSection(group.id)">
           <mat-icon>add</mat-icon>
         </button>
-        <button style="top: -15px;" mat-icon-button fxFlexAlign="baseline">
+        <button style="top: -15px;" mat-icon-button fxFlexAlign="baseline" [matMenuTriggerData]="{group: group}"
+                [matMenuTriggerFor]="sectionMenu"
+                *ngIf="(board | async)?.canEdit">
           <mat-icon>more_horiz</mat-icon>
         </button>
       </div>
@@ -21,8 +38,8 @@
            cdkDropList
            [id]="group.id"
            [cdkDropListData]="group.cards"
-           (cdkDropListDropped)="onTaskDrop($event)" style="background-color: cornflowerblue;">
-        <mat-card style="margin: 2%;" *ngFor="let task of group.cards; trackBy: trackUsingId" cdkDrag>
+           (cdkDropListDropped)="onTaskDrop($event)" [ngStyle]="{'background-color': group.color}">
+        <mat-card style="margin: 2%;" *ngFor="let task of group.cards; trackBy: trackUsingId" cdkDrag (click)="print()">
           <mat-card-content>
             <h2>{{task.title}}</h2>
             <p>{{task.description}}</p>

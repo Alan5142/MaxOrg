@@ -106,7 +106,7 @@ export class UserService {
     }
   }
 
-  getUserToken(): string {
+  get userToken(): string {
     return localStorage.getItem('token');
   }
 
@@ -195,6 +195,7 @@ export class UserService {
 
   closeSession(): void {
     localStorage.clear();
+
     this.router.navigate(['/']);
   }
 

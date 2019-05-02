@@ -13,16 +13,16 @@ export class TreeComponent implements OnInit {
   @Input() parentId: string=null;
   @Input() userId;
   @Input() adminId: string=null;
-  isAdmin:boolean=false;
+  @Input() isAdmin:boolean=false;
   constructor(public dialog: MatDialog) {
     
   }
 
   ngOnInit() {
-    if (this.adminId!=null){
-      if(this.userId==this.adminId)
-        this.isAdmin=true;
-    }
+    if(this.isAdmin)
+      return;
+    if(this.userId==this.adminId)
+      this.isAdmin=true;
   }
   openDialog(parentId): void {
     const dialogRef = this.dialog.open(NewSubgroupComponent, {

@@ -1,4 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {UserService} from "../../../../services/user.service";
 
 @Component({
   selector: 'app-chat-message',
@@ -9,12 +10,17 @@ export class ChatMessageComponent implements OnInit {
   @Input() sender: string;
   @Input() message: string;
   // TODO eliminar
-  @Input() selfMessage: boolean = Math.random() >= 0.5;
+  @Input() selfMessage: boolean = true;
 
-  constructor() {
+  constructor(private userService: UserService) {
+
   }
 
   ngOnInit() {
+    console.log('self: ' + this.selfMessage);
+    this.userService.getCurrentUser().subscribe(u => {
+      this.selfMessage = u.username === this.sender;
+    })
   }
 
 }

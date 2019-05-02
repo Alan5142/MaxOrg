@@ -24,10 +24,24 @@ export interface KanbanGroupMember {
   id: string;
 }
 
+export enum KanbanMemberPermissions {
+  Admin,
+  Write,
+  Read
+}
+
+export interface KanbanGroupMember {
+  userId: string;
+  memberPermissions: KanbanMemberPermissions;
+}
+
 export interface KanbanBoard {
+  id: string;
+  creationDate: Date;
   name: string;
-  members: string[];
+  members: KanbanGroupMember[];
   kanbanGroups: KanbanGroup[];
+  canEdit: boolean;
 }
 
 export interface KanbanBoardDescription {
@@ -71,5 +85,34 @@ export class KanbanCardsService {
     const headers = new HttpHeaders().append('Authorization', 'Bearer ' + localStorage.getItem('token'));
     return this.http.post(environment.apiUrl + `groups/${groupId}/boards/${boardId}/sections/${sectionId}/cards`,
       cardData, {headers: headers});
+  }
+
+  editGroupInfo(groupId: string, boardId: string, sectionId: string, newData: KanbanGroup): Observable<void> {
+    const headers = new HttpHeaders().append('Authorization', 'Bearer ' + localStorage.getItem('token'));
+    return this.http.put<void>(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/sections/${sectionId}`,
+      newData, {headers: headers});
+  }
+
+  moveCard(groupId: string, boardId: string, sectionId: string, cardId: string, newSectionId: string, newIndex: number) {
+    return this.http.put<void>(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/sections/${sectionId}/cards/${cardId}`,
+      {
+        newSectionId: newSectionId,
+        newIndex: newIndex
+      });
+  }
+
+  createSection(groupId: string, boardId: string, name: string) {
+    return this.http.post<void>(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/sections`, {name: name});
+  }
+
+  deleteSection(groupId: string, boardId: string, sectionId: string) {
+    return this.http.delete<void>(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/sections/${sectionId}`);
+  }
+
+  swapCards(groupId: string, boardId: string, sectionId: string, previousIndex: number, newIndex: number) {
+    return this.http.put<void>(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/sections/${sectionId}/cards/swap`, {
+      previousIndex: previousIndex,
+      newIndex: newIndex
+    })
   }
 }

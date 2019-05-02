@@ -1,4 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {MediaObserver} from '@angular/flex-layout';
+import {KanbanBoard, KanbanGroup} from '../../../services/kanban-cards.service';
+import {Observable, Subject} from 'rxjs';
 
 @Component({
   selector: 'app-kanban-toolbar',
@@ -6,7 +9,13 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./kanban-toolbar.component.scss']
 })
 export class KanbanToolbarComponent implements OnInit {
-  constructor() {
+
+  @Output() reload = new EventEmitter<any>();
+  @Output() createSection = new EventEmitter<any>();
+
+  @Input() canEdit = false;
+
+  constructor(public mediaObserver: MediaObserver) {
   }
 
   ngOnInit() {

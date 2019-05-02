@@ -13,9 +13,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using shortid;
 using System;
+using System.IO.Compression;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
@@ -32,18 +34,18 @@ namespace MaxOrg
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         private void ConfigureAzure(IServiceCollection services)
         {
             services.AddTransient<CloudBlobContainer>(provider =>
             {
                 var storage = CloudStorageAccount.Parse(Configuration["AppSettings:AzureFiles:ConnectionString"]);
-            
+
                 var blobClient = storage.CreateCloudBlobClient();
-                
-                CloudBlobContainer container = blobClient.GetContainerReference("maxorgfiles");
-            
+
+                var container = blobClient.GetContainerReference("maxorgfiles");
+
                 container.SetPermissionsAsync(new BlobContainerPermissions
                 {
                     PublicAccess = BlobContainerPublicAccessType.Off
@@ -117,7 +119,7 @@ namespace MaxOrg
                             // If the request is for our hub...
                             var path = context.HttpContext.Request.Path;
                             if (!string.IsNullOrEmpty(accessToken) &&
-                                (path.StartsWithSegments("/notification-hub")))
+                                (path.StartsWithSegments("/notification-hub") || path.StartsWithSegments("/chat-hub")))
                             {
                                 // Read the token out of the query string
                                 context.Token = accessToken;
@@ -171,19 +173,41 @@ namespace MaxOrg
             services.AddSingleton<IScheduledTask, RemoveExpiredTokens>();
             services.AddScheduler((sender, args) => { args.SetObserved(); });
             services.AddSignalR();
-            
+
             ConfigureAzure(services);
+
+            services.Configure<GzipCompressionProviderOptions>(options =>
+            {
+                options.Level = CompressionLevel.Optimal;
+            });
+
+            services.Configure<BrotliCompressionProviderOptions>(options =>
+            {
+                options.Level = CompressionLevel.Optimal;
+            });
+
+            services.AddResponseCompression(options =>
+            {
+                options.Providers.Add<BrotliCompressionProvider>();
+                options.Providers.Add<GzipCompressionProvider>();
+                options.EnableForHttps = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseResponseCompression();
+
             //app.UseCors(builder =>
             //            builder
             //            .WithOrigins("https://localhost:44384", "http://localhost:4200").AllowAnyOrigin());
             app.UseCors(builder =>
-                builder
-                    .AllowAnyOrigin());
+            {
+                builder.AllowAnyOrigin();
+                builder.AllowAnyMethod();
+                builder.AllowAnyMethod();
+            });
 
             if (env.IsDevelopment())
             {
@@ -203,6 +227,7 @@ namespace MaxOrg
             {
                 routes.MapHub<NotificationHub>("/notification-hub");
                 routes.MapHub<ChatHub>("/chat-hub");
+                routes.MapHub<KanbanHub>("/kanban-hub");
             });
 
             app.UseMvc(routes =>

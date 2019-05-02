@@ -26,9 +26,11 @@ namespace MaxOrg.Controllers
         private IConfiguration Configuration { get; }
         private readonly PasswordHasher<Models.User> m_passwordHasher;
         private static readonly HttpClient client = new HttpClient();
+        private readonly IArangoDatabase Database;
 
         public LoginController(IConfiguration configuration, IArangoDatabase database)
         {
+            Database = database;
             Configuration = configuration;
             m_passwordHasher = new PasswordHasher<Models.User>();
         }
@@ -42,34 +44,29 @@ namespace MaxOrg.Controllers
                 return BadRequest(new {message = "No password or username was given"});
             }
 
-            using (var db = ArangoDatabase.CreateWithSetting())
+            var db = Database;
+            var user = await (from u in db.Query<Models.User>()
+                where u.Username == userLoginData.username
+                select u).FirstOrDefaultAsync();
+            
+            if (user == null) return NotFound(new {message = "Incorrect username or password"});
+            
+            if (m_passwordHasher.VerifyHashedPassword(user, user.Password,
+                    user.Salt + userLoginData.password) != PasswordVerificationResult.Success)
             {
-                var user = await (from u in db.Query<Models.User>()
-                    where u.Username == userLoginData.username
-                    select u).FirstOrDefaultAsync();
-                if (user != null)
-                {
-                    if (m_passwordHasher.VerifyHashedPassword(user, user.Password,
-                            user.Salt + userLoginData.password) != PasswordVerificationResult.Success)
-                    {
-                        return BadRequest(new {message = "Username or password are incorrect"});
-                    }
-
-                    var token = await GenerateRefreshAndJwtToken(user);
-                    var response = new LoginResponse
-                    {
-                        userId = user.Key,
-                        userResourceLocation = "users/" + user.Key,
-                        token = token.token,
-                        refreshToken = token.refreshToken.Token
-                    };
-                    return Ok(response);
-                }
-                else
-                {
-                    return NotFound(new {message = "Incorrect username or password"});
-                }
+                return BadRequest(new {message = "Username or password are incorrect"});
             }
+
+            var (token, refreshToken) = await GenerateRefreshAndJwtToken(user);
+            var response = new LoginResponse
+            {
+                userId = user.Key,
+                userResourceLocation = "users/" + user.Key,
+                token = token,
+                refreshToken = refreshToken.Token
+            };
+            return Ok(response);
+
         }
 
         [HttpPost("refresh-token")]

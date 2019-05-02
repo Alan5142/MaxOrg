@@ -22,6 +22,7 @@ export class OrgChartComponent implements OnInit,OnChanges {
       this.observable.subscribe(project => {
         this.myTree.push(project);
         this.calcLeafs(this.myTree);
+        this.treeWidth*=2;
       })
     });
   }
@@ -32,7 +33,7 @@ export class OrgChartComponent implements OnInit,OnChanges {
   calcLeafs(tree: any) {
     tree.forEach(node => {
       if (!node.subgroups || node.subgroups===[] || node.subgroups.length === 0) {
-        this.treeWidth += (node.name.length > 9) ? node.name.length * 11 + 10 : 150;
+        this.treeWidth += (node.name.length > 9) ? node.name.length * 11  : 70;
       } else {
         this.calcLeafs(node.subgroups);
       }

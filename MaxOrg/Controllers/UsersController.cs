@@ -39,8 +39,11 @@ namespace MaxOrg.Controllers
         private PasswordHasher<User> m_passwordHasher;
         private readonly IConfiguration m_configuration;
         private readonly CloudBlobContainer Container;
-        public UsersController(IConfiguration configuration, CloudBlobContainer container)
+        private readonly IArangoDatabase Database;
+        
+        public UsersController(IConfiguration configuration, CloudBlobContainer container, IArangoDatabase database)
         {
+            Database = database;
             Container = container;
             m_configuration = configuration;
             m_passwordHasher = new PasswordHasher<User>();
@@ -113,25 +116,23 @@ namespace MaxOrg.Controllers
         [HttpGet("current")]
         public async Task<IActionResult> GetCurrentUser()
         {
-            using (var db = ArangoDatabase.CreateWithSetting())
-            {
-                var user = await db.Query<User>()
-                    .Where(u => u.Key == HttpContext.User.Identity.Name)
-                    .Select(u => u)
-                    .FirstOrDefaultAsync();
+            var db = Database;
+            var user = await db.Query<User>()
+                .Where(u => u.Key == HttpContext.User.Identity.Name)
+                .Select(u => u)
+                .FirstOrDefaultAsync();
                 
-                return Ok(new
-                {
-                    user.Username,
-                    user.RealName,
-                    user.Email,
-                    user.Description,
-                    user.Birthday,
-                    user.Occupation,
-                    user.Key,
-                    ProfilePicture = $"{m_configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
-                });
-            }
+            return Ok(new
+            {
+                user.Username,
+                user.RealName,
+                user.Email,
+                user.Description,
+                user.Birthday,
+                user.Occupation,
+                user.Key,
+                ProfilePicture = $"{m_configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
+            });
         }
         
         /// <summary>
@@ -148,40 +149,38 @@ namespace MaxOrg.Controllers
                 return BadRequest(new {message = "username, password or email are empty"});
             }
 
-            using (var db = ArangoDatabase.CreateWithSetting())
+            var db = Database;
+            var query = from u in db.Query<User>()
+                where u.Username == user.Username
+                select u;
+
+            if (await query.FirstOrDefaultAsync() != null)
             {
-                var query = from u in db.Query<User>()
-                    where u.Username == user.Username
-                    select u;
-
-                if (query.Any())
-                {
-                    return Conflict(new {message = $"Username {user.Username} already exists"});
-                }
-
-                query = db.Query<User>().Where(u => u.Email == user.Email);
-                if (query.Any())
-                {
-                    return Conflict(new {message = $"Email {user.Email} already exists"});
-                }
-
-                var random = new RNGCryptoServiceProvider();
-                var salt = new byte[32];
-                random.GetBytes(salt);
-                var saltAsString = Convert.ToBase64String(salt);
-
-                var userToInsert = new User(user);
-                userToInsert.Password = m_passwordHasher.HashPassword(userToInsert, saltAsString + user.Password);
-                userToInsert.Salt = saltAsString;
-
-                var createdUser = await db.InsertAsync<User>(userToInsert);
-                return Created("api/users/" + createdUser.Key, new
-                {
-                    message = "Please, go to 'api/login' to obtain a token",
-                    user.Username,
-                    user.Email
-                });
+                return Conflict(new {message = $"Username {user.Username} already exists"});
             }
+
+            query = db.Query<User>().Where(u => u.Email == user.Email);
+            if (await query.FirstOrDefaultAsync() != null)
+            {
+                return Conflict(new {message = $"Email {user.Email} already exists"});
+            }
+
+            var random = new RNGCryptoServiceProvider();
+            var salt = new byte[32];
+            random.GetBytes(salt);
+            var saltAsString = Convert.ToBase64String(salt);
+
+            var userToInsert = new User(user);
+            userToInsert.Password = m_passwordHasher.HashPassword(userToInsert, saltAsString + user.Password);
+            userToInsert.Salt = saltAsString;
+
+            var createdUser = await db.InsertAsync<User>(userToInsert);
+            return Created("api/users/" + createdUser.Key, new
+            {
+                message = "Please, go to 'api/login' to obtain a token",
+                user.Username,
+                user.Email
+            });
         }
 
 

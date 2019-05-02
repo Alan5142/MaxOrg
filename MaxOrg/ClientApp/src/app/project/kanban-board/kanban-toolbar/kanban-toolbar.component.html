@@ -3,12 +3,18 @@
     <mat-icon>arrow_back</mat-icon>
   </button>
   <h1>Tablero</h1>
+  <div fxFlex="5"></div>
+  <button *ngIf="mediaObserver.isActive('gt-md')" mat-icon-button (click)="reload.emit($event)">
+    <mat-icon>cached</mat-icon>
+  </button>
   <div fxFlex fxLayoutAlign="end end">
-    <!-- TODO mostrar este icono solo si esta en un grupo de tarjetas-->
-    <button mat-icon-button>
+    <button mat-icon-button *ngIf="!mediaObserver.isActive('gt-md')" (click)="reload.emit($event)">
+      <mat-icon>cached</mat-icon>
+    </button>
+    <button mat-icon-button *ngIf="canEdit !== null && canEdit" (click)="createSection.emit($event)">
       <mat-icon>add</mat-icon>
     </button>
-    <button mat-icon-button>
+    <button mat-icon-button *ngIf="canEdit !== null && canEdit">
       <mat-icon>person_add</mat-icon>
     </button>
   </div>

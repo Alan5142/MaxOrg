@@ -38,6 +38,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
           return;
         }
         this.chat = chatService.getChatWithId(this.chatId).pipe(shareReplay(1));
+        this.userService.getCurrentUser().subscribe(u => console.log(u));
         this.chat.subscribe(c => this.virtualScroll.scrollToIndex(this.items.length - 1, true, 0, 0),
             error => this.router.navigate(['not-found'], {relativeTo: this.route.parent}));
       });
@@ -53,7 +54,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       this.chatService.connect(this.chatId);
       this.receiveMessages = this.chatService.observeMessages;
       this.receiveMessages.subscribe(messageReceived => {
-        console.log(':D');
         this.updateMessages();
       });
     });
