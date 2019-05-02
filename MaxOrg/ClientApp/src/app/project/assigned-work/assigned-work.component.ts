@@ -83,11 +83,11 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
     }
   }
 
-  openAssignTask() {
+  openAssignTask(groupId:string) {
     const dialogRef = this.dialog.open(AssignWorkComponent, {
       width: '250px',
       maxWidth: '400px',
-      data: null
+      data: groupId
     });
   }
 }

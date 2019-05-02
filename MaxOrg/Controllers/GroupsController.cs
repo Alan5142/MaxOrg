@@ -428,15 +428,7 @@ namespace MaxOrg.Controllers
             await Database.InsertAsync<ToDoTask>(task);
 
             // Si no referencia a un requerimiento o a una tarea terminamos, de lo contrario debemos referenciar al requerimiento
-            if (request.ReferenceRequirement == null && request.ReferenceTask == null)
-                return Created($"api/groups/{groupId}/tasks/{task.Key}", new
-                {
-                    Id = task.Key,
-                    task.Name,
-                    task.Description,
-                    task.CreationDate
-                });
-            else if (request.ReferenceRequirement != null && request.ReferenceTask == null)
+            if (request.ReferenceRequirement != null && request.ReferenceTask == null)
             {
                 // Checamos si ese requerimiento esta en algún lugar del grupo raíz, en caso de que no simplemente le decimos
                 // que se creo el requerimiento pero hubo un error con el requerimiento
