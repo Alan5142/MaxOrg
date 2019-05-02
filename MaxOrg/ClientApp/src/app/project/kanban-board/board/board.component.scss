@@ -25,12 +25,10 @@
   flex-shrink: 0;
 
   // Some extra styling to make the card list look better.
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   padding: 8px;
-}
 
-.card-list {
   // Makes it possible for the `card-list-content ` to take up the remaining space.
   display: flex;
   flex-direction: column;
@@ -46,6 +44,7 @@
     margin-top: 10px;
   }
 }
+
 
 .card-list-content {
   // Make the list scrollable and stretch it to take up the available height.
