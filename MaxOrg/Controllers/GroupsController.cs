@@ -72,24 +72,6 @@ namespace MaxOrg.Controllers
                     where u.Username == ud
                     select u;
 
-                var groupMembers = GetGroupMembers(createGroup.CurrentGroupId);
-
-                if (groupMembers.Find(u => u.Key == createGroup.SubgroupAdminId) == null)
-                {
-                    return BadRequest(new {message = "Invalid subgroup admin id"});
-                }
-
-                usersToAdd = from u in usersToAdd
-                    from um in groupMembers
-                    where u.Key == um.Key
-                    select u;
-
-                // Algunos usuarios no son validos
-                if (createGroup.Members.Count != usersToAdd.Count())
-                {
-                    return BadRequest(new {message = "Some users are invalid"});
-                }
-
                 var newGroup = new Group
                 {
                     CreationDate = currentDate,
