@@ -54,13 +54,8 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
     }
   }
   flat(toFlat){
-    var aux:group= <group>{name:"",id:0,members:[]};
-
     toFlat.forEach(group => {
-      aux.name=group.name;
-      aux.id=group.id;
-      aux.members=group.members;
-      this.adminGroupsFlat.push(aux);
+      this.adminGroupsFlat.push({name:group.name,id:group.id,members:group.members});
       this.flat(group.subgroups);
     });
     
