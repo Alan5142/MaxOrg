@@ -7,7 +7,7 @@ import {merge, Observable} from "rxjs";
 import {ChatService} from "../../services/chat.service";
 import {shareReplay} from "rxjs/operators";
 import {ChatModel} from "../../services/chat-model";
-import {UserService} from "../../../services/user.service";
+import {UserService, User} from "../../../services/user.service";
 
 @Component({
   selector: 'app-chat',
@@ -22,6 +22,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   chat: Observable<ChatModel>;
   receiveMessages: Observable<any>;
   chatId: string;
+  currentUser: Observable<User> = null;
 
   public items = Array.from({length: 100}).map((_, i) => `Item #${i}`);
 
@@ -31,6 +32,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
               private route: ActivatedRoute,
               private chatService: ChatService,
               private router: Router) {
+    this.currentUser = this.userService.getCurrentUser().pipe(shareReplay(1));
+    this.currentUser.subscribe(r => console.log(r));
     this.route.queryParamMap
       .subscribe(params => {
         this.chatId = params.get('chatId');
@@ -38,7 +41,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
           return;
         }
         this.chat = chatService.getChatWithId(this.chatId).pipe(shareReplay(1));
-        this.userService.getCurrentUser().subscribe(u => console.log(u));
         this.chat.subscribe(c => this.virtualScroll.scrollToIndex(this.items.length - 1, true, 0, 0),
             error => this.router.navigate(['not-found'], {relativeTo: this.route.parent}));
       });

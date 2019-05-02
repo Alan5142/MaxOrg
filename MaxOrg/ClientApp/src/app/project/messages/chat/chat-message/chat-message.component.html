@@ -1,8 +1,8 @@
 <div [fxFlexAlign]="selfMessage ? 'end' : 'start'"
      [ngClass]="{'other-message': !selfMessage, 'self-message': selfMessage, 'chat-message-common': true}"
-     class="speech-bubble mat-elevation-z4" style="color: black;">
+     class="speech-bubble mat-elevation-z4" style="color: black">
   <div style="top: -15px; font-weight: bold; margin: 10px 0px -5px 5px; text-align: left;">
     {{sender}}
   </div>
-  <p>{{message}}</p>
+  <p style="text-overflow: ellipsis; overflow-x: hidden; margin: 10px 10px 30px 10px">{{message}}</p>
 </div>

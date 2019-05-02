@@ -34,7 +34,7 @@
           <mat-list-item matRipple *ngFor="let groupChat of chats.groupChats" routerLink="./" [queryParams]="{chatId: groupChat.key}">
             <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
             <h5 class="no-select" mat-line style="font-weight: bold;">{{groupChat.name}}</h5>
-            <p class="no-select" mat-line *ngIf="groupChat?.messages?.length > 0">
+            <p class="no-select" mat-line *ngIf="groupChat?.messages?.length > 0" style="overflow-x: hidden">
               {{groupChat.messages[groupChat.messages.length - 1]?.remitent}}: {{groupChat.messages[groupChat.messages.length - 1]?.data}}</p>
           </mat-list-item>
         </div>
@@ -61,7 +61,7 @@
 <!-- Desktop view -->
 <div *ngIf="!mediaObserver.isActive('lt-md')">
   <mat-sidenav-container id="conversations-container">
-    <mat-sidenav mode="side" [opened]="true">
+    <mat-sidenav mode="side" [opened]="true" id="sidenav-chat-container">
       <div fxLayout="row" class="width-100">
         <div fxFlex="10"></div>
         <h3 fxFlex>Conversaciones</h3>
@@ -83,7 +83,7 @@
             <mat-list-item matRipple *ngFor="let groupChat of chats.groupChats" routerLink="./" [queryParams]="{chatId: groupChat.key}">
               <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
               <h5 class="no-select" mat-line style="font-weight: bold;">{{groupChat.name}}</h5>
-              <p class="no-select" mat-line *ngIf="groupChat?.messages?.length > 0">
+              <p class="no-select" mat-line *ngIf="groupChat?.messages?.length > 0" style="overflow-x: hidden">
                 {{groupChat.messages[groupChat.messages.length - 1].remitent}}: {{groupChat.messages[groupChat.messages.length - 1].data}}</p>
             </mat-list-item>
           </div>
