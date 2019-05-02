@@ -1,1 +1,5 @@
-<router-outlet></router-outlet>
+<div [ngClass]="{'dark-theme': theme.isDarkTheme | async}" class="height-100">
+  <div class="mat-app-background height-100 width-100">
+    <router-outlet></router-outlet>
+  </div>
+</div>

@@ -1,4 +1,6 @@
 import {Component} from '@angular/core';
+import {ThemeService} from "./services/theme.service";
+import {UserService} from "./services/user.service";
 
 @Component({
   selector: 'app-root',
@@ -7,8 +9,7 @@ import {Component} from '@angular/core';
 })
 
 export class AppComponent {
-  constructor() {
-
+  constructor(public theme: ThemeService, userService: UserService) {
     Notification.requestPermission(function (result) {
       if (result === 'granted') {
         navigator.serviceWorker.ready.then(function (registration) {

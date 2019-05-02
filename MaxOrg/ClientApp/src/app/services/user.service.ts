@@ -195,6 +195,7 @@ export class UserService {
 
   closeSession(): void {
     localStorage.clear();
+
     this.router.navigate(['/']);
   }
 

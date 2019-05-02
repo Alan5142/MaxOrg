@@ -22,7 +22,7 @@ import {
   MatRadioModule, MatRippleModule,
   MatSelectModule,
   MatSidenavModule,
-  MatSliderModule,
+  MatSliderModule, MatSlideToggleModule,
   MatSnackBarModule,
   MatStepperModule,
   MatToolbarModule
@@ -105,6 +105,7 @@ import {ImageCropperComponent} from "ngx-img-cropper";
     MatSnackBarModule,
     MatSliderModule,
     MatGridListModule,
+    MatSlideToggleModule,
     CommonComponentsModule
   ],
   bootstrap: [StartPageComponent]

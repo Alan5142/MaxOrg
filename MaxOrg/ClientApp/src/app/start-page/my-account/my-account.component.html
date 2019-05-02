@@ -16,6 +16,7 @@
   </div>
 
   <mat-divider></mat-divider>
+  <mat-slide-toggle (change)="changeTheme($event)" [checked]="theme.isDarkTheme | async">Modo oscuro</mat-slide-toggle>
   <form fxLayout="column" [formGroup]="userDataForm">
     <h2>{{currentUser === null ? '' : currentUser.username}}</h2>
 
