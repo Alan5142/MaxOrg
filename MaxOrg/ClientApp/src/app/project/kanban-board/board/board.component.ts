@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import {ActivatedRoute} from '@angular/router';
 import {KanbanBoard, KanbanCard, KanbanCardsService, KanbanGroup} from '../../../services/kanban-cards.service';
-import {merge, Observable, Subject} from 'rxjs';
+import {merge, Observable} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
 import {MatDialog, MatSnackBar} from '@angular/material';
 import {CreateCardComponent} from './create-card/create-card.component';
@@ -119,7 +119,7 @@ export class BoardComponent implements OnInit, OnDestroy {
       });
   }
 
-  private updateData() {
+  public updateData() {
     this.route.params.subscribe(params => {
       this.route.parent.parent.params.subscribe(parentParameters => {
         this.projectId = parentParameters['id'];

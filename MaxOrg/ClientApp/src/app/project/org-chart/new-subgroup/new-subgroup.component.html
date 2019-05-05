@@ -1,48 +1,48 @@
 <mat-dialog-content>
-    <h1 class="center" i18n>Nuevo Grupo</h1>
-    <mat-form-field class="center half">
-      <input [(ngModel)]="groupName" matInput placeholder="Nombre del Grupo">
-    </mat-form-field>
-    <br>
+  <h1 class="center" i18n>Nuevo Grupo</h1>
+  <mat-form-field class="center half">
+    <input [(ngModel)]="groupName" matInput placeholder="Nombre del Grupo">
+  </mat-form-field>
+  <br>
 
 
-    <mat-form-field class="center">
-      <mat-chip-list #chipList>
-        <mat-chip (removed)="remove(user)" *ngFor="let user of selectedUsers"
-                  [removable]="true" [selectable]="selectable">
-          {{user}}
-          <mat-icon matChipRemove>cancel</mat-icon>
-        </mat-chip>
-      </mat-chip-list>
-      <input #userInput (input)="valueChanged(userInput.value)"
-             [matAutocomplete]="userLists" [matChipInputFor]="chipList" placeholder="Integrantes">
-      <mat-autocomplete #userLists="matAutocomplete" (optionSelected)="userOption($event, userInput)">
-        <mat-option *ngFor="let user of autocompleteUsers" [value]="user">
-          {{user.username}}
-        </mat-option>
-      </mat-autocomplete>
-    </mat-form-field>
+  <mat-form-field class="center">
+    <mat-chip-list #chipList>
+      <mat-chip (removed)="remove(user)" *ngFor="let user of selectedUsers"
+                [removable]="true" [selectable]="selectable">
+        {{user}}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+    </mat-chip-list>
+    <input #userInput (input)="valueChanged(userInput.value)"
+           [matAutocomplete]="userLists" [matChipInputFor]="chipList" placeholder="Integrantes">
+    <mat-autocomplete #userLists="matAutocomplete" (optionSelected)="userOption($event, userInput)">
+      <mat-option *ngFor="let user of autocompleteUsers" [value]="user">
+        {{user.username}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
 
 
-    <mat-form-field class="center half">
-      <mat-chip-list #chipAdmin class="center">
-        <mat-chip (removed)="selectedAdmin=null" *ngIf="selectedAdmin!=null"
-                  [removable]="true" [selectable]="selectable">
-          {{selectedAdmin}}
-          <mat-icon matChipRemove>cancel</mat-icon>
-        </mat-chip>
-      </mat-chip-list>
-      <input #adminInput (input)="valueChanged(adminInput.value)"
-             [matAutocomplete]="adminLists" [matChipInputFor]="chipAdmin" placeholder="Administrador" *ngIf="selectedAdmin==null">
-      <mat-autocomplete #adminLists="matAutocomplete" (optionSelected)="adminSelected($event, adminInput)">
-        <mat-option *ngFor="let user of autocompleteUsers" [value]="user">
-          {{user.username}}
-        </mat-option>
-      </mat-autocomplete>
-    </mat-form-field>
+  <mat-form-field class="center half">
+    <mat-chip-list #chipAdmin class="center">
+      <mat-chip (removed)="selectedAdmin=null" *ngIf="selectedAdmin!=null"
+                [removable]="true" [selectable]="selectable">
+        {{selectedAdmin}}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+    </mat-chip-list>
+    <input #adminInput (input)="valueChanged(adminInput.value)"
+           [matAutocomplete]="adminLists" [matChipInputFor]="chipAdmin" placeholder="Administrador"
+           *ngIf="selectedAdmin==null">
+    <mat-autocomplete #adminLists="matAutocomplete" (optionSelected)="adminSelected($event, adminInput)">
+      <mat-option *ngFor="let user of autocompleteUsers" [value]="user">
+        {{user.username}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
 
 
-    <br>
-    <button (click)="createGroup()" class="center half" color="primary" mat-raised-button>Crear</button>
-  </mat-dialog-content>
-  
+  <br>
+  <button (click)="createGroup()" class="center half" color="primary" mat-raised-button>Crear</button>
+</mat-dialog-content>

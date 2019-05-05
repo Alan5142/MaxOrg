@@ -30,6 +30,10 @@ $ClientApp-theme: mat-light-theme($ClientApp-primary, $ClientApp-accent, $Client
 
 /* You can add global styles to this file, and also import other style files */
 
+// prism
+@import '~prismjs/themes/prism-okaidia.css';
+@import '~prismjs/plugins/line-numbers/prism-line-numbers.css';
+
 html, body {
   height: 100%;
   margin: 0;

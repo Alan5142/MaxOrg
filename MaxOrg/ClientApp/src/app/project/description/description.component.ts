@@ -1,7 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewChecked, Component, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {GroupsService} from '../../services/groups.service';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import {HighlightService} from "../../services/highlight.service";
 
 declare var require: any;
 
@@ -11,15 +12,26 @@ const sanitizeHtml = require('sanitize-html/dist/sanitize-html');
 @Component({
   selector: 'app-description',
   templateUrl: './description.component.html',
-  styleUrls: ['./description.component.scss']
+  styleUrls: ['./description.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
-export class DescriptionComponent implements OnInit {
+export class DescriptionComponent implements OnInit, AfterViewChecked {
   description: SafeHtml = null;
+  @ViewChild('descriptionContainer') descriptionContainer: HTMLElement;
+  shouldHighlight = false;
 
-  constructor(public route: ActivatedRoute, public group: GroupsService, private sanitizer: DomSanitizer) {
+  constructor(public route: ActivatedRoute,
+              public group: GroupsService,
+              private sanitizer: DomSanitizer,
+              private highlighter: HighlightService) {
+  }
 
+  ngOnInit() {
     marked.setOptions({
       renderer: new marked.Renderer(),
+      highlight: (code, lang) => {
+        return this.highlighter.highlightCode(code, lang);
+      },
       /*highlight: function(code) {
         return require('highlight.js').highlightAuto(code).value;
       },*/
@@ -65,11 +77,16 @@ export class DescriptionComponent implements OnInit {
             'tr',
             'caption',
             'span',
-            'img'
+            'img',
+            'pre',
+            'code'
           ],
           allowedAttributes: {
             'a': ['href', 'target', 'rel'],
             'img': ['src'],
+            'span': ['class'],
+            'code': ['class'],
+            'pre': ['class', 'data-start', '*'],
             '*': ['href', 'align', 'alt', 'center', 'bgcolor', 'style']
           },
           transformTags: {
@@ -80,6 +97,16 @@ export class DescriptionComponent implements OnInit {
                 attribs.rel = 'noopener noreferrer';
               }
               return {tagName, attribs};
+            },
+            'pre': (tagName, attribs) => {
+              if (attribs.class === undefined) {
+                attribs.class = 'language- line-numbers';
+              } else {
+                attribs.class += 'language- line-numbers';
+              }
+              attribs['data-start'] = "1";
+
+              return {tagName, attribs}
             }
           },
           allowedStyles: {
@@ -96,12 +123,17 @@ export class DescriptionComponent implements OnInit {
             }
           }
         });
+        console.log(':o');
         this.description = this.sanitizer.bypassSecurityTrustHtml(cleanHtml);
+        this.shouldHighlight = true;
       });
     });
   }
 
-  ngOnInit() {
-  }
+  ngAfterViewChecked(): void {
+    if (this.shouldHighlight) {
+      setTimeout(() => this.highlighter.highlightAll(), 50);
+    }
 
+  }
 }

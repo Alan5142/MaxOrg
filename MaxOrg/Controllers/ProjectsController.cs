@@ -30,7 +30,7 @@ namespace MaxOrg.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUserProjects()
         {
-            var projects = await Database.CreateStatement<dynamic>($"LET projects = (FOR v in 1 OUTBOUND 'User/276392'" +
+            var projects = await Database.CreateStatement<dynamic>($"LET projects = (FOR v in 1 OUTBOUND 'User/{HttpContext.User.Identity.Name}'" +
                                                              $" GRAPH 'GroupUsersGraph' PRUNE v.isRoot == true FILTER" +
                                                              " v.isRoot == true return " +
                                                              "merge(v, {projectOwner: " +

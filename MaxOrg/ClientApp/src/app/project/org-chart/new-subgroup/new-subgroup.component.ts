@@ -1,7 +1,7 @@
-import { Component, Input, Inject } from '@angular/core';
-import { MatAutocompleteSelectedEvent, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { User, UserService } from 'src/app/services/user.service';
-import { GroupsService } from 'src/app/services/groups.service';
+import {Component, Inject, ViewChild} from '@angular/core';
+import {MAT_DIALOG_DATA, MatAutocompleteSelectedEvent, MatDialogRef} from '@angular/material';
+import {User, UserService} from 'src/app/services/user.service';
+import {GroupsService} from 'src/app/services/groups.service';
 
 @Component({
   selector: 'app-new-subgroup',
@@ -16,6 +16,9 @@ export class NewSubgroupComponent {
   autocompleteUsers: User[];
   subgroupAdminId:string;
   parentGroupId:string;
+
+  @ViewChild('adminInput') adminInput: HTMLInputElement;
+
   constructor(public dialogRef: MatDialogRef<NewSubgroupComponent>,
               private userService: UserService,
               private groupService: GroupsService,
@@ -37,8 +40,8 @@ export class NewSubgroupComponent {
       console.log(returnPromise);
       returnPromise.subscribe(r => this.dialogRef.close());
     })
-   
-   
+
+
   }
 
   /**
