@@ -7,7 +7,7 @@ import {merge, Observable} from "rxjs";
 import {ChatService} from "../../services/chat.service";
 import {shareReplay} from "rxjs/operators";
 import {ChatModel} from "../../services/chat-model";
-import {UserService, User} from "../../../services/user.service";
+import {User, UserService} from "../../../services/user.service";
 
 @Component({
   selector: 'app-chat',
@@ -24,8 +24,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   chatId: string;
   currentUser: Observable<User> = null;
 
-  public items = Array.from({length: 100}).map((_, i) => `Item #${i}`);
-
   constructor(public mediaObserver: MediaObserver,
               public location: Location,
               public userService: UserService,
@@ -41,7 +39,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
           return;
         }
         this.chat = chatService.getChatWithId(this.chatId).pipe(shareReplay(1));
-        this.chat.subscribe(c => this.virtualScroll.scrollToIndex(this.items.length - 1, true, 0, 0),
+        this.chat.subscribe(c => this.virtualScroll.scrollToIndex(c.messages.length - 1, true, 0, 0),
             error => this.router.navigate(['not-found'], {relativeTo: this.route.parent}));
       });
   }
@@ -49,6 +47,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   updateMessages() {
     const newMessages = this.chatService.getChatWithId(this.chatId).pipe(shareReplay(1));
     this.chat = merge(this.chat, newMessages);
+    this.chat.subscribe(c => this.virtualScroll.scrollToIndex(c.messages.length - 1, true, 0, 0));
   }
 
   ngOnInit() {

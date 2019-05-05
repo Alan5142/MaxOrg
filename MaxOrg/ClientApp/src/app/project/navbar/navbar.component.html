@@ -71,12 +71,8 @@
         <mat-icon matListIcon>description</mat-icon>
         Posts
       </mat-list-item>
-      <mat-list-item routerLink="members">
-        <mat-icon matListIcon>group</mat-icon>
-        Integrantes
-      </mat-list-item>
       <mat-list-item routerLink="org-chart">
-        <mat-icon matListIcon>group_work</mat-icon>
+        <mat-icon matListIcon>group</mat-icon>
         Subgrupos
       </mat-list-item>
       <mat-list-item routerLink="calendar">
@@ -118,6 +114,8 @@
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
-    <router-outlet></router-outlet>
+    <div class="height-100">
+      <router-outlet></router-outlet>
+    </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

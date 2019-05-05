@@ -30,7 +30,10 @@
 .self-message {
   float: right;
   min-width: 150px;
-  max-width: 300px;
+  max-width: 400px;
+  @media only screen and (max-width: 959px) {
+    max-width: 85%;
+  }
   position: relative;
   background: #c9ffbf;
   border-radius: .4em;

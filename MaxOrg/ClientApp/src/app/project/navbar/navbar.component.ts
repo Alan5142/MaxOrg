@@ -1,6 +1,6 @@
 import {ChangeDetectorRef, Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {MediaMatcher} from '@angular/cdk/layout';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {MatIconRegistry} from '@angular/material';
 import {DomSanitizer} from '@angular/platform-browser';
 import {GroupInfo, GroupsService} from "../../services/groups.service";
@@ -28,6 +28,7 @@ export class NavbarComponent implements OnInit {
               private groupsService: GroupsService,
               private router: ActivatedRoute,
               private userService: UserService,
+              private navRouter: Router,
               public mediaObserver: MediaObserver) {
     iconRegistry.addSvgIcon(
       'github',
@@ -40,6 +41,10 @@ export class NavbarComponent implements OnInit {
 
     this.router.paramMap.subscribe(params => {
       this.projectInfo = this.groupsService.getGroupInfo(params.get('id')).pipe(shareReplay(1));
+      this.projectInfo.subscribe(() => {}, error => {
+        console.log(error);
+        this.navRouter.navigate(['/start-page/not-found']);
+      })
     });
   }
 

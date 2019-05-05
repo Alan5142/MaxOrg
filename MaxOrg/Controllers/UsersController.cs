@@ -1,16 +1,13 @@
-﻿using ArangoDB.Client;
-using FluentFTP;
-using MaxOrg.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using ArangoDB.Client;
+using MaxOrg.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage.Blob;
 
@@ -408,46 +405,5 @@ namespace MaxOrg.Controllers
         }
         
         #endregion
-
-        [HttpPost("hola")]
-        public async Task<IActionResult> UploadFile(IFormFile file)
-        {
-            FtpClient client = new FtpClient("23.96.107.129");
-            client.Credentials = new NetworkCredential("maxorgftp", "AlanManuel123");
-            client.Connect();
-
-            try
-            {
-                var stream = file.OpenReadStream();
-                await client.UploadAsync(stream, $"/files/{file.FileName}");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.InnerException.Message);
-                throw;
-            }
-            
-
-            return Ok();
-        }
-
-        [HttpGet("hola/{nombre}")]
-        public async Task<IActionResult> GetFile(string nombre)
-        {
-            FtpClient client = new FtpClient("23.96.107.129");
-            client.Credentials = new NetworkCredential("maxorgftp", "AlanManuel123");
-            client.Connect();
-
-            try
-            {
-                var stream = await client.OpenReadAsync($"/files/{nombre}");
-                return Ok(stream);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.InnerException.Message);
-                throw;
-            }
-        }
     }
 }
