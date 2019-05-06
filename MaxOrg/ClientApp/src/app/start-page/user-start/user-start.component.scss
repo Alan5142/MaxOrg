@@ -9,6 +9,13 @@
   height: 100%;
 }
 
+.projects-card {
+  max-height: 400px;
+  @media only screen and (min-width: 960px) {
+    width: 25%;
+  }
+}
+
 .ghost-lines {
   h2, h3, p {
 

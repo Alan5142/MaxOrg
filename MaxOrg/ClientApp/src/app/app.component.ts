@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {ThemeService} from "./services/theme.service";
 import {UserService} from "./services/user.service";
+import {SwPush} from "@angular/service-worker";
 
 @Component({
   selector: 'app-root',
@@ -9,11 +10,11 @@ import {UserService} from "./services/user.service";
 })
 
 export class AppComponent {
-  constructor(public theme: ThemeService, userService: UserService) {
+  constructor(public theme: ThemeService, userService: UserService, private push: SwPush) {
     Notification.requestPermission(function (result) {
       if (result === 'granted') {
         navigator.serviceWorker.ready.then(function (registration) {
-          registration.showNotification('Notification with ServiceWorker');
+          console.log('Succesfully registered service worker');
         });
       }
     });

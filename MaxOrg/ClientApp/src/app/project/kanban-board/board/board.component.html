@@ -14,7 +14,7 @@
 </mat-menu>
 <div *ngIf="groups | async;else loading">
   <div cdkDropListGroup [cdkDropListGroupDisabled]="!(board | async)?.canEdit" class="board">
-    <div class="card-list mat-elevation-z5 card-holder" ngClass="" ngClass.lt-md="card-mobile"
+    <div class="card-list mat-elevation-z5 card-holder"
          *ngFor="let group of groups | async">
       <div cdkDragHandle fxLayout="row">
         <h2 class="mat-h2">{{group.name}}

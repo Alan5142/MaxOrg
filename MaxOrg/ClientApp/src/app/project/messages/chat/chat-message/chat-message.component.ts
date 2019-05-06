@@ -18,9 +18,6 @@ export class ChatMessageComponent implements OnInit {
 
   ngOnInit() {
     console.log('self: ' + this.selfMessage);
-    this.userService.getCurrentUser().subscribe(u => {
-      this.selfMessage = u.username === this.sender;
-    })
   }
 
 }

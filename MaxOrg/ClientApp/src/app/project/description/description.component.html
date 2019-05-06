@@ -1,4 +1,5 @@
-<div #descriptionContainer *ngIf="description; else loading" [innerHtml]="description" id="description-container">
+<div #descriptionContainer *ngIf="description; else loading" id="description-container" [innerHtml]="description">
+
 </div>
 
 <ng-template #loading>

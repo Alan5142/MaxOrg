@@ -9,7 +9,7 @@
 
     <!-- Set this to true if you enable server-side prerendering -->
     <BuildServerSideRenderer>false</BuildServerSideRenderer>
-    <LangVersion>8</LangVersion>
+    <LangVersion>7.3</LangVersion>
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
@@ -33,6 +33,10 @@
 
   <ItemGroup>
     <Folder Include="Database\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\services\prism-include.ts" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

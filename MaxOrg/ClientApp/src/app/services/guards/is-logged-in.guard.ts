@@ -2,12 +2,13 @@ import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs';
 import {UserService} from '../user.service';
+import {NotificationService} from "../notification.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class IsLoggedInGuard implements CanActivate {
-  constructor(private userService: UserService, private router: Router) {
+  constructor(private userService: UserService, private router: Router, private notification: NotificationService) {
   }
 
   canActivate(
@@ -18,8 +19,16 @@ export class IsLoggedInGuard implements CanActivate {
       if (!isLoggedIn) {
         this.router.navigate(['/start']);
       }
+      if (!this.notification.connected) {
+        this.notification.connect();
+      }
       return true;
     } else {
+      isLoggedIn.subscribe(isLoggedIn => {
+        if (isLoggedIn && !this.notification.connected) {
+          this.notification.connect();
+        }
+      });
       return isLoggedIn;
     }
   }

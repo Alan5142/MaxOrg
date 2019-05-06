@@ -1,15 +1,14 @@
-﻿using ArangoDB.Client;
-using MaxOrg.Hubs;
-using MaxOrg.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ArangoDB.Client;
+using MaxOrg.Hubs;
+using MaxOrg.Models;
 using MaxOrg.Models.Requirements;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Internal;
 
 namespace MaxOrg.Controllers
@@ -29,28 +28,21 @@ namespace MaxOrg.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetUserProjects()
+        public async Task<IActionResult> GetUserProjects()
         {
-            using (var db = ArangoDatabase.CreateWithSetting())
+            var projects = await Database.CreateStatement<dynamic>($"LET projects = (FOR v in 1 OUTBOUND 'User/{HttpContext.User.Identity.Name}'" +
+                                                             $" GRAPH 'GroupUsersGraph' PRUNE v.isRoot == true FILTER" +
+                                                             " v.isRoot == true return " +
+                                                             "merge(v, {projectOwner: " +
+                                                             "DOCUMENT(CONCAT('User/', v.groupOwner)).username}))" +
+                                                             @"FOR p in projects
+                return {name: p.name, projectOwner: p.projectOwner, id: p._key}")
+                .ToListAsync();
+
+            return Ok(new
             {
-                var traversal = db.Traverse<Group, UsersInGroup>(new TraversalConfig
-                {
-                    StartVertex = "User/" + HttpContext.User.Identity.Name,
-                    GraphName = "GroupUsersGraph",
-                    Direction = EdgeDirection.Outbound,
-                    MinDepth = 1
-                });
-                var projects = from g in traversal.Visited.Vertices
-                    from u in db.Query<User>()
-                    where g.IsRoot && g.GroupOwner == u.Key
-                    select new
-                    {
-                        g.Name,
-                        Id = g.Key,
-                        ProjectOwner = u.Username
-                    };
-                return Ok(new {projects});
-            }
+                projects
+            });
         }
 
         [HttpPost]

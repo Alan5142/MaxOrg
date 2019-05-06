@@ -1,4 +1,9 @@
-﻿using ArangoDB.Client;
+﻿using System;
+using System.IO.Compression;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using ArangoDB.Client;
 using MaxOrg.Hubs;
 using MaxOrg.Services.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,20 +12,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using shortid;
-using System;
-using System.IO.Compression;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
+using shortid;
 
 namespace MaxOrg
 {
@@ -140,7 +140,7 @@ namespace MaxOrg
                 });
 
             // In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/dist"; });
+            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/dist/ClientApp"; });
 
             // Configure ArangoDB settings, to instantiate an object to communicate with Arango
             ArangoDatabase.ChangeSetting(settings =>

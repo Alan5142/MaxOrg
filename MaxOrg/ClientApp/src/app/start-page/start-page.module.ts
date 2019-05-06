@@ -10,7 +10,8 @@ import {
   MatDatepickerModule,
   MatDialogModule,
   MatExpansionModule,
-  MatFormFieldModule, MatGridListModule,
+  MatFormFieldModule,
+  MatGridListModule,
   MatIconModule,
   MatInputModule,
   MatListModule,
@@ -19,10 +20,12 @@ import {
   MatOptionModule,
   MatProgressBarModule,
   MatProgressSpinnerModule,
-  MatRadioModule, MatRippleModule,
+  MatRadioModule,
+  MatRippleModule,
   MatSelectModule,
   MatSidenavModule,
-  MatSliderModule, MatSlideToggleModule,
+  MatSliderModule,
+  MatSlideToggleModule,
   MatSnackBarModule,
   MatStepperModule,
   MatToolbarModule
@@ -43,7 +46,7 @@ import {ServicesModule} from '../services/services.module';
 import {GithubLoginComponent} from './github-login/github-login.component';
 import {NotFoundComponent} from './not-found/not-found.component';
 import {CommonComponentsModule} from "../common-components/common-components.module";
-import {ImageCropperComponent} from "ngx-img-cropper";
+import {ImageCropperModule} from "ngx-img-cropper";
 
 @NgModule({
   providers: [],
@@ -66,8 +69,7 @@ import {ImageCropperComponent} from "ngx-img-cropper";
     TodosComponent,
     RegisterComponent,
     GithubLoginComponent,
-    NotFoundComponent,
-    ImageCropperComponent
+    NotFoundComponent
   ],
   imports: [
     CommonModule,
@@ -106,7 +108,8 @@ import {ImageCropperComponent} from "ngx-img-cropper";
     MatSliderModule,
     MatGridListModule,
     MatSlideToggleModule,
-    CommonComponentsModule
+    CommonComponentsModule,
+    ImageCropperModule
   ],
   bootstrap: [StartPageComponent]
 })
