@@ -17,18 +17,11 @@ steps:
   displayName: 'Install Node.js'
 
 - script: |
-    npm uninstall -g angular-cli
-    npm cache clean or npm cache verify (if npm > 5)
-    npm install -g @angular/cli@latest
+    npm install -g @angular/cli
   displayName: 'npm install angular cli'
 
-- script: dotnet publish --configuration Release -o bin/release/publish
+- script: dotnet publish --configuration Release -o $(build.artifactstagingdirectory)
   displayName: 'Build MaxOrg'
-
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: 'bin/release/publish'
-    TargetFolder: '$(build.artifactstagingdirectory)'
   
 - task: PublishBuildArtifacts@1    
   displayName: 'Publish Artifact: drop'
