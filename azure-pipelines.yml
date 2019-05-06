@@ -22,11 +22,9 @@ steps:
 
 - script: dotnet build
   displayName: 'Build MaxOrg'
-  
-- task: AzureWebApp@1
+
+- task: PublishBuildArtifacts@1
   inputs:
-    azureSubscription: 'Azure para estudiantes(2f221f4a-0c67-4193-bdc6-8c67c4e2e3f3)'
-    appType: 'webApp'
-    appName: 'maxorg'
-    package: '$(System.DefaultWorkingDirectory)/**/*.zip'
-    deploymentMethod: 'auto'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/WebApp'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
