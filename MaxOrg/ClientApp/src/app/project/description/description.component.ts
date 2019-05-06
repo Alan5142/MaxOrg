@@ -132,7 +132,8 @@ export class DescriptionComponent implements OnInit, AfterViewChecked {
 
   ngAfterViewChecked(): void {
     if (this.shouldHighlight) {
-      setTimeout(() => this.highlighter.highlightAll(), 50);
+      this.shouldHighlight = false;
+      this.highlighter.highlightAll()
     }
 
   }

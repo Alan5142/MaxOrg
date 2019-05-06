@@ -1,21 +1,17 @@
-﻿using ArangoDB.Client;
-using MaxOrg.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using ArangoDB.Client;
 using MaxOrg.Hubs;
 using MaxOrg.Hubs.Clients;
+using MaxOrg.Models;
 using MaxOrg.Models.Kanban;
 using MaxOrg.Models.Tasks;
-using MaxOrg.Utility;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.EntityFrameworkCore.Scaffolding.Internal;
 
 namespace MaxOrg.Controllers
 {
@@ -334,7 +330,7 @@ namespace MaxOrg.Controllers
         public async Task<IActionResult> CreateCardInSection(string groupId, string boardId, string sectionId,
             [FromBody] CreateKanbanCardInSectionRequest cardInfo)
         {
-            using var db = Database;
+            var db = Database;
             var group = await (from g in db.Query<Group>()
                 where g.Key == groupId
                 select g).FirstOrDefaultAsync();
@@ -486,7 +482,7 @@ namespace MaxOrg.Controllers
         public async Task<IActionResult> MoveCard(string groupId, string boardId, string sectionId, string cardId,
             [FromBody] MoveKanbanCardRequest moveKanbanCardRequest)
         {
-            using var db = ArangoDatabase.CreateWithSetting();
+            var db = Database;
             // obtenemos el grupo y verificamos si existe
             var group = await (from g in db.Query<Group>()
                 where g.Key == groupId
@@ -869,7 +865,7 @@ namespace MaxOrg.Controllers
         /// </returns>
         private async Task<bool> IsGroupAdmin(string currentGroup, string userId)
         {
-            using var db = Database;
+            var db = Database;
             var graph = db.Graph("GroupUsersGraph");
 
             var user = await (from u in db.Query<User>()
