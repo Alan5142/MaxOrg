@@ -14,7 +14,7 @@ export class AppComponent {
     Notification.requestPermission(function (result) {
       if (result === 'granted') {
         navigator.serviceWorker.ready.then(function (registration) {
-          registration.showNotification('Notification with ServiceWorker');
+          console.log('Succesfully registered service worker');
         });
       }
     });
