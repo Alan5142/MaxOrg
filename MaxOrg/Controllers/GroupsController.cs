@@ -254,14 +254,15 @@ namespace MaxOrg.Controllers
             }
 
             var kanbanBoards = (from kb in @group.KanbanBoards
-                where kb.Members.Find(km => km.UserId == HttpContext.User.Identity.Name) != null && kb.Id == boardId
+                where kb.Members.Find(km => km.UserId == HttpContext.User.Identity.Name) != null
                 select @group.KanbanBoards).FirstOrDefault();
             if (kanbanBoards == null)
             {
                 return NotFound();
             }
 
-            var kanbanBoard = kanbanBoards.FirstOr(null);
+            var kanbanBoard = kanbanBoards.Find(kb => kb.Id == boardId);
+            
             if (kanbanBoard == null)
             {
                 return NotFound();
