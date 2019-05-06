@@ -2,7 +2,7 @@ import {AfterViewChecked, Component, OnInit, ViewChild, ViewEncapsulation} from 
 import {ActivatedRoute} from '@angular/router';
 import {GroupsService} from '../../services/groups.service';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
-import {HighlightService} from "../../services/highlight.service";
+import {HighlightService} from '../../services/highlight.service';
 
 declare var require: any;
 
