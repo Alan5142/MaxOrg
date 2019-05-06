@@ -1,4 +1,5 @@
 # Node.js with Angular
+
 # Build a Node.js project that uses Angular.
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
@@ -21,5 +22,12 @@ steps:
 
 - script: dotnet build
   displayName: 'Build MaxOrg'
-
-
+  
+- task: AzureRmWebAppDeployment@4
+  displayName: 'Upload to azure'
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'Azure para estudiantes(2f221f4a-0c67-4193-bdc6-8c67c4e2e3f3)'
+    appType: 'webApp'
+    WebAppName: 'maxorg'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
