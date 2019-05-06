@@ -20,8 +20,13 @@ steps:
     npm install -g @angular/cli
   displayName: 'npm install angular cli'
 
-- script: dotnet build
+- script: dotnet publish --configuration Release -o bin/release/publish
   displayName: 'Build MaxOrg'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: 'bin/release/publish'
+    TargetFolder: '$(build.artifactstagingdirectory)'
   
 - task: PublishBuildArtifacts@1    
   displayName: 'Publish Artifact: drop'
