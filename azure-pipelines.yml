@@ -24,9 +24,9 @@ steps:
   displayName: 'Build MaxOrg'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Publish app'
   inputs:
     command: 'publish'
     publishWebProjects: true
     feedsToUse: 'select'
     versioningScheme: 'off'
-    workingDirectory: '$(Build.ArtifactStagingDirectory)/WebApp'
