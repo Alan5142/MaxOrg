@@ -11,11 +11,12 @@ import {SwPush} from "@angular/service-worker";
 
 export class AppComponent {
   constructor(public theme: ThemeService, userService: UserService, private push: SwPush) {
-    Notification.requestPermission(function (result) {
-      if (result === 'granted') {
-        navigator.serviceWorker.ready.then(function (registration) {
-          console.log('Succesfully registered service worker');
-        });
+    navigator.serviceWorker.ready.then(registration => {
+      console.log('Succesfully registered service worker');
+    });
+    Notification.requestPermission().then((result) => {
+      if (result === "denied") {
+        alert('Puedes activar las notificaciones en la configuración de tu navegador');
       }
     });
   }
