@@ -23,8 +23,10 @@ steps:
 - script: dotnet build
   displayName: 'Build MaxOrg'
 
-- task: PublishBuildArtifacts@1
+- task: DotNetCoreCLI@2
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/WebApp'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+    command: 'publish'
+    publishWebProjects: true
+    feedsToUse: 'select'
+    versioningScheme: 'off'
+    workingDirectory: '$(Build.ArtifactStagingDirectory)/WebApp'
