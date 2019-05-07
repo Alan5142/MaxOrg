@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.AspNetCore.WebSockets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -119,7 +120,9 @@ namespace MaxOrg
                             // If the request is for our hub...
                             var path = context.HttpContext.Request.Path;
                             if (!string.IsNullOrEmpty(accessToken) &&
-                                (path.StartsWithSegments("/notification-hub") || path.StartsWithSegments("/chat-hub")))
+                                (path.StartsWithSegments("/notification-hub") || 
+                                 path.StartsWithSegments("/chat-hub") ||
+                                 path.StartsWithSegments("/kanban-hub")))
                             {
                                 // Read the token out of the query string
                                 context.Token = accessToken;
@@ -192,6 +195,9 @@ namespace MaxOrg
                 options.Providers.Add<GzipCompressionProvider>();
                 options.EnableForHttps = true;
             });
+            services.AddWebSockets(configure =>
+            {
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -223,11 +229,12 @@ namespace MaxOrg
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
+            app.UseWebSockets();
             app.UseSignalR(routes =>
             {
                 routes.MapHub<NotificationHub>("/notification-hub");
-                routes.MapHub<ChatHub>("/chat-hub");
                 routes.MapHub<KanbanHub>("/kanban-hub");
+                routes.MapHub<ChatHub>("/chat-hub");
             });
 
             app.UseMvc(routes =>

@@ -9,6 +9,7 @@ export interface KanbanCard {
   id: string;
   title: string;
   description: string;
+  detailedDescription: string;
   creationDate: Date;
 }
 
@@ -17,11 +18,6 @@ export interface KanbanGroup {
   name: string;
   cards: KanbanCard[];
   color?: string;
-}
-
-export interface KanbanGroupMember {
-  username: string;
-  id: string;
 }
 
 export enum KanbanMemberPermissions {
@@ -33,6 +29,7 @@ export enum KanbanMemberPermissions {
 export interface KanbanGroupMember {
   userId: string;
   memberPermissions: KanbanMemberPermissions;
+  user?: string;
 }
 
 export interface KanbanBoard {
@@ -42,6 +39,7 @@ export interface KanbanBoard {
   members: KanbanGroupMember[];
   kanbanGroups: KanbanGroup[];
   canEdit: boolean;
+  isAdmin: boolean;
 }
 
 export interface KanbanBoardDescription {
@@ -114,5 +112,17 @@ export class KanbanCardsService {
       previousIndex: previousIndex,
       newIndex: newIndex
     })
+  }
+
+  deleteCard(groupId: string, boardId: string, sectionId: string, cardId: string) {
+    return this.http.delete(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/sections/${sectionId}/cards/${cardId}`);
+  }
+
+  updateCard(groupId: string, boardId: string, sectionId: string, cardId: string, card: KanbanCard) {
+    return this.http.patch(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/sections/${sectionId}/cards/${cardId}`, card);
+  }
+
+  addMembersToKanban(groupId: string, boardId: string, newMembers: KanbanGroupMember[]) {
+    return this.http.post(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/members`, {newMembers: newMembers});
   }
 }

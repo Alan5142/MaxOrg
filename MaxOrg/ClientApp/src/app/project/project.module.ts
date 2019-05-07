@@ -2,14 +2,16 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ProjectComponent} from './project.component';
 import {
-  GestureConfig, MatBadgeModule,
-  MatButtonModule, MatButtonToggleModule,
-  MatCardModule,
+  GestureConfig,
   MatAutocompleteModule,
+  MatBadgeModule,
+  MatButtonModule,
+  MatButtonToggleModule,
+  MatCardModule,
   MatCheckboxModule,
+  MatChipsModule,
   MatDialogModule,
   MatDividerModule,
-  MatChipsModule,
   MatExpansionModule,
   MatFormFieldModule,
   MatGridListModule,
@@ -19,11 +21,13 @@ import {
   MatMenuModule,
   MatPaginatorModule,
   MatProgressBarModule,
-  MatProgressSpinnerModule, MatRadioModule,
+  MatProgressSpinnerModule,
+  MatRadioModule,
   MatRippleModule,
   MatSelectModule,
   MatSidenavModule,
-  MatSlideToggleModule, MatSnackBarModule,
+  MatSlideToggleModule,
+  MatSnackBarModule,
   MatSortModule,
   MatTableModule,
   MatTabsModule,
@@ -75,13 +79,16 @@ import {CreateTestDialogComponent} from './tests/create-test/create-test-dialog/
 import {CreateReportDialogComponent} from './tests/record/create-report-dialog/create-report-dialog.component';
 import {ReportsComponent} from './tests/reports/reports.component';
 import {ChatService} from "./services/chat.service";
-import { NodeComponent } from './org-chart/tree/node/node.component';
-import { NewSubgroupComponent } from './org-chart/new-subgroup/new-subgroup.component';
-import { EditRequirementComponent } from './requirements/edit-requirement/edit-requirement.component';
-import { RemoveRequirementComponent } from './requirements/remove-requirement/remove-requirement.component';
-import { EditSectionComponent } from './kanban-board/board/edit-section/edit-section.component';
-import { CreateSectionComponent } from './kanban-board/board/create-section/create-section.component';
-import { DeleteSectionComponent } from './kanban-board/board/delete-section/delete-section.component';
+import {NodeComponent} from './org-chart/tree/node/node.component';
+import {NewSubgroupComponent} from './org-chart/new-subgroup/new-subgroup.component';
+import {EditRequirementComponent} from './requirements/edit-requirement/edit-requirement.component';
+import {RemoveRequirementComponent} from './requirements/remove-requirement/remove-requirement.component';
+import {EditSectionComponent} from './kanban-board/board/edit-section/edit-section.component';
+import {CreateSectionComponent} from './kanban-board/board/create-section/create-section.component';
+import {DeleteSectionComponent} from './kanban-board/board/delete-section/delete-section.component';
+import {CardDetailedComponent} from './kanban-board/board/card-detailed/card-detailed.component';
+import {CardDeleteComponent} from './kanban-board/board/card-delete/card-delete.component';
+import {ModifyMembersComponent} from './kanban-board/modify-members/modify-members.component';
 
 @NgModule({
   entryComponents: [
@@ -100,7 +107,10 @@ import { DeleteSectionComponent } from './kanban-board/board/delete-section/dele
     RemoveRequirementComponent,
     CreateSectionComponent,
     EditSectionComponent,
-    DeleteSectionComponent
+    DeleteSectionComponent,
+    CardDetailedComponent,
+    CardDeleteComponent,
+    ModifyMembersComponent
   ],
   imports: [
     CommonModule,
@@ -188,7 +198,10 @@ import { DeleteSectionComponent } from './kanban-board/board/delete-section/dele
     RemoveRequirementComponent,
     EditSectionComponent,
     CreateSectionComponent,
-    DeleteSectionComponent
+    DeleteSectionComponent,
+    CardDetailedComponent,
+    CardDeleteComponent,
+    ModifyMembersComponent
   ],
   bootstrap: [
     ProjectComponent

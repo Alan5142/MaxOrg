@@ -1,5 +1,6 @@
 <app-kanban-toolbar (reload)="updateData()"
                     (createSection)="createSection()"
+                    (members)="showMembers()"
                     [canEdit]="(board | async)?.canEdit"></app-kanban-toolbar>
 <mat-menu #sectionMenu="matMenu">
   <ng-template let-group="group" matMenuContent>
@@ -39,7 +40,7 @@
            [id]="group.id"
            [cdkDropListData]="group.cards"
            (cdkDropListDropped)="onTaskDrop($event)" [ngStyle]="{'background-color': group.color}">
-        <mat-card style="margin: 2%;" *ngFor="let task of group.cards; trackBy: trackUsingId" cdkDrag (click)="print()">
+        <mat-card style="margin: 2%;" *ngFor="let task of group.cards; trackBy: trackUsingId" cdkDrag (click)="showDetailedInfo(task, group)">
           <mat-card-content>
             <h2>{{task.title}}</h2>
             <p>{{task.description}}</p>
