@@ -243,11 +243,11 @@ export class BoardComponent implements OnInit, OnDestroy {
           if (value !== undefined) {
             console.log(board.members);
             this.kanbanService.addMembersToKanban(this.projectId, this.boardId, board.members).subscribe(() => {
-              this.snackBar.open('Se modificaron con exito los miembros del grupo', 'OK');
+              this.snackBar.open('Se modificaron con exito los miembros del grupo', 'OK', {duration: 2000});
               this.updateData();
             }, error => {
               console.log(error);
-              this.snackBar.open('No se pudieron modificar los miembros del grupo', 'OK');
+              this.snackBar.open('No se pudieron modificar los miembros del grupo', 'OK', {duration: 2000});
               this.updateData();
             });
           }

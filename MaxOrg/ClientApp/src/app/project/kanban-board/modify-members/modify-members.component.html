@@ -13,7 +13,7 @@
                *ngIf="member.memberPermissions === KanbanMemberPermissions.Admin">
       </mat-form-field>
       <mat-form-field *ngIf="member.memberPermissions !== KanbanMemberPermissions.Admin">
-        <mat-select [value]="member.memberPermissions" [disabled]="!data.canEdit">
+        <mat-select [(ngModel)]="member.memberPermissions" [disabled]="!data.canEdit">
           <mat-option [value]="KanbanMemberPermissions.Read">Leer</mat-option>
           <mat-option [value]="KanbanMemberPermissions.Write">Escribir</mat-option>
         </mat-select>
@@ -53,6 +53,6 @@
 </div>
 <div mat-dialog-actions align="end">
   <button mat-button cdkFocusInitial [mat-dialog-close]="">CANCELAR</button>
-  <button mat-flat-button color="accent" *ngIf="data.canEdit" [mat-dialog-close]="{update: true}">GUARDAR</button>
+  <button mat-flat-button color="accent" *ngIf="data.canEdit" [mat-dialog-close]="{update: true, members: data.members}">GUARDAR</button>
   <button mat-flat-button color="primary" [mat-dialog-close]="">CERRAR</button>
 </div>
