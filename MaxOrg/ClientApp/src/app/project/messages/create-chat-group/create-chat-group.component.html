@@ -1,0 +1,45 @@
+<h1 mat-dialog-title>
+  Crear nuevo grupo
+</h1>
+<div mat-dialog-content>
+  <form fxLayout="column" [formGroup]="formGroup">
+    <mat-form-field>
+      <input matInput type="text" formControlName="chatName">
+      <mat-label>Nombre del grupo</mat-label>
+      <mat-error *ngIf="formGroup.get('chatName')?.errors?.required">Este campo es requerido</mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="example-chip-list">
+      <mat-chip-list #chipList>
+        <mat-chip
+          *ngFor="let member of addedMembers"
+          [selectable]="true"
+          [removable]="true"
+          (removed)="removeMember(member.key)">
+          {{member.username}}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+        <input
+          placeholder="Agregar miembro..."
+          #memberInput
+          [formControl]="membersControl"
+          [matAutocomplete]="auto"
+          [matChipInputFor]="chipList"
+          [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+          [matChipInputAddOnBlur]="true"
+          (matChipInputTokenEnd)="addMember($event)">
+      </mat-chip-list>
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+        <mat-option *ngFor="let member of filteredMembers" [value]="member.username">
+          {{member.username}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+
+
+  </form>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button cdkFocusInitial [mat-dialog-close]="">CANCELAR</button>
+  <button mat-flat-button color="primary" (click)="sendData()">CREAR</button>
+</div>
