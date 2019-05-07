@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
 import {ChatModel, GetUserChatsResponse} from "./chat-model";
-import {HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel} from "@aspnet/signalr";
+import {HubConnection, HubConnectionBuilder, LogLevel} from "@aspnet/signalr";
 import {UserService} from "../../services/user.service";
 import {from, Observable} from "rxjs";
 
@@ -55,8 +55,13 @@ export class ChatService {
       });
   }
 
-  createChat(chatName: string) {
-
+  createChat(chatName: string, projectId: string, projectMembers: string[], isGroup: boolean) {
+    return this.http.post(`${environment.apiUrl}chats`, {
+        name: chatName,
+        projectId: projectId,
+        members: projectMembers,
+        isGroup: isGroup
+    });
   }
 
   getChatWithId(chatId: string) {

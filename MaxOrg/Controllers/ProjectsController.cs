@@ -138,7 +138,6 @@ namespace MaxOrg.Controllers
                     {
                         Read = false,
                         Message = notificationMessage,
-                        // TODO checar prioridad
                         Priority = NotificationPriority.Medium,
                         Context = $"project/{createdGroup.Key}"
                     };
@@ -203,6 +202,32 @@ namespace MaxOrg.Controllers
                 };
                 return Ok(returnMessage);
             }
+        }
+
+        [HttpGet("{projectId}/members")]
+        public async Task<IActionResult> GetAllProjectMembers(string projectId)
+        {
+            var users = await Database.CreateStatement<User>($@"
+                            FOR g in 0..10000 ANY 'Group/{projectId}' Graph 'SubgroupGraph' 
+                                FOR c in 1 INBOUND g._id GRAPH 'GroupUsersGraph'
+                                    return DISTINCT c").ToListAsync();
+
+            if (users.Find(u => u.Key == HttpContext.User.Identity.Name) == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new
+            {
+                Members = users.Select(u => new
+                {
+                    u.Key,
+                    u.Description,
+                    u.Username,
+                    u.Birthday,
+                    u.Email
+                })
+            });
         }
 
         private GroupHierarchy[] GetSubgroupHierarchy(string projectId)
