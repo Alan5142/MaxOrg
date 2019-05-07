@@ -19,7 +19,6 @@ export class ModifyMembersComponent implements OnInit {
   }
 
   addUser(username: string, memberPermissions: KanbanMemberPermissions) {
-
     if (this.data.members.findIndex(value => {
       return value.user === username;
     }) !== -1) {
