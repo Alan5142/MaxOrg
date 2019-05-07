@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {MatAutocompleteSelectedEvent, MatDialogRef} from '@angular/material';
 import {User, UserService} from '../../services/user.service';
 import {ProjectsService} from '../../services/projects.service';
+import {shareReplay} from "rxjs/operators";
 
 
 @Component({
@@ -39,7 +40,7 @@ export class NewProjectComponent {
 
   valueChanged(value: string) {
     if (value.length > 2) {
-      this.userService.getUsersByName(value, 7).subscribe(users => {
+      this.userService.getUsersByName(value, 7).pipe(shareReplay(1)).subscribe(users => {
         this.autocompleteUsers = users;
         const index = this.autocompleteUsers.findIndex(user => user.key === localStorage.getItem('userId'));
         if (index >= 0) {

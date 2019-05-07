@@ -10,6 +10,11 @@ import {EditSectionComponent} from './edit-section/edit-section.component';
 import {CreateSectionComponent} from './create-section/create-section.component';
 import {DeleteSectionComponent} from "./delete-section/delete-section.component";
 import * as signalR from "@aspnet/signalr";
+import {CardDetailedComponent} from "./card-detailed/card-detailed.component";
+import {MediaObserver} from "@angular/flex-layout";
+import {ModifyMembersComponent} from "../modify-members/modify-members.component";
+import {UserService} from "../../../services/user.service";
+import {GroupsService} from "../../../services/groups.service";
 
 @Component({
   selector: 'app-board',
@@ -20,6 +25,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   connection: signalR.HubConnection;
   projectId: string;
   boardId: string;
+  canEdit: boolean;
 
   board: Observable<KanbanBoard> = null;
   groups: Observable<KanbanGroup[]> = null;
@@ -27,7 +33,10 @@ export class BoardComponent implements OnInit, OnDestroy {
   constructor(private kanbanService: KanbanCardsService,
               private route: ActivatedRoute,
               private snackBar: MatSnackBar,
-              private dialog: MatDialog) {
+              private dialog: MatDialog,
+              private userService: UserService,
+              private groupService: GroupsService,
+              private mediaObserver: MediaObserver) {
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl('/kanban-hub', {accessTokenFactory: () => localStorage.getItem('token')})
       .configureLogging(signalR.LogLevel.None)
@@ -79,11 +88,11 @@ export class BoardComponent implements OnInit, OnDestroy {
         newContainerId,
         newIndex)
         .subscribe(_ => {
-        this.updateData()
-      }, error => {
-        this.updateData();
-        this.snackBar.open('No se pudo mover', 'OK', {duration: 2000});
-      });
+          this.updateData()
+        }, error => {
+          this.updateData();
+          this.snackBar.open('No se pudo mover', 'OK', {duration: 2000});
+        });
     }
   }
 
@@ -91,7 +100,8 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.connection.stop().then(() => {});
+    this.connection.stop().then(() => {
+    });
   }
 
   getKanbanGroups(): Observable<KanbanGroup[]> {
@@ -129,6 +139,8 @@ export class BoardComponent implements OnInit, OnDestroy {
         } else {
           this.board = merge(this.board, this.kanbanService.getBoardData(this.projectId, this.boardId).pipe(shareReplay(1)));
         }
+
+        this.board.subscribe(b => this.canEdit = b.canEdit);
 
         this.groups = this.board.pipe(shareReplay(1)).pipe(map<KanbanBoard, KanbanGroup[]>(result => {
           return result.kanbanGroups;
@@ -186,7 +198,61 @@ export class BoardComponent implements OnInit, OnDestroy {
     });
   }
 
-  print() {
-    console.log('Clicked');
+  showDetailedInfo(task: KanbanCard, group: KanbanGroup) {
+    console.log('open');
+
+    const dialog = this.dialog.open(CardDetailedComponent, {
+      data: {
+        task: task,
+        canEdit: this.canEdit
+      },
+      width: this.mediaObserver.isActive('lt-md') ? '95%' : '60%'
+    });
+    dialog.afterClosed().subscribe(modifyOptions => {
+      if (modifyOptions !== undefined && modifyOptions.shouldDelete) {
+        this.kanbanService.deleteCard(this.projectId, this.boardId, group.id, task.id).subscribe(ok => {
+          this.updateData();
+          this.snackBar.open('Tarjeta eliminada con exito', 'OK', {duration: 2000});
+        }, error => {
+          this.snackBar.open('No se pudo eliminar la tarjeta', 'OK', {duration: 2000});
+        });
+      } else if (this.canEdit && modifyOptions !== undefined && modifyOptions.shouldModify) {
+        this.kanbanService.updateCard(this.projectId, this.boardId, group.id, task.id, task).subscribe(ok => {
+          this.updateData();
+        }, error => {
+        })
+      } else {
+        this.updateData();
+      }
+    });
+  }
+
+  showMembers() {
+    this.groupService.getMembers(this.projectId).pipe(shareReplay(1)).subscribe(groupMembers => {
+      const observable = this.board.pipe(shareReplay(1)).subscribe(board => {
+        const modifyMembersDialog = this.dialog.open(ModifyMembersComponent, {
+          data: {
+            members: board.members,
+            canEdit: board.isAdmin,
+            groupMembers: groupMembers.members
+          },
+          maxHeight: '50%',
+        });
+        modifyMembersDialog.afterClosed().subscribe((value) => {
+          observable.unsubscribe();
+          if (value !== undefined) {
+            console.log(board.members);
+            this.kanbanService.addMembersToKanban(this.projectId, this.boardId, board.members).subscribe(() => {
+              this.snackBar.open('Se modificaron con exito los miembros del grupo', 'OK');
+              this.updateData();
+            }, error => {
+              console.log(error);
+              this.snackBar.open('No se pudieron modificar los miembros del grupo', 'OK');
+              this.updateData();
+            });
+          }
+        });
+      });
+    });
   }
 }

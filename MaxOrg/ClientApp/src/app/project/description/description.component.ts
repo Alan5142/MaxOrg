@@ -3,11 +3,8 @@ import {ActivatedRoute} from '@angular/router';
 import {GroupsService} from '../../services/groups.service';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {HighlightService} from '../../services/highlight.service';
-
-declare var require: any;
-
-const marked = require('marked/marked.min');
-const sanitizeHtml = require('sanitize-html/dist/sanitize-html');
+import * as marked from 'marked/marked.min';
+import * as sanitizeHtml from 'sanitize-html/dist/sanitize-html';
 
 @Component({
   selector: 'app-description',

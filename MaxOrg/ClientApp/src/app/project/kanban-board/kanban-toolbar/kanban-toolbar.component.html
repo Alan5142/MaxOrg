@@ -14,8 +14,8 @@
     <button mat-icon-button *ngIf="canEdit !== null && canEdit" (click)="createSection.emit($event)">
       <mat-icon>add</mat-icon>
     </button>
-    <button mat-icon-button *ngIf="canEdit !== null && canEdit">
-      <mat-icon>person_add</mat-icon>
+    <button mat-icon-button (click)="members.emit($event)">
+      <mat-icon>group</mat-icon>
     </button>
   </div>
 </mat-toolbar>

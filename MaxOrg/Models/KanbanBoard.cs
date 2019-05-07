@@ -1,13 +1,9 @@
-﻿using ArangoDB.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Drawing;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using shortid;
+using ArangoDB.Client;
 using MaxOrg.Models.Kanban;
+using shortid;
 
 namespace MaxOrg.Models
 {
@@ -22,14 +18,22 @@ namespace MaxOrg.Models
         /// alfanúmericos
         /// </summary>
         public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 20);
+
         /// <summary>
         /// Titulo de la tarjeta, proporciona a los usuarios un titulo con el nombre de la actividad a desempeñar
         /// </summary>
-        public string Title { get; set; }
+        public string Title { get; set; } = "";
+
         /// <summary>
-        /// Descripción detallada de la tarjeta, proporciona información más detallada de la tarjeta
+        /// Descripción pequeña de la tarjeta, proporciona una breve descripción de la actividad
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
+
+        /// <summary>
+        /// Descripción detallada de la tarjeta, propociona a detalle la actividad
+        /// </summary>
+        public string DetailedDescription { get; set; } = "";
+
         /// <summary>
         /// Fecha de creación de la tarjeta
         /// </summary>
@@ -48,14 +52,17 @@ namespace MaxOrg.Models
         /// caracteres
         /// </summary>
         public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 20);
+
         /// <summary>
         /// Nombre de la sección de tarjetas, ayuda a los usuarios a identificar la función de determinada sección de tarjetas
         /// </summary>
         public string Name { get; set; }
+
         /// <summary>
         /// Tarjetas pertenecientes a una sección 
         /// </summary>
         public List<KanbanCard> Cards { get; set; } = new List<KanbanCard>();
+
         /// <summary>
         /// Color de la sección, es personalizable por el usuario.
         /// </summary>
@@ -93,18 +100,22 @@ namespace MaxOrg.Models
         /// Identificador del tablero, consiste en caracteres alfanúmericos y tiene una longitud de 20 caracteres
         /// </summary>
         public string Id { get; set; } = ShortId.Generate(useNumbers: true, useSpecial: false, 20);
+
         /// <summary>
         /// Nombre del tablero, ayuda al usuario a determinar que tipo de tarjetas se encontrará en su interior.
         /// </summary>
         public string Name { get; set; }
+
         /// <summary>
         /// Identificadores unicos de los usuarios que pertenecen a determinado tablero
         /// </summary>
         public List<KanbanGroupMember> Members { get; set; } = new List<KanbanGroupMember>();
+
         /// <summary>
         /// Secciones de un tablero, estas secciones son las que almacenan las tarjetas
         /// </summary>
         public List<KanbanCardSection> KanbanGroups { get; set; } = new List<KanbanCardSection>();
+
         /// <summary>
         /// Fecha de creación del tablero
         /// </summary>
@@ -120,7 +131,8 @@ namespace MaxOrg.Models
         /// <summary>
         /// Nombre con el que se creará el nuevo grupo de tarjetas
         /// </summary>
-        [Required] public string Name { get; set; }
+        [Required]
+        public string Name { get; set; }
     }
 
     /// <summary>
@@ -134,6 +146,7 @@ namespace MaxOrg.Models
         /// Nombre de la tarjeta
         /// </summary>
         public string Name { get; set; }
+
         /// <summary>
         /// Descripción de la tarjeta
         /// </summary>

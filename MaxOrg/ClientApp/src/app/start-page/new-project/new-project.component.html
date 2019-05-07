@@ -7,7 +7,7 @@
   <mat-form-field class="center">
     <mat-chip-list #chipList>
       <mat-chip (removed)="remove(user)" *ngFor="let user of selectedUsers"
-                [removable]="true" [selectable]="selectable">
+                [removable]="true" [selectable]="true">
         {{user}}
         <mat-icon matChipRemove>cancel</mat-icon>
       </mat-chip>

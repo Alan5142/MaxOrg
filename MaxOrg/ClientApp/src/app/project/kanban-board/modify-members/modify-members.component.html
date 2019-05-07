@@ -1,0 +1,58 @@
+<h1 mat-dialog-title>
+  Miembros
+</h1>
+<div mat-dialog-content>
+  <div fxLayout="column" class="width-100">
+    <div class="width-100" *ngFor="let member of data.members; index as i" fxLayout="row">
+      <img [src]="member.profilePicture" class="member-image">
+      <mat-form-field [ngClass]="{'width-100': member.memberPermissions === KanbanMemberPermissions.Admin}"
+                      [color]="member.memberPermissions === KanbanMemberPermissions.Admin ? 'primary' : 'accent'">
+        <input matInput disabled [value]="member.user"
+               *ngIf="member.memberPermissions !== KanbanMemberPermissions.Admin">
+        <input class="width-100" matInput disabled [value]="member.user"
+               *ngIf="member.memberPermissions === KanbanMemberPermissions.Admin">
+      </mat-form-field>
+      <mat-form-field *ngIf="member.memberPermissions !== KanbanMemberPermissions.Admin">
+        <mat-select [value]="member.memberPermissions" [disabled]="!data.canEdit">
+          <mat-option [value]="KanbanMemberPermissions.Read">Leer</mat-option>
+          <mat-option [value]="KanbanMemberPermissions.Write">Escribir</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button color="warn"
+              *ngIf="member.memberPermissions !== KanbanMemberPermissions.Admin && data.canEdit"
+              (click)="removeUser(i)"
+              mat-icon-button>
+        <mat-icon>
+          remove
+        </mat-icon>
+      </button>
+    </div>
+
+    <div class="width-100" *ngIf="data.canEdit">
+      <mat-form-field>
+        <input #user (input)="onUserNameChange($event)" matInput type="text" [matAutocomplete]="userAutocomplete">
+        <mat-autocomplete #userAutocomplete="matAutocomplete">
+          <mat-option *ngFor="let member of filterList" [value]="member.username">{{member.username}}</mat-option>
+        </mat-autocomplete>
+        <mat-label>Nombre de usuario</mat-label>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Permisos</mat-label>
+        <mat-select #select>
+          <mat-option [value]="KanbanMemberPermissions.Read">Leer</mat-option>
+          <mat-option [value]="KanbanMemberPermissions.Write">Escribir</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button color="primary" mat-icon-button (click)="addUser(user.value, select.value); user.value = ''; select.value = ''">
+        <mat-icon>
+          add
+        </mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button cdkFocusInitial [mat-dialog-close]="">CANCELAR</button>
+  <button mat-flat-button color="accent" *ngIf="data.canEdit" [mat-dialog-close]="{update: true}">GUARDAR</button>
+  <button mat-flat-button color="primary" [mat-dialog-close]="">CERRAR</button>
+</div>

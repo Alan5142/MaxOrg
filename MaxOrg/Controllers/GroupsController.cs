@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Configuration;
 
 namespace MaxOrg.Controllers
 {
@@ -23,13 +24,20 @@ namespace MaxOrg.Controllers
     [ApiController]
     public class GroupsController : ControllerBase
     {
-        private readonly IArangoDatabase Database;
-        private readonly IHubContext<KanbanHub, IKanbanClient> KanbanHub;
+        private IArangoDatabase Database { get; }
+        private IHubContext<KanbanHub, IKanbanClient> KanbanHub { get; }
+        private IHubContext<NotificationHub> NotificationHub { get; }
+        private IConfiguration Configuration { get; }
 
-        public GroupsController(IArangoDatabase database, IHubContext<KanbanHub, IKanbanClient> kanbanHub)
+        public GroupsController(IArangoDatabase database,
+            IHubContext<KanbanHub, IKanbanClient> kanbanHub,
+            IHubContext<NotificationHub> notificationHub,
+            IConfiguration configuration)
         {
+            Configuration = configuration;
             KanbanHub = kanbanHub;
             Database = database;
+            NotificationHub = notificationHub;
         }
 
         /// <summary>
@@ -48,7 +56,7 @@ namespace MaxOrg.Controllers
                 var currentDate = DateTime.UtcNow;
 
                 // El usuario no es administrador del grupo que se planea hacer un subgrupo
-                if (!await IsGroupAdmin(createGroup.CurrentGroupId, HttpContext.User.Identity.Name))
+                if (!await IsAdmin(createGroup.CurrentGroupId))
                 {
                     return Unauthorized();
                 }
@@ -140,11 +148,11 @@ namespace MaxOrg.Controllers
                     return NotFound();
                 }
 
-                if (!await IsGroupAdmin(groupId, HttpContext.User.Identity.Name))
+                if (!await IsAdmin(groupId))
                 {
                     return Unauthorized();
                 }
-                
+
                 group.Description = newDescription.NewDescription;
                 await db.UpdateByIdAsync<Group>(group.Id, group);
             }
@@ -155,14 +163,14 @@ namespace MaxOrg.Controllers
         [HttpGet("{groupId}/description")]
         public async Task<IActionResult> GetGroupDescription(string groupId)
         {
-            var db = Database;
             var group = await GetGroup(groupId);
             if (group == null)
             {
                 return NotFound();
             }
 
-            if (GetGroupMembers(groupId).Find(u => u.Key == HttpContext.User.Identity.Name) == null)
+            if (GetGroupMembers(groupId).Find(u => u.Key == HttpContext.User.Identity.Name) == null &&
+                !await IsAdmin(groupId))
             {
                 // the user is not in the group
                 return Unauthorized();
@@ -178,7 +186,7 @@ namespace MaxOrg.Controllers
             var group = await (from g in db.Query<Group>()
                 where g.Key == groupId
                 select g).FirstOrDefaultAsync();
-            if (@group == null)
+            if (group == null)
             {
                 return NotFound();
             }
@@ -187,6 +195,33 @@ namespace MaxOrg.Controllers
 
             return Ok(new
                 {@group.Name, @group.Key, @group.GroupOwner, @group.CreationDate, @group.Description, members});
+        }
+
+        [HttpGet("{groupId}/members")]
+        public async Task<IActionResult> GetMembersOfGroup(string groupId)
+        {
+            var group = await (from g in Database.Query<Group>()
+                where g.Key == groupId
+                select g).FirstOrDefaultAsync();
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            var members = GetGroupMembers(groupId).Select(u => new
+            {
+                u.Key, 
+                u.Username,
+                ProfilePicture = $"{Configuration["AppSettings:DefaultURL"]}/api/users/{u.Key}/profile.jpeg"
+            }).ToList();
+
+            var isMemberOfGroup = members.Find(u => u.Key == HttpContext.User.Identity.Name) != null;
+            if (!isMemberOfGroup && !await IsAdmin(groupId))
+            {
+                return Unauthorized();
+            }
+            
+            return Ok(new {Members = members});
         }
 
         #region Kanban Boards
@@ -224,10 +259,15 @@ namespace MaxOrg.Controllers
             {
                 return NotFound();
             }
+
             IEnumerable<KanbanBoard> kanbanBoards = group.KanbanBoards;
-            kanbanBoards = from kb in kanbanBoards
-                where kb.Members.Find(km => km.UserId == HttpContext.User.Identity.Name) != null
-                select kb;
+            if (!await IsAdmin(groupId))
+            {
+                kanbanBoards = from kb in kanbanBoards
+                    where kb.Members.Find(km => km.UserId == HttpContext.User.Identity.Name) != null
+                    select kb;
+            }
+
             // send only names and ids
             if (kanbanBoards.Count() == 0)
             {
@@ -236,6 +276,7 @@ namespace MaxOrg.Controllers
                     boards = new List<KanbanBoard>()
                 });
             }
+
             return Ok(new
             {
                 boards = from kb in kanbanBoards
@@ -262,23 +303,124 @@ namespace MaxOrg.Controllers
             }
 
             var kanbanBoard = kanbanBoards.Find(kb => kb.Id == boardId);
-            
+
             if (kanbanBoard == null)
             {
                 return NotFound();
             }
+
+            var canEdit =
+                kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name).MemberPermissions !=
+                KanbanMemberPermissions.Read || await IsAdmin(groupId);
+            var isAdmin =
+                kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name).MemberPermissions ==
+                KanbanMemberPermissions.Admin || await IsAdmin(groupId);
+
+            var members = kanbanBoard.Members.Select(m => new
+            {
+                m.MemberPermissions,
+                User = db.Query<User>().Where(u => u.Key == m.UserId).Select(u => u).FirstOrDefault()?.Username,
+                ProfilePicture = $"{Configuration["AppSettings:DefaultURL"]}/api/users/{m.UserId}/profile.jpeg"
+            });
 
             return Ok(new
             {
                 kanbanBoard.CreationDate,
                 kanbanBoard.Id,
                 kanbanBoard.KanbanGroups,
-                kanbanBoard.Members,
+                Members = members,
                 kanbanBoard.Name,
-                CanEdit =
-                    kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name).MemberPermissions !=
-                    KanbanMemberPermissions.Read
+                CanEdit = canEdit,
+                IsAdmin = isAdmin
             });
+        }
+
+        [HttpPost("{groupId}/boards/{boardId}/members")]
+        public async Task<IActionResult> ModifyMembersToBoard(string groupId, string boardId,
+            [FromBody] ModifyKanbanMembersRequest request)
+        {
+            var db = Database;
+            var group = await (from g in db.Query<Group>() where g.Key == groupId select g).FirstOrDefaultAsync();
+            if (@group == null)
+            {
+                return NotFound();
+            }
+
+            var kanbanBoards = (from kb in @group.KanbanBoards
+                where kb.Members.Find(km => km.UserId == HttpContext.User.Identity.Name) != null
+                select @group.KanbanBoards).FirstOrDefault();
+            if (kanbanBoards == null)
+            {
+                return NotFound();
+            }
+
+            var kanbanBoard = kanbanBoards.Find(kb => kb.Id == boardId);
+
+            if (kanbanBoard == null)
+            {
+                return NotFound();
+            }
+
+            var canEdit =
+                kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name).MemberPermissions !=
+                KanbanMemberPermissions.Admin || await IsAdmin(groupId);
+            if (!canEdit)
+            {
+                return Unauthorized();
+            }
+
+            foreach (var newMember in request.NewMembers)
+            {
+                var user = Database.CreateStatement<User>($@"
+                    FOR v in 1 INBOUND 'Group/{groupId}' GRAPH 'GroupUsersGraph' 
+                    FILTER v.username == '{newMember.User}' return v").ToList().FirstOrDefault();
+                if (user == null)
+                {
+                    continue;
+                }
+
+                var exists = kanbanBoard.Members.Find(m => m.UserId == user.Key);
+
+                if (exists?.MemberPermissions == KanbanMemberPermissions.Admin)
+                {
+                    continue;
+                }
+                
+                string notificationMessage;
+
+                if (exists != null && exists.MemberPermissions != KanbanMemberPermissions.Admin) // si existe
+                {
+                    exists.MemberPermissions = newMember.MemberPermissions;
+                    notificationMessage = $"Tus permisos han cambiado en el tablero {kanbanBoard.Name}";
+                }
+                else
+                {
+                    kanbanBoard.Members.Add(new KanbanGroupMember()
+                    {
+                        MemberPermissions = newMember.MemberPermissions,
+                        UserId = user.Key
+                    });
+                    notificationMessage = $"Fuiste agregado al tablero {kanbanBoard.Name}";
+                }
+
+                var notification = new Notification
+                {
+                    Read = false,
+                    Message = notificationMessage,
+                    Priority = NotificationPriority.Low,
+                    Context = $"project/{groupId}/board/{boardId}"
+                };
+
+                user.Notifications.Add(notification);
+                await Database.UpdateByIdAsync<User>(user.Id, user);
+                await NotificationHub.Clients
+                    .Group($"Users/{user.Key}")
+                    .SendAsync("notificationReceived", notificationMessage);
+            }
+
+            await Database.UpdateByIdAsync<Group>(group.Id, group);
+            await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
+            return Ok();
         }
 
         [HttpPost("{groupId}/boards/{boardId}/sections")]
@@ -300,7 +442,7 @@ namespace MaxOrg.Controllers
             }
 
             var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
-            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
+            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read && !await IsAdmin(groupId))
             {
                 return Unauthorized();
             }
@@ -311,7 +453,7 @@ namespace MaxOrg.Controllers
             });
 
             await Database.UpdateByIdAsync<Group>(group.Id, group);
-            
+
             await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
 
             return Ok();
@@ -347,7 +489,7 @@ namespace MaxOrg.Controllers
             }
 
             var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
-            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
+            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read && !await IsAdmin(groupId))
             {
                 return Unauthorized();
             }
@@ -368,9 +510,9 @@ namespace MaxOrg.Controllers
 
             kanbanSection.Cards.Add(card);
             await db.UpdateByIdAsync<Group>(@group.Id, @group);
-            
+
             await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
-            
+
             return Ok();
         }
 
@@ -393,7 +535,7 @@ namespace MaxOrg.Controllers
             }
 
             var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
-            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
+            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read && !await IsAdmin(groupId))
             {
                 return Unauthorized();
             }
@@ -411,7 +553,7 @@ namespace MaxOrg.Controllers
             kanbanSection.Color = request.Color ?? kanbanSection.Color;
 
             await Database.UpdateByIdAsync<Group>(group.Id, group);
-            
+
             await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
 
             return Ok();
@@ -435,13 +577,13 @@ namespace MaxOrg.Controllers
             }
 
             var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
-            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
+            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read && !await IsAdmin(groupId))
             {
                 return Unauthorized();
             }
 
             var kanbanSection = (from ks in kanbanBoard.KanbanGroups
-                where ks.Id == sectionId 
+                where ks.Id == sectionId
                 select ks).FirstOrDefault();
 
             if (kanbanSection == null)
@@ -451,12 +593,136 @@ namespace MaxOrg.Controllers
 
             kanbanBoard.KanbanGroups.RemoveAll(ks => ks.Id == sectionId);
             await Database.UpdateByIdAsync<Group>(group.Id, group);
-            
+
             await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
-            
+
             return Ok();
         }
-        
+
+        [HttpDelete("{groupId}/boards/{boardId}/sections/{sectionId}/cards/{cardId}")]
+        public async Task<IActionResult> DeleteCard(string groupId, string boardId, string sectionId, string cardId)
+        {
+            var group = await (from g in Database.Query<Group>()
+                where g.Key == groupId
+                select g).FirstOrDefaultAsync();
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            var kanbanBoard = (from kb in @group.KanbanBoards where kb.Id == boardId select kb).FirstOrDefault();
+            if (kanbanBoard == null)
+            {
+                return NotFound();
+            }
+
+            var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
+            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read && !await IsAdmin(groupId))
+            {
+                return Unauthorized();
+            }
+
+            var kanbanSection = (from ks in kanbanBoard.KanbanGroups
+                where ks.Id == sectionId
+                select ks).FirstOrDefault();
+
+            if (kanbanSection == null)
+            {
+                return NotFound();
+            }
+
+            var card = kanbanSection.Cards.Find(c => c.Id == cardId);
+
+            if (card == null)
+            {
+                return NotFound();
+            }
+
+            kanbanSection.Cards.Remove(card);
+
+            foreach (var member in kanbanBoard.Members)
+            {
+                var user = Database.Query<User>().Where(u => u.Key == member.UserId).Select(u => u).FirstOrDefault();
+                if (user == null /* <- nunca debería pasar */ || user?.Key == HttpContext.User.Identity.Name)
+                {
+                    continue;
+                }
+
+                var notificationMessage =
+                    string.Format($"Se ha eliminado la tarjeta {card.Title} del grupo {kanbanBoard.Name}");
+
+                // enviar la notificación
+                await NotificationHub.Clients
+                    .Group($"Users/{user.Key}")
+                    .SendAsync("notificationReceived", notificationMessage);
+
+                var notification = new Notification
+                {
+                    Read = false,
+                    Message = notificationMessage,
+                    Priority = NotificationPriority.Low,
+                    Context = $"project/{groupId}/board/{boardId}"
+                };
+
+                user.Notifications.Add(notification);
+                await Database.UpdateByIdAsync<User>(user.Id, user);
+            }
+
+            Database.UpdateById<Group>(group.Id, group);
+
+            await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
+            return Ok();
+        }
+
+        [HttpPatch("{groupId}/boards/{boardId}/sections/{sectionId}/cards/{cardId}")]
+        public async Task<IActionResult> UpdateCard(string groupId, string boardId, string sectionId, string cardId,
+            KanbanCard cardNewData)
+        {
+            var group = await (from g in Database.Query<Group>()
+                where g.Key == groupId
+                select g).FirstOrDefaultAsync();
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            var kanbanBoard = (from kb in @group.KanbanBoards where kb.Id == boardId select kb).FirstOrDefault();
+            if (kanbanBoard == null)
+            {
+                return NotFound();
+            }
+
+            var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
+            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read && !await IsAdmin(groupId))
+            {
+                return Unauthorized();
+            }
+
+            var kanbanSection = (from ks in kanbanBoard.KanbanGroups
+                where ks.Id == sectionId
+                select ks).FirstOrDefault();
+
+            if (kanbanSection == null)
+            {
+                return NotFound();
+            }
+
+            var card = kanbanSection.Cards.Find(c => c.Id == cardId);
+
+            if (card == null)
+            {
+                return NotFound();
+            }
+
+            card.Title = cardNewData.Title ?? card.Title;
+            card.Description = cardNewData.Description ?? card.Description;
+            card.DetailedDescription = cardNewData.DetailedDescription ?? card.DetailedDescription;
+            await Database.UpdateByIdAsync<Group>(group.Id, group);
+
+            await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
+            return Ok();
+        }
+
         /// <summary>
         /// Mueve de sección una tarjeta
         /// </summary>
@@ -500,7 +766,7 @@ namespace MaxOrg.Controllers
             }
 
             var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
-            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
+            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read && !await IsAdmin(groupId))
             {
                 return Unauthorized();
             }
@@ -564,7 +830,7 @@ namespace MaxOrg.Controllers
             }
 
             var memberData = kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name);
-            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read)
+            if (memberData?.MemberPermissions == KanbanMemberPermissions.Read && !await IsAdmin(groupId))
             {
                 return Unauthorized();
             }
@@ -918,6 +1184,15 @@ namespace MaxOrg.Controllers
 
                 return traverse.Visited.Vertices;
             }
+        }
+
+        private async Task<bool> IsAdmin(string groupId)
+        {
+            var result = await Database.CreateStatement<bool>(
+                $@"LET isAdmin = (FOR v in 0..5000 INBOUND 'Group/{groupId}' Graph 'SubgroupGraph' 
+PRUNE v.groupOwner == '{HttpContext.User.Identity.Name}' FILTER v.groupOwner == '{HttpContext.User.Identity.Name}' return v)
+return isAdmin != []").ToListAsync();
+            return result.Count != 0 && result[0];
         }
     }
 }

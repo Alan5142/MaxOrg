@@ -21,6 +21,10 @@ export interface CreateGroupData {
   subgroupAdminId:string;
 }
 
+export interface GetGroupMembersResponse {
+  members: User[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -56,6 +60,10 @@ export class GroupsService {
     return this.http.post(environment.apiUrl + 'groups', newGroupData, {headers: headers}).pipe(map<any, boolean>(response => {
       return response;
     }));
+  }
+
+  getMembers(groupId: string): Observable<GetGroupMembersResponse> {
+    return this.http.get<GetGroupMembersResponse>(`${environment.apiUrl}groups/${groupId}/members`);
   }
 
 }
