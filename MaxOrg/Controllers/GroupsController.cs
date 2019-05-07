@@ -391,7 +391,7 @@ namespace MaxOrg.Controllers
                 
                 string notificationMessage;
 
-                if (exists?.MemberPermissions != KanbanMemberPermissions.Admin) // si existe
+                if (exists != null && exists.MemberPermissions != KanbanMemberPermissions.Admin) // si existe
                 {
                     exists.MemberPermissions = newMember.MemberPermissions;
                     notificationMessage = $"Tus permisos han cambiado en el tablero {kanbanBoard.Name}";
