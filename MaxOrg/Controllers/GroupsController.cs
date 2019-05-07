@@ -310,10 +310,10 @@ namespace MaxOrg.Controllers
             }
 
             var canEdit =
-                kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name).MemberPermissions !=
+                kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name)?.MemberPermissions !=
                 KanbanMemberPermissions.Read || await IsAdmin(groupId);
             var isAdmin =
-                kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name).MemberPermissions ==
+                kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name)?.MemberPermissions ==
                 KanbanMemberPermissions.Admin || await IsAdmin(groupId);
 
             var members = kanbanBoard.Members.Select(m => new
@@ -368,6 +368,8 @@ namespace MaxOrg.Controllers
             {
                 return Unauthorized();
             }
+            
+            List<KanbanGroupMember> newMembers = new List<KanbanGroupMember>();
 
             foreach (var newMember in request.NewMembers)
             {
@@ -383,19 +385,21 @@ namespace MaxOrg.Controllers
 
                 if (exists?.MemberPermissions == KanbanMemberPermissions.Admin)
                 {
+                    newMembers.Add(exists);
                     continue;
                 }
                 
                 string notificationMessage;
 
-                if (exists != null && exists.MemberPermissions != KanbanMemberPermissions.Admin) // si existe
+                if (exists?.MemberPermissions != KanbanMemberPermissions.Admin) // si existe
                 {
                     exists.MemberPermissions = newMember.MemberPermissions;
                     notificationMessage = $"Tus permisos han cambiado en el tablero {kanbanBoard.Name}";
+                    newMembers.Add(exists);
                 }
                 else
                 {
-                    kanbanBoard.Members.Add(new KanbanGroupMember()
+                    newMembers.Add(new KanbanGroupMember()
                     {
                         MemberPermissions = newMember.MemberPermissions,
                         UserId = user.Key
@@ -418,6 +422,8 @@ namespace MaxOrg.Controllers
                     .SendAsync("notificationReceived", notificationMessage);
             }
 
+            kanbanBoard.Members = newMembers;
+            
             await Database.UpdateByIdAsync<Group>(group.Id, group);
             await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
             return Ok();

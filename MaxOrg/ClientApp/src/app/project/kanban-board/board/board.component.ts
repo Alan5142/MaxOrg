@@ -37,21 +37,6 @@ export class BoardComponent implements OnInit, OnDestroy {
               private userService: UserService,
               private groupService: GroupsService,
               private mediaObserver: MediaObserver) {
-    this.connection = new signalR.HubConnectionBuilder()
-      .withUrl('/kanban-hub', {accessTokenFactory: () => localStorage.getItem('token')})
-      .configureLogging(signalR.LogLevel.None)
-      .build();
-
-    this.connection.on("UpdateBoard", () => {
-      this.updateData();
-    });
-
-    this.connection.start().then(() => this.connection.send('JoinGroup', {
-      groupId: this.projectId,
-      boardId: this.boardId
-    }));
-
-    this.updateData();
   }
 
   onTaskDrop(event: CdkDragDrop<any[]>) {
@@ -97,6 +82,21 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.connection = new signalR.HubConnectionBuilder()
+      .withUrl('/kanban-hub', {accessTokenFactory: () => this.userService.userToken})
+      .configureLogging(signalR.LogLevel.None)
+      .build();
+
+    this.connection.on("UpdateBoard", () => {
+      this.updateData();
+    });
+
+    this.connection.start().then(() => this.connection.send('JoinGroup', {
+      groupId: this.projectId,
+      boardId: this.boardId
+    }));
+
+    this.updateData();
   }
 
   ngOnDestroy(): void {
