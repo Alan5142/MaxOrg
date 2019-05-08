@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO.Compression;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using ArangoDB.Client;
@@ -39,7 +40,7 @@ namespace MaxOrg
 
         private void ConfigureAzure(IServiceCollection services)
         {
-            services.AddTransient<CloudBlobContainer>(provider =>
+            services.AddTransient(provider =>
             {
                 var storage = CloudStorageAccount.Parse(Configuration["AppSettings:AzureFiles:ConnectionString"]);
 
@@ -151,8 +152,8 @@ namespace MaxOrg
                 settings.Database = Configuration["AppSettings:Database:Name"];
                 settings.Url = Configuration["AppSettings:Database:Host"];
 
-                string dbUsername = Configuration["AppSettings:Database:User"];
-                string dbPassword = Configuration["AppSettings:Database:Password"];
+                var dbUsername = Configuration["AppSettings:Database:User"];
+                var dbPassword = Configuration["AppSettings:Database:Password"];
 
                 settings.Credential = new NetworkCredential(dbUsername, dbPassword);
                 settings.SystemDatabaseCredential = new NetworkCredential(dbUsername, dbPassword);
@@ -170,8 +171,9 @@ namespace MaxOrg
                 CreateCollection(db, "Subgroup", CollectionType.Edge);
                 CreateCollection(db, "UsersInGroup", CollectionType.Edge);
             }
-
-            services.AddSingleton(ArangoDatabase.CreateWithSetting());
+            
+            services.AddTransient(provider => ArangoDatabase.CreateWithSetting());
+            services.AddSingleton(new HttpClient());
 
             services.AddSingleton<IScheduledTask, RemoveExpiredTokens>();
             services.AddScheduler((sender, args) => { args.SetObserved(); });

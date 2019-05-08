@@ -1,18 +1,9 @@
-﻿using ArangoDB.Client;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
+using ArangoDB.Client;
 
-namespace MaxOrg.Models
+namespace MaxOrg.Models.Users
 {
-    public enum NotificationPreference
-    {
-        AllowEverything = 1,
-        AllowMediumAndHigh = 2,
-        AllowHigh = 3
-    }
-    
     [CollectionProperty(Naming = NamingConvention.ToCamelCase)]
     public class User
     {
@@ -57,38 +48,5 @@ namespace MaxOrg.Models
         public List<Notification> Notifications { get; set; } = new List<Notification>();
 
         public NotificationPreference NotificationPreference { get; set; } = NotificationPreference.AllowEverything;
-    }
-
-    public class UserForm
-    {
-        [StringLength(maximumLength: 20, MinimumLength = 7)]
-        [Required]
-        public string Username { get; set; }
-
-        [Required] [EmailAddress] public string Email { get; set; }
-
-        [Required]
-        [StringLength(maximumLength: 100, MinimumLength = 8)]
-        public string Password { get; set; }
-
-        public string RealName { get; set; }
-        public string Description { get; set; }
-        public string Occupation { get; set; }
-        public DateTime? Birthday { get; set; }
-    }
-
-    public class UserUpdateInfo
-    {
-        [StringLength(maximumLength: 100, MinimumLength = 8)]
-        public string Password { get; set; } = null;
-
-        public string RealName { get; set; } = null;
-        public string Description { get; set; } = null;
-        public string Occupation { get; set; } = null;
-        public DateTime? Birthday { get; set; } = null;
-
-        public IFormFile ProfilePicture { get; set; } = null;
-        
-        public string ProfilePictureAsBase64 { get; set; } = null;
     }
 }

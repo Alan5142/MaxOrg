@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ArangoDB.Client;
 using MaxOrg.Models;
+using MaxOrg.Models.Group;
 
 namespace MaxOrg.Utility
 {

@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using ArangoDB.Client;
 using MaxOrg.Models;
+using MaxOrg.Models.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,22 +14,6 @@ using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace MaxOrg.Controllers
 {
-    public class UsersQueryOptions
-    {
-        public string name { get; set; }
-        public bool? sorted { get; set; }
-        public int? limit { get; set; }
-        public int? page { get; set; }
-        public string email { get; set; }
-        public int? maxElements { get; set; }
-    }
-
-    public class NotificationQueryOptions
-    {
-        public int? Limit { get; set; }
-        public int? Page { get; set; }
-    }
-    
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -389,7 +374,7 @@ namespace MaxOrg.Controllers
         {
             using (var db = ArangoDatabase.CreateWithSetting())
             {
-                var selectedUser = await (from u in db.Query<Models.User>()
+                var selectedUser = await (from u in db.Query<Models.Users.User>()
                     where u.Key == userId
                     select u).FirstOrDefaultAsync();
                 return selectedUser;

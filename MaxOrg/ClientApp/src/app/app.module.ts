@@ -10,7 +10,6 @@ import {
   MatDialogModule,
   MatFormFieldModule,
   MatInputModule,
-  MatSlideToggleModule,
   MatToolbarModule
 } from '@angular/material';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
@@ -20,6 +19,9 @@ import {ServicesModule} from './services/services.module';
 import {ServiceWorkerModule} from '@angular/service-worker';
 import {environment} from '../environments/environment';
 import {TokenInterceptor} from "./utility/token-interceptor";
+import { SocialLoginModule, AuthServiceConfig } from "angularx-social-login";
+import { GoogleLoginProvider} from "angularx-social-login";
+
 
 @NgModule({
   declarations: [
@@ -39,6 +41,7 @@ import {TokenInterceptor} from "./utility/token-interceptor";
     ServicesModule,
     FormsModule,
     ReactiveFormsModule,
+    SocialLoginModule,
     ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production})
   ],
   providers: [
@@ -47,9 +50,24 @@ import {TokenInterceptor} from "./utility/token-interceptor";
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,
       multi: true
+    },
+    {
+      provide: AuthServiceConfig,
+      useFactory: provideConfig
     }
   ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
+}
+
+let config = new AuthServiceConfig([
+  {
+    id: GoogleLoginProvider.PROVIDER_ID,
+    provider: new GoogleLoginProvider("495753764174-kr5o676hqpcqlpb40a7m2a92v7614hst.apps.googleusercontent.com")
+  }
+]);
+
+export function provideConfig() {
+  return config;
 }

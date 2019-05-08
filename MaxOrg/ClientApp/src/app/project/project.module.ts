@@ -91,6 +91,7 @@ import {CardDeleteComponent} from './kanban-board/board/card-delete/card-delete.
 import {ModifyMembersComponent} from './kanban-board/modify-members/modify-members.component';
 import {CreateChatGroupComponent} from './messages/create-chat-group/create-chat-group.component';
 
+
 @NgModule({
   entryComponents: [
     ProjectComponent,

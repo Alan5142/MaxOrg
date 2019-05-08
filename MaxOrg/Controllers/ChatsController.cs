@@ -6,6 +6,8 @@ using ArangoDB.Client;
 using MaxOrg.Graphs;
 using MaxOrg.Hubs;
 using MaxOrg.Models;
+using MaxOrg.Models.Group;
+using MaxOrg.Models.Users;
 using MaxOrg.Requests.Chat;
 using MaxOrg.Utility;
 using Microsoft.AspNetCore.Authorization;
