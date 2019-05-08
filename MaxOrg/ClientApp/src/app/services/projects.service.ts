@@ -110,4 +110,8 @@ export class ProjectsService {
       {description: newDescription},
       {headers: headers});
   }
+
+  getAllUsersOfProject(projectOrGroupId: string): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}projects/${projectOrGroupId}/members`);
+  }
 }

@@ -89,6 +89,8 @@ import {DeleteSectionComponent} from './kanban-board/board/delete-section/delete
 import {CardDetailedComponent} from './kanban-board/board/card-detailed/card-detailed.component';
 import {CardDeleteComponent} from './kanban-board/board/card-delete/card-delete.component';
 import {ModifyMembersComponent} from './kanban-board/modify-members/modify-members.component';
+import {CreateChatGroupComponent} from './messages/create-chat-group/create-chat-group.component';
+
 
 @NgModule({
   entryComponents: [
@@ -110,7 +112,8 @@ import {ModifyMembersComponent} from './kanban-board/modify-members/modify-membe
     DeleteSectionComponent,
     CardDetailedComponent,
     CardDeleteComponent,
-    ModifyMembersComponent
+    ModifyMembersComponent,
+    CreateChatGroupComponent
   ],
   imports: [
     CommonModule,
@@ -201,7 +204,8 @@ import {ModifyMembersComponent} from './kanban-board/modify-members/modify-membe
     DeleteSectionComponent,
     CardDetailedComponent,
     CardDeleteComponent,
-    ModifyMembersComponent
+    ModifyMembersComponent,
+    CreateChatGroupComponent
   ],
   bootstrap: [
     ProjectComponent

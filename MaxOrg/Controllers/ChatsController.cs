@@ -6,7 +6,10 @@ using ArangoDB.Client;
 using MaxOrg.Graphs;
 using MaxOrg.Hubs;
 using MaxOrg.Models;
+using MaxOrg.Models.Group;
+using MaxOrg.Models.Users;
 using MaxOrg.Requests.Chat;
+using MaxOrg.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -28,10 +31,13 @@ namespace MaxOrg.Controllers
         /// Contiene los datos del Hub SignalR del chat, el hub de chat nos permite mantener una comunicación en tiempo real entre el cliente y el servidor
         /// </summary>
         private readonly IHubContext<ChatHub> _chatHub;
+
         /// <summary>
         /// Contiene los datos del Hub SignalR de las notificaciones, con esto podemos enviar una notificación en caso de que un usuario haya sido agregado a un chat
         /// </summary>
         private readonly IHubContext<NotificationHub> _notificationHub;
+
+        private IArangoDatabase Database { get; }
 
         /// <summary>
         /// Constructor de ChatsController, recibe dos parametros, uno de ellos es una referencia al ChatHub de SignalR y el otro una referencia
@@ -39,12 +45,14 @@ namespace MaxOrg.Controllers
         /// </summary>
         /// <param name="chatHub"></param>
         /// <param name="notificationHub"></param>
-        public ChatsController(IHubContext<ChatHub> chatHub, IHubContext<NotificationHub> notificationHub)
+        public ChatsController(IHubContext<ChatHub> chatHub, IHubContext<NotificationHub> notificationHub,
+            IArangoDatabase database)
         {
+            Database = database;
             _chatHub = chatHub;
             _notificationHub = notificationHub;
         }
-        
+
         /// <summary>
         /// Obtiene los chats a los que pertenece un usuario en determinado proyecto.
         /// Lo que hace el método es conectarse a la base de datos y buscar al usuario actual, si no existe entonces devuelve un código HTTP 404, en caso de que exista
@@ -55,26 +63,26 @@ namespace MaxOrg.Controllers
         [HttpGet]
         public async Task<IActionResult> GetIdentifiedUserChats([FromQuery] string projectId)
         {
-            using (var db = ArangoDatabase.CreateWithSetting())
+            // Buscamos al usuario
+            var user = await Database.Query<User>()
+                .Where(u => u.Key == HttpContext.User.Identity.Name)
+                .Select(u => u).FirstOrDefaultAsync();
+
+            // Si es nulo entonces retornamos un "NotFound" (Http 404)
+            if (user == null)
             {
-                // Buscamos al usuario
-                var user = await db.Query<User>()
-                    .Where(u => u.Key == HttpContext.User.Identity.Name)
-                    .Select(u => u).FirstOrDefaultAsync();
-                
-                // Si es nulo entonces retornamos un "NotFound" (Http 404)
-                if (user == null)
-                {
-                    return NotFound();
-                }
-                
-                // Busqueda en la base de datos que obtiene los chats grupales a los que pertenece un usuario
-                var groupChats = await db.CreateStatement<Chat>(@"
+                return NotFound();
+            }
+
+            var rootGroup = await Database.GetRootGroup(projectId);
+
+            // Busqueda en la base de datos que obtiene los chats grupales a los que pertenece un usuario
+            var groupChats = await Database.CreateStatement<Chat>(@"
                     LET chat = (FOR c in 1..1 INBOUND" + $"'{user.Id}'" + @"
                      GRAPH 'ChatsUsersGraph'
                      return c)
                      FOR c in chat
-                     FILTER c.isGroup == true FILTER c.projectId == " + $"'{projectId}'" + @"
+                     FILTER c.isGroup == true FILTER c.projectId == " + $"'{rootGroup.Key}'" + @"
                     
                     LET messages = (
                     FOR m in c.messages
@@ -85,13 +93,13 @@ namespace MaxOrg.Controllers
                     return MERGE(c, {messages: messages})
                 ").ToListAsync();
 
-                // Busqueda en la base de datos que obtiene los chats individuales a los que pertenece un usuario
-                var pairChats = await db.CreateStatement<Chat>(@"
+            // Busqueda en la base de datos que obtiene los chats individuales a los que pertenece un usuario
+            var pairChats = await Database.CreateStatement<Chat>(@"
                     LET chat = (FOR c in 1..1 INBOUND" + $"'{user.Id}'" + @"
                      GRAPH 'ChatsUsersGraph'
                      return c)
                      FOR c in chat
-                     FILTER c.isGroup == false FILTER c.projectId == " + $"'{projectId}'" + @"
+                     FILTER c.isGroup == false FILTER c.projectId == " + $"'{rootGroup.Key}'" + @"
                     
                     LET messages = (
                     FOR m in c.messages
@@ -101,12 +109,11 @@ namespace MaxOrg.Controllers
                     )
                     return MERGE(c, {messages: messages})
                 ").ToListAsync();
-                
-                // Devolvemos un "Ok" (Http 200) junto con los chats grupales y los chats entre 2 personas
-                return Ok(new{groupChats, pairChats});
-            }
+
+            // Devolvemos un "Ok" (Http 200) junto con los chats grupales y los chats entre 2 personas
+            return Ok(new {groupChats, pairChats});
         }
-        
+
         /// <summary>
         /// Crea un chat con los integrantes y el nombre que desee el usuario, además de especificar si es un chat grupal o uno individual.
         /// Este método recibe un solo parametro, que es el modelo de la petición Http, el modelo esta definido anteriormente, la acción que realiza esté método es
@@ -134,19 +141,22 @@ namespace MaxOrg.Controllers
                 {
                     return BadRequest();
                 }
+
+                var rootGroup = await Database.GetRootGroup(request.ProjectId);
                 
                 var chat = new Chat
                 {
                     Name = request.Name,
                     Messages = new List<Message>(),
                     IsGroup = request.IsGroup,
-                    ProjectId = request.ProjectId
+                    ProjectId = rootGroup.Key
                 };
 
-                var usersInChatGraph = db.Graph("ChatsUsersGraph");
-                
                 var createdChat = await db.InsertAsync<Chat>(chat);
                 
+                var usersInChatGraph = db.Graph("ChatsUsersGraph");
+
+
                 var userToAdd = new ChatMembers
                 {
                     Chat = createdChat.Id,
@@ -156,25 +166,40 @@ namespace MaxOrg.Controllers
                 await usersInChatGraph.InsertEdgeAsync<ChatMembers>(userToAdd);
                 var notificationMessage =
                     $"${user.Username} te ha agregado al chat ${chat.Name} en el proyecto ${group.Name}";
+                
                 foreach (var userId in request.Members)
                 {
+                    var memberUser = Database.Query<User>().Where(u => u.Key == userId).Select(u => u).FirstOrDefault();
+                    
+                    
                     userToAdd = new ChatMembers
                     {
                         Chat = createdChat.Id,
                         User = $"User/{userId}"
                     };
-                    
+
                     await usersInChatGraph.InsertEdgeAsync<ChatMembers>(userToAdd);
-                    
+
                     await _notificationHub.Clients
                         .Group($"User/{userId}")
                         .SendAsync("notificationReceived", notificationMessage);
+                    
+                    var notification = new Notification
+                    {
+                        Read = false,
+                        Message = notificationMessage,
+                        Priority = NotificationPriority.Medium,
+                        Context = $"project/{rootGroup.Key}/messages"
+                    };
+                    
+                    memberUser?.Notifications.Add(notification);
+                    await db.UpdateByIdAsync<User>(memberUser?.Id, memberUser);
                 }
 
                 return Ok();
             }
         }
-        
+
         /// <summary>
         /// Obtiene los datos de determinado chat a través del identificador de ese chat, este método verifica que el usuario que desea acceder a esos datos
         /// pertenezca al chat, para eso realiza un recorrido por medio de grafos, en caso de que no pertenezca regresa un código HTTP 404, por lo contrario,
@@ -205,8 +230,8 @@ namespace MaxOrg.Controllers
                                 return MERGE(m, {remitent: u.username})
                             )
                     return MERGE(c, {messages: messages})"
-                ).ToListAsync()).Select(c => new{c.Key, c.Name, c.Messages, c.IsGroup, c.Description, c.ProjectId});
-                
+                ).ToListAsync()).Select(c => new {c.Key, c.Name, c.Messages, c.IsGroup, c.Description, c.ProjectId});
+
                 var traversalResult = await db.TraverseAsync<User, Chat>(new TraversalConfig
                 {
                     StartVertex = chat.Id,
@@ -247,11 +272,11 @@ namespace MaxOrg.Controllers
                     Type = MessageType.Text,
                     Data = request.Message,
                     Remitent = HttpContext.User.Identity.Name,
-                    Date =  DateTime.UtcNow
+                    Date = DateTime.UtcNow
                 });
 
                 await _chatHub.Clients.Group(chat.Id).SendAsync("receiveMessage", request.Message);
-                
+
                 await db.UpdateByIdAsync<Chat>(chat.Id, chat);
                 return Ok();
             }
@@ -292,7 +317,7 @@ namespace MaxOrg.Controllers
                 var group = await db.Query<Chat>()
                     .Where(c => c.Key == chatId)
                     .Select(c => c).FirstOrDefaultAsync();
-                
+
                 if (group == null)
                 {
                     return NotFound();
@@ -309,10 +334,9 @@ namespace MaxOrg.Controllers
                 var chats = traversalResult.Visited.Vertices;
 
                 var users = chats.Select(u => new {u.Key, u.Username});
-                
+
                 return Ok(users);
             }
         }
-
     }
 }

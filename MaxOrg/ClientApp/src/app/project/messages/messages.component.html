@@ -1,6 +1,6 @@
 <!-- Contextual menus -->
 <mat-menu #messages="matMenu">
-  <button mat-menu-item>
+  <button mat-menu-item (click)="createGroup()">
     <mat-icon>group</mat-icon>
     Nuevo grupo
   </button>
@@ -70,13 +70,6 @@
         </button>
       </div>
       <mat-list>
-        <h3 mat-subheader>Con el administrador</h3>
-        <mat-list-item matRipple routerLink="./" [queryParams]="{chatId: 1}">
-          <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
-          <h5 class="no-select" mat-line style="font-weight: bold;">Nombre del admin</h5>
-          <p class="no-select" mat-line>Ultimo mensaje</p>
-        </mat-list-item>
-        <mat-divider></mat-divider>
         <h3 mat-subheader>Grupos</h3>
         <div>
           <div *ngIf="chats | async as chats">
@@ -87,7 +80,6 @@
                 {{groupChat.messages[groupChat.messages.length - 1].remitent}}: {{groupChat.messages[groupChat.messages.length - 1].data}}</p>
             </mat-list-item>
           </div>
-
         </div>
         <mat-divider></mat-divider>
         <h3 mat-subheader>Conversaciones</h3>

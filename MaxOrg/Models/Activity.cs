@@ -17,6 +17,6 @@ namespace MaxOrg.Models
 
         public DateTime CreationDate { get; set; } = DateTime.UtcNow;
 
-        public short CompletedPercentaget { get; set; } = 0;
+        public short CompletedPercentage { get; set; } = 0;
     }
 }

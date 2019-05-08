@@ -4,6 +4,7 @@ using ArangoDB.Client;
 using MaxOrg.Hubs.Clients;
 using MaxOrg.Hubs.Requests;
 using MaxOrg.Models;
+using MaxOrg.Models.Group;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 

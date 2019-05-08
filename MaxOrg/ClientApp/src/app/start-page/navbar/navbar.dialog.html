@@ -30,11 +30,14 @@
 
     <div fxLayout="column" fxLayoutGap="15px">
       <h1 fxLayoutAlign="center" i18n mat-dialog-title>O utiliza una cuenta</h1>
-      <button i18n mat-raised-button>
+
+      <button i18n mat-raised-button (click)="googleLogin()">
         <img class="social-logo-img"
              src="/images/logos/google-logo-icon.png">
         Cuenta de Google
       </button>
+
+
       <button (click)="githubLogin()" class="github-logo-button" i18n mat-raised-button><img class="social-logo-img"
                                                                                              src="/images/logos/GitHub-Mark-Light-64px.png">
         Cuenta de Github

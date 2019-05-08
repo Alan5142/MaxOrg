@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using Octokit;
 using System;
@@ -24,15 +25,19 @@ namespace MaxOrg.Controllers
     public class LoginController : ControllerBase
     {
         private IConfiguration Configuration { get; }
-        private readonly PasswordHasher<Models.User> m_passwordHasher;
+        private readonly PasswordHasher<Models.Users.User> m_passwordHasher;
         private static readonly HttpClient client = new HttpClient();
         private readonly IArangoDatabase Database;
+        private HttpClient HttpClient { get; }
+        private CloudBlobContainer Container { get; }
 
-        public LoginController(IConfiguration configuration, IArangoDatabase database)
+        public LoginController(IConfiguration configuration, IArangoDatabase database, HttpClient httpClient, CloudBlobContainer container)
         {
+            Container = container;
+            HttpClient = httpClient;
             Database = database;
             Configuration = configuration;
-            m_passwordHasher = new PasswordHasher<Models.User>();
+            m_passwordHasher = new PasswordHasher<Models.Users.User>();
         }
 
         [HttpPost]
@@ -45,7 +50,7 @@ namespace MaxOrg.Controllers
             }
 
             var db = Database;
-            var user = await (from u in db.Query<Models.User>()
+            var user = await (from u in db.Query<Models.Users.User>()
                 where u.Username == userLoginData.username
                 select u).FirstOrDefaultAsync();
             
@@ -77,7 +82,7 @@ namespace MaxOrg.Controllers
             {
                 var dateNow = DateTime.UtcNow;
                 var userTokenPair = await (from t in db.Query<RefreshToken>()
-                    from u in db.Query<Models.User>()
+                    from u in db.Query<Models.Users.User>()
                     where t.UserKey == u.Key
                     select new {token = t, user = u}).FirstOrDefaultAsync();
 
@@ -108,7 +113,7 @@ namespace MaxOrg.Controllers
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 var hasPassword = true;
-                Models.User userToAuth;
+                Models.Users.User userToAuth;
 
                 // MaxOrg is using the API
                 var githubClient = new GitHubClient(new Octokit.ProductHeaderValue("MaxOrg"));
@@ -129,7 +134,7 @@ namespace MaxOrg.Controllers
                 // get user email
                 var githubUser = await githubClient.User.Current();
 
-                var userWithSameId = await (from u in db.Query<Models.User>()
+                var userWithSameId = await (from u in db.Query<Models.Users.User>()
                     where u.GithubId == githubUser.Id
                     select u).FirstOrDefaultAsync();
 
@@ -148,7 +153,7 @@ namespace MaxOrg.Controllers
                         return BadRequest(new {message = "GitHub user doesn't have a published email"});
                     }
 
-                    var userWithSameEmail = await (from u in db.Query<Models.User>()
+                    var userWithSameEmail = await (from u in db.Query<Models.Users.User>()
                         where u.Email == githubUser.Email
                         select u).FirstOrDefaultAsync();
                     if (userWithSameEmail != null)
@@ -169,7 +174,7 @@ namespace MaxOrg.Controllers
                     }
                     else
                     {
-                        userToAuth = new Models.User
+                        userToAuth = new Models.Users.User
                         {
                             Description = githubUser.Bio,
                             RealName = githubUser.Name,
@@ -178,7 +183,7 @@ namespace MaxOrg.Controllers
                             GithubId = githubUser.Id
                         };
 
-                        var usernameExists = await (from u in db.Query<Models.User>()
+                        var usernameExists = await (from u in db.Query<Models.Users.User>()
                             where u.Username == githubUser.Login
                             select u).FirstOrDefaultAsync();
                         string username = githubUser.Login;
@@ -186,17 +191,21 @@ namespace MaxOrg.Controllers
                         // concat a random number to username if the username exists
                         if (usernameExists != null)
                         {
-                            username = githubUser.Location + new Random(DateTime.UtcNow.Millisecond).Next(100, 10000);
+                            username = githubUser.Login + new Random(DateTime.UtcNow.Millisecond).Next(100, 10000);
                         }
 
                         userToAuth.Username = username;
 
                         // insert the user
-                        var insertedUser = await db.InsertAsync<Models.User>(userToAuth);
+                        var insertedUser = await db.InsertAsync<Models.Users.User>(userToAuth);
+                        var image = await HttpClient.GetAsync(githubUser.AvatarUrl);
+                        var blob = Container.GetBlockBlobReference($"users/{insertedUser.Key}/profile.jpeg");
+                        await blob.UploadFromStreamAsync(await image.Content.ReadAsStreamAsync());
                         userToAuth.Key = insertedUser.Key;
                         hasPassword = false;
                     }
                 }
+
 
                 // generate a token :D
                 var token = await GenerateRefreshAndJwtToken(userToAuth);
@@ -241,7 +250,7 @@ namespace MaxOrg.Controllers
         /// </summary>
         /// <param name="user">Usuario para el que se generará el token</param>
         /// <returns>Token como cadena de texto</returns>
-        private string GenerateJwtToken(Models.User user)
+        private string GenerateJwtToken(Models.Users.User user)
         {
             var key = Encoding.ASCII.GetBytes(Configuration["AppSettings:Secret"]);
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -277,7 +286,7 @@ namespace MaxOrg.Controllers
         ///     token: token JWT que se utilizará para todas las tareas que requieran autenticación, este token expira despues de unas horas
         ///     refreshToken token que servirá para refrescar el token dado, este token expira despues de 1 día
         /// </returns>
-        private async Task<(string token, RefreshToken refreshToken)> GenerateRefreshAndJwtToken(Models.User user)
+        private async Task<(string token, RefreshToken refreshToken)> GenerateRefreshAndJwtToken(Models.Users.User user)
         {
             var nowDate = DateTime.UtcNow;
             var token = GenerateJwtToken(user);

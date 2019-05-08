@@ -53,13 +53,11 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
   }
   flat(toFlat){
     toFlat.forEach(group => {
-      let array;
-      this.taskService.getGroupTasks(group.id).subscribe(r=>{array=r});
       this.adminGroupsFlat.push({
         name:group.name,
         id:group.id,
         members:group.members,
-        tasks: array
+        tasks: this.taskService.getGroupTasks(group.id)
       });
       this.flat(group.subgroups);
     });
