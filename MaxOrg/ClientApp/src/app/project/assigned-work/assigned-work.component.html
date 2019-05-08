@@ -12,16 +12,16 @@
               </mat-panel-title>
             </mat-expansion-panel-header>
             <mat-accordion class="assigned-task-container">
-              <mat-expansion-panel class="assigned-task" *ngFor="let task of group.tasks">
+              <mat-expansion-panel class="assigned-task" *ngFor="let task of group.tasks | async">
                 <mat-expansion-panel-header class="text-bold">
-                  Nombre de tarea
+                  {{task.name}}
                 </mat-expansion-panel-header>
                 <div class="width-100" fxLayout="column" fxLayout.gt-md="row">
-                  <p fxFlex="33">Asignada en: 13/01/2019</p>
-                  <p fxFlex="33">Fecha estimada: 20/01/2019</p>
+                  <p fxFlex="33">Asignada en: {{task.creationDate}}</p>
+                  <p fxFlex="33">Fecha estimada: TODO</p>
                   <p fxFlex="33">
-                    progreso:
-                    <mat-checkbox [checked]="true" [disabled]="true"></mat-checkbox>
+                    progreso: {{task.progress}}%
+                    <mat-progress-bar mode="determinate" value="{{task.progress}}"></mat-progress-bar>
                   </p>
                 </div>
               </mat-expansion-panel>

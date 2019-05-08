@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
 
 export interface CreateTaskRequest{
   name:string;
@@ -40,22 +39,17 @@ export class TasksService {
     }));
   }
 
-  getGroupTasks(groupId: string):Observable<Task[]>{
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      'Content-Type': 'application/json'});
-    return this.http.get(`${environment.apiUrl}groups/${groupId}/tasks`,  {headers: headers})
-      .pipe(map<response,Task[]>(response=>{
-        console.log(response);
-        if(response){
-          return [{key:"",
-            id:"",
-            name:"",
-            description:"",
-            creationDate:"",//C# DateTime type
-            progress:99}];
-        }
-        return [];
-      }))
+  getGroupTasks(groupId: string){
+    const url= environment.apiUrl + 'groups/' + groupId + '/tasks';
+    
+    return this.http.get(url).pipe(map<Task[],any>(tasks=>{tasks.forEach(task => {
+      task.creationDate=this.formatDate(task.creationDate);
+    }); return tasks;}));
+    
+  
+  }
+  formatDate(dateToFormat:any){
+    let date=new Date(Date.parse(dateToFormat));
+    return (date.getDate()>9?"":"0")+date.getDate()+"/"+(date.getMonth()>8?"":"0")+(date.getMonth()+1)+"/"+date.getFullYear();
   }
 }
