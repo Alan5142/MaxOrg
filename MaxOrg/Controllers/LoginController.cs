@@ -27,11 +27,12 @@ namespace MaxOrg.Controllers
         private IConfiguration Configuration { get; }
         private readonly PasswordHasher<Models.Users.User> m_passwordHasher;
         private static readonly HttpClient client = new HttpClient();
-        private readonly IArangoDatabase Database;
+        private IArangoDatabase Database { get; }
         private HttpClient HttpClient { get; }
         private CloudBlobContainer Container { get; }
 
-        public LoginController(IConfiguration configuration, IArangoDatabase database, HttpClient httpClient, CloudBlobContainer container)
+        public LoginController(IConfiguration configuration, IArangoDatabase database, HttpClient httpClient,
+            CloudBlobContainer container)
         {
             Container = container;
             HttpClient = httpClient;
@@ -53,9 +54,9 @@ namespace MaxOrg.Controllers
             var user = await (from u in db.Query<Models.Users.User>()
                 where u.Username == userLoginData.username
                 select u).FirstOrDefaultAsync();
-            
+
             if (user == null) return NotFound(new {message = "Incorrect username or password"});
-            
+
             if (m_passwordHasher.VerifyHashedPassword(user, user.Password,
                     user.Salt + userLoginData.password) != PasswordVerificationResult.Success)
             {
@@ -71,37 +72,46 @@ namespace MaxOrg.Controllers
                 refreshToken = refreshToken.Token
             };
             return Ok(response);
-
         }
 
         [HttpPost("refresh-token")]
         [AllowAnonymous]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest token)
         {
-            using (var db = ArangoDatabase.CreateWithSetting())
+            var dateNow = DateTime.UtcNow;
+            var refreshToken = (await
+                Database.CreateStatement<RefreshToken>(
+                        $@"FOR t in RefreshToken FILTER t.token == '{token.RefreshToken}' return t")
+                    .ToListAsync()).FirstOrDefault();
+            if (refreshToken == null)
             {
-                var dateNow = DateTime.UtcNow;
-                var userTokenPair = await (from t in db.Query<RefreshToken>()
-                    from u in db.Query<Models.Users.User>()
-                    where t.UserKey == u.Key
-                    select new {token = t, user = u}).FirstOrDefaultAsync();
-
-                var expirationDate = userTokenPair.token.Expires;
-                // El token de refresco no es valido :(
-                if (expirationDate <= dateNow)
-                {
-                    return BadRequest(new {message = "Token expired"});
-                }
-
-                // created token
-                var newToken = GenerateJwtToken(userTokenPair.user);
-                return Ok(new RefreshTokenResponse
-                {
-                    token = newToken,
-                    userId = userTokenPair.user.Key,
-                    message = $"Successful created token"
-                });
+                return NotFound();
             }
+
+            var user = (await Database
+                    .CreateStatement<MaxOrg.Models.Users.User>($@"FOR u in User FILTER u._key == '{refreshToken.UserKey}' return u")
+                    .ToListAsync())
+                .FirstOrDefault();
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var expirationDate = refreshToken.Expires;
+            // El token de refresco no es valido :(
+            if (expirationDate <= dateNow)
+            {
+                return BadRequest(new {message = "Token expired"});
+            }
+
+            // created token
+            var newToken = GenerateJwtToken(user);
+            return Ok(new RefreshTokenResponse
+            {
+                Token = newToken,
+                UserId = user.Key,
+                Message = $"Successful created token"
+            });
         }
 
         [HttpPost("github")]
@@ -261,7 +271,7 @@ namespace MaxOrg.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Key.ToString()),
+                    new Claim(ClaimTypes.Name, user.Key),
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(ClaimTypes.Surname, user.Username)
                 }),
@@ -294,11 +304,11 @@ namespace MaxOrg.Controllers
             {
                 Token = Guid.NewGuid().ToString("N"),
                 IssuedAt = nowDate,
-                Expires = nowDate.AddDays(14),
+                Expires = nowDate.AddDays(30),
                 UserKey = user.Key
             };
 
-            await WriteRefreshTokenToDb(refreshToken);
+            await Database.InsertAsync<RefreshToken>(refreshToken);
 
             return (token, refreshToken);
         }
@@ -314,19 +324,6 @@ namespace MaxOrg.Controllers
             {
                 rng.GetBytes(randomNumber);
                 return Convert.ToBase64String(randomNumber);
-            }
-        }
-
-        /// <summary>
-        /// Escribe el token en la base de datos
-        /// </summary>
-        /// <param name="token">token a escribir en la BD</param>
-        /// <returns>La tarea que ejecutará el código, esta tarea no regresa variables</returns>
-        private async Task WriteRefreshTokenToDb(RefreshToken token)
-        {
-            using (var db = ArangoDatabase.CreateWithSetting())
-            {
-                await db.InsertAsync<RefreshToken>(token);
             }
         }
     }

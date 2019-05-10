@@ -1,5 +1,9 @@
-<div *ngIf="notifications | async as notifications$" style="overflow-y: hidden">
-  <div *ngFor="let notification of notifications$">
+<div *ngIf="notifications | async as notifications$" style="overflow-y: hidden" class="height-100 width-100">
+  <div *ngFor="let notification of notifications$"
+       class="notification"
+       [ngClass]="{'notification-unread': !notification.read,
+       'notification-high-priority': notification.priority === NotificationPriority.high,
+       'notification-medium-priority': notification.priority === NotificationPriority.medium}">
     <div fxLayout="row" fxLayoutAlign="start center" matRipple class="no-select"
          (click)="navigateToContext(notification)">
       <div>

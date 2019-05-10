@@ -113,6 +113,7 @@ namespace MaxOrg.Controllers
                 user.Birthday,
                 user.Occupation,
                 user.Key,
+                user.NotificationPreference,
                 ProfilePicture = $"{m_configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
             });
         }
@@ -245,6 +246,7 @@ namespace MaxOrg.Controllers
                 user.Description = userData.Description ?? user.Description;
                 user.Birthday = userData.Birthday ?? user.Birthday;
                 user.Occupation = userData.Occupation ?? user.Occupation;
+                user.NotificationPreference = userData.Preferences ?? user.NotificationPreference;
                 if (userData.ProfilePicture != null || userData.ProfilePictureAsBase64 != null)
                 {
                     var blob = Container.GetBlockBlobReference($"users/{user.Key}/profile.jpeg");

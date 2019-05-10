@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import * as signalR from '@aspnet/signalr';
 import {HubConnectionState} from '@aspnet/signalr';
 import {Observable, Subject} from "rxjs";
-import {UserService} from "./user.service";
+import {Notification, NotificationPreference, NotificationPriority, UserService} from "./user.service";
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +13,7 @@ export class NotificationService {
   notificationsUpdate$: Observable<void> = this._subject.asObservable();
   private _startedConnection = false;
 
-  constructor(userService: UserService) {
+  constructor(private userService: UserService) {
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl('/notification-hub', {accessTokenFactory: () => userService.userToken})
       .configureLogging(signalR.LogLevel.None)
@@ -28,20 +28,47 @@ export class NotificationService {
     this.connection.start()
       .then(ok => this.connection.send('connectToHub'));
 
-    this.connection.on('notificationReceived', (message: string) => {
-      try {
-        const notification = new Notification(message, {icon: '/favicon.ico', requireInteraction: false, silent: true});
-        this._subject.next();
-      } catch (exception) {
-        navigator.serviceWorker.getRegistration().then(reg => {
-          console.log(reg);
-          reg.showNotification('MaxOrg', {
-            body: message,
+    this.connection.on('notificationReceived', (receivedNotification: Notification) => {
+      const triggerNotification = () => {
+        try {
+          const notification = new Notification(receivedNotification.message, {
             icon: '/favicon.ico',
-            vibrate: [200, 100, 200, 100, 200, 100, 200]
-          }).then(res => {}, err => {});
-        });
-      }
+            requireInteraction: false,
+            silent: true,
+          });
+        } catch (exception) {
+          navigator.serviceWorker.getRegistration().then(reg => {
+            reg.showNotification('MaxOrg', {
+              body: receivedNotification.message,
+              icon: '/favicon.ico',
+              vibrate: [200, 100, 200, 100, 200, 100, 200]
+            }).then(res => {
+            }, err => {
+            });
+          });
+        }
+      };
+
+      this.userService.getCurrentUser().subscribe(user => {
+        console.log(user.notificationPreference);
+        switch (user.notificationPreference) {
+          case NotificationPreference.allowEverything:
+            triggerNotification();
+            break;
+          case NotificationPreference.allowMediumAndHigh:
+            if (receivedNotification.priority !== NotificationPriority.low) {
+              triggerNotification();
+            }
+            break;
+          case NotificationPreference.allowHigh:
+            if (receivedNotification.priority === NotificationPriority.high) {
+              triggerNotification();
+            }
+            break;
+
+        }
+        this._subject.next();
+      });
     });
   }
 

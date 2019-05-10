@@ -35,7 +35,7 @@ namespace MaxOrg.Controllers
         /// <summary>
         /// Contiene los datos del Hub SignalR de las notificaciones, con esto podemos enviar una notificación en caso de que un usuario haya sido agregado a un chat
         /// </summary>
-        private readonly IHubContext<NotificationHub> _notificationHub;
+        private IHubContext<NotificationHub> NotificationHub { get; }
 
         private IArangoDatabase Database { get; }
 
@@ -50,7 +50,7 @@ namespace MaxOrg.Controllers
         {
             Database = database;
             _chatHub = chatHub;
-            _notificationHub = notificationHub;
+            NotificationHub = notificationHub;
         }
 
         /// <summary>
@@ -180,9 +180,6 @@ namespace MaxOrg.Controllers
 
                     await usersInChatGraph.InsertEdgeAsync<ChatMembers>(userToAdd);
 
-                    await _notificationHub.Clients
-                        .Group($"User/{userId}")
-                        .SendAsync("notificationReceived", notificationMessage);
                     
                     var notification = new Notification
                     {
@@ -191,6 +188,9 @@ namespace MaxOrg.Controllers
                         Priority = NotificationPriority.Medium,
                         Context = $"project/{rootGroup.Key}/messages"
                     };
+                    await NotificationHub.Clients
+                        .Group($"User/{userId}")
+                        .SendAsync("notificationReceived", notification);
                     
                     memberUser?.Notifications.Add(notification);
                     await db.UpdateByIdAsync<User>(memberUser?.Id, memberUser);

@@ -17,6 +17,7 @@ export interface User {
   occupation?: string;
   birthday?: Date;
   profilePicture?: string;
+  notificationPreference?: NotificationPreference;
 }
 
 export interface RegisterResponse {
