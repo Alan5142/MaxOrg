@@ -255,4 +255,12 @@ export class BoardComponent implements OnInit, OnDestroy {
       });
     });
   }
+
+  getAllCards():Observable<number> {
+    return this.groups.pipe(map<KanbanGroup[], number>(gs => {
+      let count = 0;
+      gs.forEach(g => count += g.cards.length);
+      return count;
+    }));
+  }
 }

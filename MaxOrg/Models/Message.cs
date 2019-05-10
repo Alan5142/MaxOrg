@@ -7,7 +7,8 @@ namespace MaxOrg.Models
     {
         Text,
         Image,
-        Video
+        Video,
+        Other
     }
 
     /// <summary>

@@ -18,7 +18,7 @@
     <div class="card-list mat-elevation-z5 card-holder"
          *ngFor="let group of groups | async">
       <div cdkDragHandle fxLayout="row">
-        <h2 class="mat-h2">{{group.name}}
+        <h2 class="mat-h2">{{group.cards.length}}/{{getAllCards() | async}} {{group.name}}
         </h2>
         <div fxFlex></div>
         <button style="top: -15px;"
