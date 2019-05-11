@@ -91,6 +91,9 @@ export class ChatService {
       reportProgress: true,
     });
 
-    return this.http.request(uploadReq);
+    return this.http.post(`${environment.apiUrl}chats/${chatId}/messages`, formData, {
+      reportProgress: true,
+      observe: "events"
+    });
   }
 }
