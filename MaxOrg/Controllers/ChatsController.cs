@@ -296,6 +296,7 @@ namespace MaxOrg.Controllers
                     await blob.UploadFromStreamAsync(request.Attachment.OpenReadStream());
                     await blob.FetchAttributesAsync();
                     blob.Properties.ContentType = request.Attachment.ContentType;
+                    blob.Properties.CacheControl = "max-age=2419200";
                     await blob.SetPropertiesAsync();
                     
                     // tipo de contenido
@@ -356,8 +357,6 @@ namespace MaxOrg.Controllers
             {
                 return NotFound();
             }
-
-            await blob.FetchAttributesAsync();
             
             var sasConstraints = new SharedAccessBlobPolicy
             {

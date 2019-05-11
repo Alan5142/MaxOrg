@@ -102,7 +102,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   scrollToBottom(index: number) {
-    this.virtualScroll.scrollToIndex(index, true, 0, 100);
+    this.virtualScroll.scrollToIndex(index, true, 0, 0);
   }
 
   onSpeedDialFabClicked(btn: FabButton) {
@@ -121,6 +121,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     const behaviourSubject = new Subject<number | boolean>();
     const dialog = this.dialog.open(UploadFileComponent, {data: behaviourSubject.asObservable()});
     this.chatService.sendFile(this.chatId, $event.target.files[0]).subscribe(result => {
+      console.log('Type: ' + result.type);
+      console.log(`Result: ${result}`);
       if (result.type === HttpEventType.UploadProgress) {
         behaviourSubject.next(Math.round(100 * result.loaded / result.total));
       } else if (result instanceof HttpResponse) {

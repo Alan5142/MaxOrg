@@ -13,7 +13,7 @@
       <img (load)="refresh.emit()" style="width: 100%; max-width: 400px; max-height: 500px;" src="{{(attachmentData | async)?.url}}">
     </div>
     <div style="width: 100%" *ngIf="messageData.type === MessageType.Video">
-      <video (load)="refresh.emit()" #videoElement controls width="100%">
+      <video (load)="refresh.emit()" #videoElement controls width="100%" preload="metadata">
         <source type="{{(attachmentData | async)?.mime}}" src="{{(attachmentData | async)?.url}}">
       </video>
     </div>

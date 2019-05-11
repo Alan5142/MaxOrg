@@ -15,6 +15,8 @@ export class UploadFileComponent implements OnInit {
               @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit() {
+    console.log('Data: ');
+    console.log(this.data);
     (this.data as Observable<number | boolean>).subscribe(result => {
       switch (typeof result) {
         case "number":

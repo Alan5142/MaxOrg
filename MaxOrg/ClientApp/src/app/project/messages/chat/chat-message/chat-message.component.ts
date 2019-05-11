@@ -39,12 +39,19 @@ export class ChatMessageComponent implements OnInit, AfterViewInit {
           const sourceTag = document.createElement("source");
           sourceTag.src = data.url;
           this.videoElement.nativeElement.appendChild(sourceTag);
+          this.videoElement.nativeElement.onloadedmetadata = () => {
+            console.log('loaded metadata');
+            this.refresh.next()
+          }
         }
+        setTimeout(() => this.refresh.next(), 300);
       });
     }
   }
 
   ngAfterViewInit() {
+    console.log('Loaded');
+    setTimeout(() => this.refresh.next(), 300);
     this.refresh.next();
   }
 
