@@ -1,10 +1,7 @@
-﻿using ArangoDB.Client;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using ArangoDB.Client;
 
-namespace MaxOrg.Models
+namespace MaxOrg.Models.Chats
 {
     /// <summary>
     /// Chat dentro de la base de datos

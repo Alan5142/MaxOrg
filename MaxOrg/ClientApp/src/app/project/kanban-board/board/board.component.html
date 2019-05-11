@@ -18,7 +18,7 @@
     <div class="card-list mat-elevation-z5 card-holder"
          *ngFor="let group of groups | async">
       <div cdkDragHandle fxLayout="row">
-        <h2 class="mat-h2">{{group.cards.length}}/{{getAllCards() | async}} {{group.name}}
+        <h2 class="mat-h2" style="word-wrap: break-word">{{group.cards.length}}/{{getAllCards() | async}} {{group.name}}
         </h2>
         <div fxFlex></div>
         <button style="top: -15px;"
@@ -42,8 +42,8 @@
            (cdkDropListDropped)="onTaskDrop($event)" [ngStyle]="{'background-color': group.color}">
         <mat-card style="margin: 2%;" *ngFor="let task of group.cards; trackBy: trackUsingId" cdkDrag (click)="showDetailedInfo(task, group)">
           <mat-card-content>
-            <h2>{{task.title}}</h2>
-            <p>{{task.description}}</p>
+            <h2 style="word-wrap: break-word">{{task.title}}</h2>
+            <p style="word-wrap: break-word">{{task.description}}</p>
           </mat-card-content>
         </mat-card>
       </div>

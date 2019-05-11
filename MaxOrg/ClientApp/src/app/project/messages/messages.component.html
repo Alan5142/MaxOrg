@@ -31,11 +31,10 @@
       <h3 mat-subheader>Grupos</h3>
       <div>
         <div *ngIf="chats | async as chats">
-          <mat-list-item matRipple *ngFor="let groupChat of chats.groupChats" routerLink="./" [queryParams]="{chatId: groupChat.key}">
+          <mat-list-item matRipple *ngFor="let groupChat of chats.groupChats" routerLink="./"
+                         [queryParams]="{chatId: groupChat.key}">
             <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
-            <h5 class="no-select" mat-line style="font-weight: bold;">{{groupChat.name}}</h5>
-            <p class="no-select" mat-line *ngIf="groupChat?.messages?.length > 0" style="overflow-x: hidden">
-              {{groupChat.messages[groupChat.messages.length - 1]?.remitent}}: {{groupChat.messages[groupChat.messages.length - 1]?.data}}</p>
+            <h5 class="no-select" mat-line style="font-weight: bold; word-wrap: break-word">{{groupChat.name}}</h5>
           </mat-list-item>
         </div>
       </div>
@@ -73,11 +72,10 @@
         <h3 mat-subheader>Grupos</h3>
         <div>
           <div *ngIf="chats | async as chats">
-            <mat-list-item matRipple *ngFor="let groupChat of chats.groupChats" routerLink="./" [queryParams]="{chatId: groupChat.key}">
+            <mat-list-item matRipple *ngFor="let groupChat of chats.groupChats" routerLink="./"
+                           [queryParams]="{chatId: groupChat.key}">
               <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
-              <h5 class="no-select" mat-line style="font-weight: bold;">{{groupChat.name}}</h5>
-              <p class="no-select" mat-line *ngIf="groupChat?.messages?.length > 0" style="overflow-x: hidden">
-                {{groupChat.messages[groupChat.messages.length - 1].remitent}}: {{groupChat.messages[groupChat.messages.length - 1].data}}</p>
+              <h5 class="no-select" mat-line style="font-weight: bold; word-wrap: break-word">{{groupChat.name}}</h5>
             </mat-list-item>
           </div>
         </div>

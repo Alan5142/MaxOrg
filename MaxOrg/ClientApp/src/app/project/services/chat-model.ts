@@ -11,6 +11,7 @@ export interface Message {
   date: Date;
   type: MessageType;
   data: string;
+  attachmentName?: string;
 }
 
 export interface ChatModel {

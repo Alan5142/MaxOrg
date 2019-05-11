@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams, HttpRequest} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
 import {ChatModel, GetUserChatsResponse} from "./chat-model";
 import {HubConnection, HubConnectionBuilder, LogLevel} from "@aspnet/signalr";
@@ -74,7 +74,23 @@ export class ChatService {
   }
 
   sendMessage(chatId: string, message: string) {
-    const headers = new HttpHeaders().append('Authorization', `Bearer ${localStorage.getItem('token')}`);
-    return this.http.post(`${environment.apiUrl}chats/${chatId}/messages`, {message: message}, {headers: headers});
+    const formData: FormData = new FormData();
+    formData.append('message', message);
+    return this.http.post(`${environment.apiUrl}chats/${chatId}/messages`, formData);
+  }
+
+  public getAttachmentData(serverUrl: string): Observable<any> {
+    return this.http.get<any>(serverUrl);
+  }
+
+  sendFile(chatId: string, file: File) {
+    const formData = new FormData();
+    formData.append('attachment', file);
+
+    const uploadReq = new HttpRequest('POST', `${environment.apiUrl}chats/${chatId}/messages`, formData, {
+      reportProgress: true,
+    });
+
+    return this.http.request(uploadReq);
   }
 }

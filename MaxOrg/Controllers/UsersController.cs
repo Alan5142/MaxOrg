@@ -18,17 +18,17 @@ namespace MaxOrg.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private PasswordHasher<User> m_passwordHasher;
-        private readonly IConfiguration m_configuration;
-        private readonly CloudBlobContainer Container;
-        private readonly IArangoDatabase Database;
+        private PasswordHasher<User> PasswordHasher { get; }
+        private IConfiguration Configuration { get; }
+        private CloudBlobContainer Container { get; }
+        private IArangoDatabase Database { get; }
         
         public UsersController(IConfiguration configuration, CloudBlobContainer container, IArangoDatabase database)
         {
             Database = database;
             Container = container;
-            m_configuration = configuration;
-            m_passwordHasher = new PasswordHasher<User>();
+            Configuration = configuration;
+            PasswordHasher = new PasswordHasher<User>();
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace MaxOrg.Controllers
                 user.Occupation,
                 user.Key,
                 user.NotificationPreference,
-                ProfilePicture = $"{m_configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
+                ProfilePicture = $"{Configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
             });
         }
         
@@ -154,7 +154,7 @@ namespace MaxOrg.Controllers
             var saltAsString = Convert.ToBase64String(salt);
 
             var userToInsert = new User(user);
-            userToInsert.Password = m_passwordHasher.HashPassword(userToInsert, saltAsString + user.Password);
+            userToInsert.Password = PasswordHasher.HashPassword(userToInsert, saltAsString + user.Password);
             userToInsert.Salt = saltAsString;
 
             var createdUser = await db.InsertAsync<User>(userToInsert);
@@ -199,7 +199,7 @@ namespace MaxOrg.Controllers
                     user.Birthday,
                     user.Occupation,
                     user.Key,
-                    ProfilePicture = $"{m_configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
+                    ProfilePicture = $"{Configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
                 });
             }
         }
@@ -212,6 +212,7 @@ namespace MaxOrg.Controllers
             {
                 return NotFound();
             }
+            
             var sasConstraints = new SharedAccessBlobPolicy
             {
                 SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5),
@@ -240,7 +241,7 @@ namespace MaxOrg.Controllers
                 }
 
                 user.Password = userData.Password != null
-                    ? m_passwordHasher.HashPassword(user, userData.Password)
+                    ? PasswordHasher.HashPassword(user, userData.Password)
                     : user.Password;
                 user.RealName = userData.RealName ?? user.RealName;
                 user.Description = userData.Description ?? user.Description;
@@ -259,6 +260,7 @@ namespace MaxOrg.Controllers
                         catch (Exception e)
                         {
                             Console.Error.WriteLine(e.Message);
+                            return StatusCode(500);
                         }
                     }
                     else
@@ -271,9 +273,13 @@ namespace MaxOrg.Controllers
                         catch (Exception e)
                         {
                             Console.Error.WriteLine(e);
+                            return StatusCode(500);
                         }
-                        
                     }
+
+                    await blob.FetchAttributesAsync();
+                    blob.Properties.ContentType = "image/jpeg";
+                    await blob.SetPropertiesAsync();
                 }
 
                 await db.UpdateByIdAsync<User>(user.Key, user);

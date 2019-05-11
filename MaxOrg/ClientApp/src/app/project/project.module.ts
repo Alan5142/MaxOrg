@@ -1,4 +1,4 @@
- import {NgModule} from '@angular/core';
+import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ProjectComponent} from './project.component';
 import {
@@ -90,6 +90,7 @@ import {CardDetailedComponent} from './kanban-board/board/card-detailed/card-det
 import {CardDeleteComponent} from './kanban-board/board/card-delete/card-delete.component';
 import {ModifyMembersComponent} from './kanban-board/modify-members/modify-members.component';
 import {CreateChatGroupComponent} from './messages/create-chat-group/create-chat-group.component';
+import {UploadFileComponent} from './messages/chat/upload-file/upload-file.component';
 
 
 @NgModule({
@@ -113,7 +114,8 @@ import {CreateChatGroupComponent} from './messages/create-chat-group/create-chat
     CardDetailedComponent,
     CardDeleteComponent,
     ModifyMembersComponent,
-    CreateChatGroupComponent
+    CreateChatGroupComponent,
+    UploadFileComponent
   ],
   imports: [
     CommonModule,
@@ -205,7 +207,8 @@ import {CreateChatGroupComponent} from './messages/create-chat-group/create-chat
     CardDetailedComponent,
     CardDeleteComponent,
     ModifyMembersComponent,
-    CreateChatGroupComponent
+    CreateChatGroupComponent,
+    UploadFileComponent
   ],
   bootstrap: [
     ProjectComponent
