@@ -113,10 +113,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  prinHello() {
-    console.log(':rrefrefe');
-  }
-
   uploadImageToServer($event: any) {
     if ($event.target.files.length !== 1) {
       return;
@@ -125,11 +121,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     const behaviourSubject = new Subject<number | boolean>();
     const dialog = this.dialog.open(UploadFileComponent, {data: behaviourSubject.asObservable()});
     this.chatService.sendFile(this.chatId, $event.target.files[0]).subscribe(result => {
-      console.log('result: ');
-      console.log(result);
       if (result.type === HttpEventType.UploadProgress) {
-        console.log('Upload progress');
-        console.log(Math.round(100 * result.loaded / result.total));
         behaviourSubject.next(Math.round(100 * result.loaded / result.total));
       } else if (result instanceof HttpResponse) {
         behaviourSubject.next(true);

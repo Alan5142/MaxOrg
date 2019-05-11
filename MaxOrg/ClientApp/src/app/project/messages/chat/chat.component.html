@@ -49,7 +49,6 @@
 
   <app-speed-dial-fab
     [canClick]="message.value.length === 0"
-    (toggle)="prinHello()"
     [fabIcon]="message.value.length > 0 ? 'message' : 'attach_file'"
     [fabButtons]="speedDialFabButtons"
     (fabClick)="onSpeedDialFabClicked($event)"

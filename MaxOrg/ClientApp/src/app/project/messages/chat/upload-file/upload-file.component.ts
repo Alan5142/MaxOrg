@@ -15,12 +15,9 @@ export class UploadFileComponent implements OnInit {
               @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit() {
-    console.log(this.data);
     (this.data as Observable<number | boolean>).subscribe(result => {
-      console.log(result);
       switch (typeof result) {
         case "number":
-          console.log('Upload progress');
           this.uploadProgress = result;
           break;
         case "boolean":
