@@ -311,7 +311,7 @@ namespace MaxOrg.Controllers
                     message = new Message
                     {
                         Type = messageType,
-                        Data = $"{Configuration["AppSettings:DefaultURL"]}/api/chats/{chatId}/messages/attachment/{id}",
+                        Data = $"/api/chats/{chatId}/messages/attachment/{id}",
                         Remitent = HttpContext.User.Identity.Name,
                         Date = DateTime.UtcNow,
                         AttachmentId = id
