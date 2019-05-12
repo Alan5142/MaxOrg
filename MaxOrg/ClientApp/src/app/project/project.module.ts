@@ -91,6 +91,7 @@ import {CardDeleteComponent} from './kanban-board/board/card-delete/card-delete.
 import {ModifyMembersComponent} from './kanban-board/modify-members/modify-members.component';
 import {CreateChatGroupComponent} from './messages/create-chat-group/create-chat-group.component';
 import {UploadFileComponent} from './messages/chat/upload-file/upload-file.component';
+import { LinkToGithubComponent } from './admin-dashboard/link-to-github/link-to-github.component';
 
 
 @NgModule({
@@ -115,7 +116,8 @@ import {UploadFileComponent} from './messages/chat/upload-file/upload-file.compo
     CardDeleteComponent,
     ModifyMembersComponent,
     CreateChatGroupComponent,
-    UploadFileComponent
+    UploadFileComponent,
+    LinkToGithubComponent
   ],
   imports: [
     CommonModule,
@@ -208,7 +210,8 @@ import {UploadFileComponent} from './messages/chat/upload-file/upload-file.compo
     CardDeleteComponent,
     ModifyMembersComponent,
     CreateChatGroupComponent,
-    UploadFileComponent
+    UploadFileComponent,
+    LinkToGithubComponent
   ],
   bootstrap: [
     ProjectComponent

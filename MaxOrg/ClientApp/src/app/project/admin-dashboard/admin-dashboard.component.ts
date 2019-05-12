@@ -1,9 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MediaObserver} from '@angular/flex-layout';
 import {GoogleChartComponent} from 'ng2-google-charts';
-import {MatDialog} from '@angular/material';
+import {MatDialog, MatSnackBar} from '@angular/material';
 import {ChangeDescriptionComponent} from './change-description/change-description.component';
 import {ActivatedRoute} from '@angular/router';
+import {LinkToGithubComponent} from "./link-to-github/link-to-github.component";
+import {UserService} from "../../services/user.service";
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -32,7 +34,9 @@ export class AdminDashboardComponent implements OnInit {
 
   constructor(public mediaObserver: MediaObserver,
               public dialog: MatDialog,
-              public route: ActivatedRoute) {
+              public route: ActivatedRoute,
+              private userService: UserService,
+              private snackBar: MatSnackBar) {
     route.parent.params.subscribe(params => {
       this.groupId = params['id'];
     });
@@ -47,5 +51,18 @@ export class AdminDashboardComponent implements OnInit {
       minHeight: '70%',
       data: {groupId: this.groupId}
     });
+  }
+
+  openLinkToGitHubDialog() {
+    this.userService.userRepos.subscribe(repos => {
+        const dialogRef = this.dialog.open(LinkToGithubComponent, {
+          data: repos,
+          maxHeight: '500px',
+          maxWidth: '400px'
+        });
+      },
+      error => {
+        this.snackBar.open('No se pudieron listar los repositorios, verifica que tu cuenta este vinculada a GitHub', 'OK');
+      });
   }
 }

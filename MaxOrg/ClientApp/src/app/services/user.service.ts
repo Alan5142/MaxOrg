@@ -60,6 +60,12 @@ export interface Notification {
   read: boolean;
 }
 
+export interface Repository {
+  description: string;
+  name: string;
+  fullName: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -202,6 +208,10 @@ export class UserService {
 
     return this.http.put<HttpResponse<any>>(`${environment.apiUrl}users/notifications/${notification.id}/mark-as-read`,
       null, {headers: headers, observe: 'response'}).pipe(map<HttpResponse<any>, boolean>(result => result.ok));
+  }
+
+  get userRepos(): Observable<Repository[]> {
+    return this.http.get<Repository[]>(`${environment.apiUrl}users/repos`);
   }
 
 }

@@ -43,6 +43,8 @@ namespace MaxOrg.Models.Group
         /// Representa si el grupo es la raíz de todos los grupos, al ser la raíz es un proyecto
         /// </summary>
         public bool IsRoot { get; set; }
+        
+        public string LinkedRepositoryName { get; set; }
 
         /// <summary>
         /// Fecha de creación del proyecto/grupo

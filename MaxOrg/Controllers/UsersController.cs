@@ -4,13 +4,15 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using ArangoDB.Client;
-using MaxOrg.Models;
 using MaxOrg.Models.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Octokit;
+using Notification = MaxOrg.Models.Notification;
+using User = MaxOrg.Models.Users.User;
 
 namespace MaxOrg.Controllers
 {
@@ -397,6 +399,34 @@ namespace MaxOrg.Controllers
             }
         }
         
+        #endregion
+
+        #region GitHub user stuff
+
+        [Authorize]
+        [HttpGet("repos")]
+        public async Task<IActionResult> GetUserRepos()
+        {
+            var user = await Database.Collection("User").DocumentAsync<User>(HttpContext.User.Identity.Name);
+            if (user?.Password == null)
+            {
+                return NotFound();
+            }
+            
+            var client = new GitHubClient(new ProductHeaderValue("maxorg"));
+            
+            var tokenAuth = new Credentials(user.GithubToken); // NOTE: not real token
+            client.Credentials = tokenAuth;
+
+            var repos = await client.Repository.GetAllForCurrent();
+            return Ok(repos.Where(repo => !repo.Archived).Select(repo => new
+            {
+                repo.Description,
+                repo.Name,
+                repo.FullName
+            }));
+        }
+
         #endregion
     }
 }

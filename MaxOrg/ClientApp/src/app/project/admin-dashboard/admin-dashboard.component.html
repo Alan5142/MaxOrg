@@ -172,12 +172,15 @@
             </form>
 
             <form class="options-container" fxFlex="50" fxLayout="column">
+              <h2>Vincular con repositorio de GitHub</h2>
+              <button color="primary" mat-flat-button (click)="openLinkToGitHubDialog()">Vincular</button>
               <h2>Ceder administración a otro usuario</h2>
               <mat-form-field>
                 <input matInput placeholder="Nombre de usuario del nuevo administrador" type="text">
               </mat-form-field>
               <button color="warn" mat-flat-button>Ceder administración</button>
             </form>
+
 
           </div>
         </mat-card-content>

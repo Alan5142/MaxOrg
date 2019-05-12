@@ -84,8 +84,7 @@ export class NavbarDialogComponent {
   }
 
   githubLogin(): void {
-    // window.location.href = 'https://github.com/login/oauth/authorize?client_id=' + environment.githubAuth.clientId;
-    window.open(`https://github.com/login/oauth/authorize?client_id=${environment.githubAuth.clientId}&scope=user%20repo`);
+    window.location.href = 'https://github.com/login/oauth/authorize?client_id=' + environment.githubAuth.clientId;
   }
 
   googleLogin() {

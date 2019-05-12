@@ -1126,6 +1126,10 @@ namespace MaxOrg.Controllers
 
         #endregion
 
+        #region GitHub repo
+
+        #endregion
+
         /// <summary>
         /// Obtiene un valor de verdadero o falso si un usuario en cuestión es administrador de un grupo definido por un
         /// identificador
