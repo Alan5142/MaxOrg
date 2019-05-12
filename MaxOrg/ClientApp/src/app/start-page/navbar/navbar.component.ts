@@ -88,8 +88,9 @@ export class NavbarDialogComponent {
   }
 
   googleLogin() {
-    this.authService.signOut(true).catch(() => {
+    this.authService.signOut(true).then(() => {}).catch(() => {
     });
+    console.log(GoogleLoginProvider.PROVIDER_ID);
     this.authService.signIn(GoogleLoginProvider.PROVIDER_ID).then(ok => {
       this.userService.googleLogin(ok.id).subscribe(userData => {
           localStorage.setItem('token', userData.token);
@@ -108,8 +109,13 @@ export class NavbarDialogComponent {
           });
           this.dialogRef.close();
         });
-    }).catch(() => {
+    }).catch(error => {
+      console.log(error);
     });
+  }
+
+  isNotChromeMobile() {
+    return !/^(?=.*\bChrome\b)(?=.*\bAndroid\b).*$/i.test(navigator.userAgent);
   }
 }
 

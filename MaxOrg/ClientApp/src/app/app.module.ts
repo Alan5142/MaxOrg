@@ -65,7 +65,7 @@ export class AppModule {
 let config = new AuthServiceConfig([
   {
     id: GoogleLoginProvider.PROVIDER_ID,
-    provider: new GoogleLoginProvider("495753764174-kr5o676hqpcqlpb40a7m2a92v7614hst.apps.googleusercontent.com")
+    provider: new GoogleLoginProvider("495753764174-j2egiqi9f0isoqelqfrqt7ptovuld4qn.apps.googleusercontent.com")
   }
 ]);
 
