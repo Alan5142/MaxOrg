@@ -36,11 +36,12 @@ namespace MaxOrg.Models.Users
         public string Description { get; set; }
         public string Occupation { get; set; }
         public DateTime Birthday { get; set; } = DateTime.MinValue;
-
-        [DocumentProperty(IgnoreProperty = true)]
+        
         public int? GithubId { get; set; }
 
         public string GithubToken { get; set; }
+        
+        public string GoogleId { get; set; }
 
         /// <summary>
         /// Notificaciones que le han llegado al usuario, estan ordenadas de forma cronologica

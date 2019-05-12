@@ -10,12 +10,14 @@ import {IsLoggedInGuard} from '../services/guards/is-logged-in.guard';
 import {IsNotLoggedInGuard} from '../services/guards/is-not-logged-in.guard';
 import {GithubLoginComponent} from './github-login/github-login.component';
 import {NotFoundComponent} from './not-found/not-found.component';
+import {GoogleLoginComponent} from "./google-login/google-login.component";
 
 const routes: Routes = [
   {
     path: '', component: StartPageComponent, children: [
       {path: '', component: IndexComponent, canActivate: [IsNotLoggedInGuard]},
       {path: 'register', component: RegisterComponent, canActivate: [IsNotLoggedInGuard]},
+      {path: 'google-login', component: GoogleLoginComponent, canActivate: [IsNotLoggedInGuard]},
       {path: 'github-login', component: GithubLoginComponent, canActivate: [IsNotLoggedInGuard]},
       {path: 'index', component: UserStartComponent, canActivate: [IsLoggedInGuard]},
       {path: 'my_account', component: MyAccountComponent, canActivate: [IsLoggedInGuard]},

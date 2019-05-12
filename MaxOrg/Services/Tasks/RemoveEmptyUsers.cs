@@ -1,27 +1,22 @@
-﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ArangoDB.Client;
-using MaxOrg.Models;
+using MaxOrg.Models.Users;
 
 namespace MaxOrg.Services.Tasks
 {
-    public class RemoveExpiredTokens : IScheduledTask
+    public class RemoveEmptyUsers : IScheduledTask
     {
-        public string Schedule => "* */6 * * *";
+        public string Schedule => "0 * * * *";
 
         public Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            Task task = new Task(() =>
+            var task = new Task(() =>
             {
                 using (var db = ArangoDatabase.CreateWithSetting())
                 {
-                    var dateTimeNow = DateTime.UtcNow;
-                    db.Query<RefreshToken>()
-                        .Where(t => t.Expires <= dateTimeNow)
-                        .Remove()
-                        .Execute();
+                    db.Query<User>().Where(u => u.Username == null).Remove().Execute();
                 }
             });
             task.Start();

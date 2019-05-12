@@ -39,11 +39,6 @@ export interface LoginResponse {
   refreshToken: string | undefined;
 }
 
-export interface GitHubLogin {
-  valid: boolean;
-  firstLogin: boolean;
-}
-
 export enum NotificationPriority {
   low,
   medium,
@@ -93,7 +88,7 @@ export class UserService {
       }
       return this.getNewTokenWithRefresh()
         .pipe(
-          map<string, boolean>(newToken =>{
+          map<string, boolean>(newToken => {
             if (newToken) {
               localStorage.setItem('token', newToken);
               return true;
@@ -101,8 +96,7 @@ export class UserService {
             return false;
           })
         );
-    }
-    else {
+    } else {
       return true;
     }
   }
@@ -170,31 +164,24 @@ export class UserService {
     }));
   }
 
-  githubLogin(accessToken: string): Observable<GitHubLogin> {
-    const headers = new HttpHeaders();
-    headers.append('Content-Type', 'application/json');
-    return this.http.post(environment.apiUrl + 'login/github',
-      {accessToken: accessToken},
-      {headers: headers, observe: 'response'}).pipe(map<HttpResponse<LoginResponse>, GitHubLogin>(response => {
-      if (response.body.token !== undefined) {
-        console.log(response);
-        localStorage.setItem('token', response.body.token);
-        localStorage.setItem('refresh', response.body.refreshToken);
-        localStorage.setItem('userId', response.body.userId);
-        return {
-          valid: true,
-          firstLogin: response.headers.get('HasPassword') === null
-        };
-      } else {
-        return {
-          valid: false,
-          firstLogin: false
-        };
-      }
-    }));
+  githubInfo(accessToken: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}login/github`, {accessToken: accessToken});
+  }
+
+  githubLogin(loginData: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}login/github/register`, loginData);
+  }
+
+  googleRegister(loginData) {
+    return this.http.post<any>(`${environment.apiUrl}login/google/register`, loginData);
+  }
+
+  googleLogin(id: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}login/google/${id}`, {});
   }
 
   closeSession(): void {
+
     localStorage.clear();
 
     this.router.navigate(['/']);
@@ -211,9 +198,10 @@ export class UserService {
   public markNotificationAsRead(notification: Notification) {
     let headers = new HttpHeaders();
     headers = headers.append('Content-Type', 'application/json');
-    headers = headers.append('Authorization',  `Bearer ${localStorage.getItem('token')}`);
+    headers = headers.append('Authorization', `Bearer ${localStorage.getItem('token')}`);
 
     return this.http.put<HttpResponse<any>>(`${environment.apiUrl}users/notifications/${notification.id}/mark-as-read`,
       null, {headers: headers, observe: 'response'}).pipe(map<HttpResponse<any>, boolean>(result => result.ok));
   }
+
 }

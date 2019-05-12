@@ -3,8 +3,6 @@ import {ThemeService} from "./services/theme.service";
 import {UserService} from "./services/user.service";
 import {SwPush} from "@angular/service-worker";
 
-import {environment} from "../environments/environment";
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -18,6 +16,9 @@ export class AppComponent {
         alert('Puedes activar las notificaciones en la configuración de tu navegador');
       }
     });
+    if (navigator.serviceWorker === undefined) {
+      return;
+    }
     navigator.serviceWorker.ready.then(registration => {
       console.log('Succesfully registered service worker');
     })

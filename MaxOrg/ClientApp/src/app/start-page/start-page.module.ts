@@ -47,6 +47,7 @@ import {GithubLoginComponent} from './github-login/github-login.component';
 import {NotFoundComponent} from './not-found/not-found.component';
 import {CommonComponentsModule} from "../common-components/common-components.module";
 import {ImageCropperModule} from "ngx-img-cropper";
+import {GoogleLoginComponent} from './google-login/google-login.component';
 
 @NgModule({
   providers: [],
@@ -69,7 +70,8 @@ import {ImageCropperModule} from "ngx-img-cropper";
     TodosComponent,
     RegisterComponent,
     GithubLoginComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    GoogleLoginComponent
   ],
   imports: [
     CommonModule,
