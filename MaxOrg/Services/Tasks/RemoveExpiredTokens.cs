@@ -1,16 +1,15 @@
-﻿using MaxOrg.Models;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ArangoDB.Client;
+using MaxOrg.Models;
 
 namespace MaxOrg.Services.Tasks
 {
     public class RemoveExpiredTokens : IScheduledTask
     {
-        public string Schedule => "0 0 * * 1,3,5,0";
+        public string Schedule => "* */6 * * *";
 
         public Task ExecuteAsync(CancellationToken cancellationToken)
         {

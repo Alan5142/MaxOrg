@@ -2,7 +2,7 @@
 <div mat-dialog-content>
   <form fxLayout="column" [formGroup]="createSectionForm">
     <mat-form-field>
-      <input matInput type="text" name="sectionName" maxlength="15" minlength="1" formControlName="sectionName">
+      <input matInput type="text" name="sectionName" maxlength="30" minlength="1" formControlName="sectionName">
       <mat-label>Maximo 15 caracteres</mat-label>
       <mat-error *ngIf="createSectionForm.get('sectionName').errors?.required">El campo es requerido</mat-error>
       <mat-error *ngIf="createSectionForm.get('sectionName').errors?.minlength">El campo requiere mas de 1 caracter

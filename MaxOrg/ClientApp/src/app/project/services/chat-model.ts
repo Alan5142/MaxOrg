@@ -1,8 +1,17 @@
+export enum MessageType {
+  Text,
+  Image,
+  Video,
+  Other
+}
+
+
 export interface Message {
   remitent: string;
   date: Date;
-  type: string;
+  type: MessageType;
   data: string;
+  attachmentName?: string;
 }
 
 export interface ChatModel {

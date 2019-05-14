@@ -373,7 +373,7 @@ namespace MaxOrg.Controllers
             
             List<KanbanGroupMember> newMembers = new List<KanbanGroupMember>();
 
-            foreach (var newMember in request.NewMembers)
+            foreach (var newMember in request.MembersToEdit)
             {
                 var user = Database.CreateStatement<User>($@"
                     FOR v in 1 INBOUND 'Group/{groupId}' GRAPH 'GroupUsersGraph' 
@@ -421,7 +421,7 @@ namespace MaxOrg.Controllers
                 await Database.UpdateByIdAsync<User>(user.Id, user);
                 await NotificationHub.Clients
                     .Group($"Users/{user.Key}")
-                    .SendAsync("notificationReceived", notificationMessage);
+                    .SendAsync("notificationReceived", notification);
             }
 
             kanbanBoard.Members = newMembers;
@@ -659,11 +659,6 @@ namespace MaxOrg.Controllers
                 var notificationMessage =
                     string.Format($"Se ha eliminado la tarjeta {card.Title} del grupo {kanbanBoard.Name}");
 
-                // enviar la notificación
-                await NotificationHub.Clients
-                    .Group($"Users/{user.Key}")
-                    .SendAsync("notificationReceived", notificationMessage);
-
                 var notification = new Notification
                 {
                     Read = false,
@@ -671,6 +666,12 @@ namespace MaxOrg.Controllers
                     Priority = NotificationPriority.Low,
                     Context = $"project/{groupId}/board/{boardId}"
                 };
+                
+                // enviar la notificación
+                await NotificationHub.Clients
+                    .Group($"Users/{user.Key}")
+                    .SendAsync("notificationReceived", notification);
+
 
                 user.Notifications.Add(notification);
                 await Database.UpdateByIdAsync<User>(user.Id, user);
@@ -1122,6 +1123,10 @@ namespace MaxOrg.Controllers
 
             return Ok();
         }
+
+        #endregion
+
+        #region GitHub repo
 
         #endregion
 

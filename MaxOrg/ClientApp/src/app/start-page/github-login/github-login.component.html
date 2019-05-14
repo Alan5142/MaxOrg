@@ -1,3 +1,78 @@
 <div class="height-100 width-100" fxFlexAlign="center stretch" fxLayout="row">
-  <mat-progress-bar fxFlex mode="indeterminate"></mat-progress-bar>
+  <form [formGroup]="requiredInformation" id="requiredInformation" class="width-100">
+    <div fxLayout="column" fxLayoutAlign="center center">
+      <mat-form-field>
+        <input #username
+               formControlName="username"
+               i18n-placeholder
+               matInput
+               placeholder="Nombre de usuario"
+               type="text">
+        <mat-hint *ngIf="username.value === ''" i18n>Debe ser unico</mat-hint>
+        <mat-error *ngIf="requiredInformation.controls.username.errors?.required">No puede estar vacio</mat-error>
+        <mat-error
+          *ngIf="requiredInformation.controls.username.errors?.minlength && !requiredInformation.controls.username.errors?.required">
+          El nombre de usuario debe tener una longitud minima de 7 letras
+        </mat-error>
+        <mat-error *ngIf="requiredInformation.controls.username.errors?.usernameexists">El usuario ya existe
+        </mat-error>
+        <mat-icon *ngIf="requiredInformation.controls.username.valid" matSuffix>done</mat-icon>
+        <mat-spinner *ngIf="requiredInformation.get('username').pending" [diameter]="20" matSuffix></mat-spinner>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput type="text" #password formControlName="description">
+        <mat-label>Descripción</mat-label>
+        <mat-hint>Opcional</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input formControlName="email"
+               id="email"
+               matInput
+               placeholder="Correo electronico"
+               type="email">
+        <mat-error *ngIf="requiredInformation.controls.email.errors?.email">Correo electronico invalido
+        </mat-error>
+        <mat-error *ngIf="requiredInformation.controls.email.errors?.required">No puede estar vacio</mat-error>
+        <mat-error *ngIf="requiredInformation.controls.email.errors?.emailexists">El email ya existe</mat-error>
+        <mat-spinner *ngIf="requiredInformation.get('email').pending" [diameter]="20" matSuffix></mat-spinner>
+        <mat-icon *ngIf="requiredInformation.controls.email.valid" matSuffix>done</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input #password
+               (keyup)="triggerPasswordValidation()"
+               formControlName="password"
+               i18n-placeholder
+               matInput
+               placeholder="Contraseña"
+               type="password">
+        <mat-error *ngIf="requiredInformation.controls.password.errors?.required">No puede estar vacio</mat-error>
+        <mat-error *ngIf="requiredInformation.controls.password.errors?.minlength &&
+                              !requiredInformation.controls.password.errors?.required">Debe tener una
+          longitud minima de
+          8 letras
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input #repeat_password
+               formControlName="repeat_password"
+               i18n-placeholder
+               matInput
+               placeholder="Repetir contraseña"
+               type="password">
+        <mat-error *ngIf="requiredInformation.controls.repeat_password.errors?.required">No puede estar vacio
+        </mat-error>
+        <mat-error *ngIf="requiredInformation.controls.repeat_password.errors?.controlValueEquals">Las contraseñas
+          no coinciden
+        </mat-error>
+      </mat-form-field>
+
+      <button [disabled]="!requiredInformation.valid" color="primary" i18n mat-flat-button type="submit" (click)="createUserWithGithub()">
+        Enviar
+      </button>
+    </div>
+  </form>
 </div>

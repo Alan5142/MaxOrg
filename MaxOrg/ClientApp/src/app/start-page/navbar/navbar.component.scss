@@ -7,16 +7,16 @@
 .mat-menu-panel.notifications-dropdown {
   max-width:none;
   margin-left: -8px;
+  overflow-y: auto;
 }
 
-@media screen and (min-width: 1280px) {
-  .notifications-dropdown {
+.notifications-dropdown {
+  overflow-y: hidden;
+  @media screen and (min-width: 1280px) {
     width: 400px;
     height: 500px;
   }
-}
-@media screen and (max-width: 1279px) {
-  .notifications-dropdown {
+  @media screen and (max-width: 1279px) {
     width: 280px;
   }
 }

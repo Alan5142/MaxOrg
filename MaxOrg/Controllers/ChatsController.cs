@@ -6,6 +6,7 @@ using ArangoDB.Client;
 using MaxOrg.Graphs;
 using MaxOrg.Hubs;
 using MaxOrg.Models;
+using MaxOrg.Models.Chats;
 using MaxOrg.Models.Group;
 using MaxOrg.Models.Users;
 using MaxOrg.Requests.Chat;
@@ -13,6 +14,10 @@ using MaxOrg.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Configuration;
+using Microsoft.WindowsAzure.Storage.Blob;
+using shortid;
 
 namespace MaxOrg.Controllers
 {
@@ -35,9 +40,13 @@ namespace MaxOrg.Controllers
         /// <summary>
         /// Contiene los datos del Hub SignalR de las notificaciones, con esto podemos enviar una notificación en caso de que un usuario haya sido agregado a un chat
         /// </summary>
-        private readonly IHubContext<NotificationHub> _notificationHub;
+        private IHubContext<NotificationHub> NotificationHub { get; }
 
         private IArangoDatabase Database { get; }
+
+        private CloudBlobContainer BlobContainer { get; }
+
+        private IConfiguration Configuration { get; }
 
         /// <summary>
         /// Constructor de ChatsController, recibe dos parametros, uno de ellos es una referencia al ChatHub de SignalR y el otro una referencia
@@ -45,12 +54,16 @@ namespace MaxOrg.Controllers
         /// </summary>
         /// <param name="chatHub"></param>
         /// <param name="notificationHub"></param>
+        /// <param name="database"></param>
+        /// <param name="blobContainer"></param>
         public ChatsController(IHubContext<ChatHub> chatHub, IHubContext<NotificationHub> notificationHub,
-            IArangoDatabase database)
+            IArangoDatabase database, CloudBlobContainer blobContainer, IConfiguration configuration)
         {
+            Configuration = configuration;
+            BlobContainer = blobContainer;
             Database = database;
             _chatHub = chatHub;
-            _notificationHub = notificationHub;
+            NotificationHub = notificationHub;
         }
 
         /// <summary>
@@ -63,6 +76,11 @@ namespace MaxOrg.Controllers
         [HttpGet]
         public async Task<IActionResult> GetIdentifiedUserChats([FromQuery] string projectId)
         {
+            if (projectId == null)
+            {
+                return BadRequest();
+            }
+
             // Buscamos al usuario
             var user = await Database.Query<User>()
                 .Where(u => u.Key == HttpContext.User.Identity.Name)
@@ -77,38 +95,22 @@ namespace MaxOrg.Controllers
             var rootGroup = await Database.GetRootGroup(projectId);
 
             // Busqueda en la base de datos que obtiene los chats grupales a los que pertenece un usuario
-            var groupChats = await Database.CreateStatement<Chat>(@"
-                    LET chat = (FOR c in 1..1 INBOUND" + $"'{user.Id}'" + @"
-                     GRAPH 'ChatsUsersGraph'
-                     return c)
-                     FOR c in chat
-                     FILTER c.isGroup == true FILTER c.projectId == " + $"'{rootGroup.Key}'" + @"
-                    
-                    LET messages = (
-                    FOR m in c.messages
-                    FOR u in User
-                    FILTER m.remitent == u._key
-                    return MERGE(m, {remitent: u.username})
-                    )
-                    return MERGE(c, {messages: messages})
-                ").ToListAsync();
+            var groupChats = await Database.CreateStatement<dynamic>($@"
+            FOR c in 1..1 INBOUND '{user.Id}'
+                GRAPH 'ChatsUsersGraph'
+                FILTER c.isGroup == true
+                FILTER c.projectId == '{rootGroup.Key}'
+                return {{key: c._key, id: c._id, projectId: c.projectId, name: c.name, description: c.description}}")
+                .ToListAsync();
 
             // Busqueda en la base de datos que obtiene los chats individuales a los que pertenece un usuario
-            var pairChats = await Database.CreateStatement<Chat>(@"
-                    LET chat = (FOR c in 1..1 INBOUND" + $"'{user.Id}'" + @"
-                     GRAPH 'ChatsUsersGraph'
-                     return c)
-                     FOR c in chat
-                     FILTER c.isGroup == false FILTER c.projectId == " + $"'{rootGroup.Key}'" + @"
-                    
-                    LET messages = (
-                    FOR m in c.messages
-                    FOR u in User
-                    FILTER m.remitent == u._key
-                    return MERGE(m, {remitent: u.username})
-                    )
-                    return MERGE(c, {messages: messages})
-                ").ToListAsync();
+            var pairChats = await Database.CreateStatement<dynamic>($@"
+            FOR c in 1..1 INBOUND '{user.Id}'
+                GRAPH 'ChatsUsersGraph'
+                FILTER c.isGroup == false
+                FILTER c.projectId == '{rootGroup.Key}'
+                return {{key: c._key, id: c._id, projectId: c.projectId, name: c.name, description: c.description}}")
+                .ToListAsync();
 
             // Devolvemos un "Ok" (Http 200) junto con los chats grupales y los chats entre 2 personas
             return Ok(new {groupChats, pairChats});
@@ -143,7 +145,7 @@ namespace MaxOrg.Controllers
                 }
 
                 var rootGroup = await Database.GetRootGroup(request.ProjectId);
-                
+
                 var chat = new Chat
                 {
                     Name = request.Name,
@@ -153,7 +155,7 @@ namespace MaxOrg.Controllers
                 };
 
                 var createdChat = await db.InsertAsync<Chat>(chat);
-                
+
                 var usersInChatGraph = db.Graph("ChatsUsersGraph");
 
 
@@ -166,12 +168,12 @@ namespace MaxOrg.Controllers
                 await usersInChatGraph.InsertEdgeAsync<ChatMembers>(userToAdd);
                 var notificationMessage =
                     $"${user.Username} te ha agregado al chat ${chat.Name} en el proyecto ${group.Name}";
-                
+
                 foreach (var userId in request.Members)
                 {
                     var memberUser = Database.Query<User>().Where(u => u.Key == userId).Select(u => u).FirstOrDefault();
-                    
-                    
+
+
                     userToAdd = new ChatMembers
                     {
                         Chat = createdChat.Id,
@@ -180,10 +182,7 @@ namespace MaxOrg.Controllers
 
                     await usersInChatGraph.InsertEdgeAsync<ChatMembers>(userToAdd);
 
-                    await _notificationHub.Clients
-                        .Group($"User/{userId}")
-                        .SendAsync("notificationReceived", notificationMessage);
-                    
+
                     var notification = new Notification
                     {
                         Read = false,
@@ -191,7 +190,10 @@ namespace MaxOrg.Controllers
                         Priority = NotificationPriority.Medium,
                         Context = $"project/{rootGroup.Key}/messages"
                     };
-                    
+                    await NotificationHub.Clients
+                        .Group($"User/{userId}")
+                        .SendAsync("notificationReceived", notification);
+
                     memberUser?.Notifications.Add(notification);
                     await db.UpdateByIdAsync<User>(memberUser?.Id, memberUser);
                 }
@@ -260,26 +262,124 @@ namespace MaxOrg.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("{chatId}/messages")]
-        public async Task<IActionResult> SendMessage(string chatId, SendMessageRequest request)
+        [RequestSizeLimit(52428800)]
+        public async Task<IActionResult> SendMessage(string chatId, [FromForm, FromBody] SendMessageRequest request)
         {
-            using (var db = ArangoDatabase.CreateWithSetting())
+            var chat = await Database.Query<Chat>()
+                .Where(c => c.Key == chatId)
+                .Select(c => c).FirstOrDefaultAsync();
+            if (request.Attachment is null && request.Message is null)
             {
-                var chat = await db.Query<Chat>()
-                    .Where(c => c.Key == chatId)
-                    .Select(c => c).FirstOrDefaultAsync();
-                chat.Messages.Add(new Message()
+                return NotFound();
+            }
+
+            Message message;
+
+            if (request.Message != null)
+            {
+                message = new Message()
                 {
                     Type = MessageType.Text,
                     Data = request.Message,
                     Remitent = HttpContext.User.Identity.Name,
                     Date = DateTime.UtcNow
-                });
-
-                await _chatHub.Clients.Group(chat.Id).SendAsync("receiveMessage", request.Message);
-
-                await db.UpdateByIdAsync<Chat>(chat.Id, chat);
-                return Ok();
+                };
             }
+            else
+            {
+                try
+                {
+                    // id del blob
+                    var id = ShortId.Generate(true, false, 30);
+                    var blob = BlobContainer.GetBlockBlobReference($"chats/{chatId}/{id}");
+                    var messageType = MessageType.Other;
+                    var contentType = request.Attachment.ContentType;
+                    await blob.UploadFromStreamAsync(request.Attachment.OpenReadStream());
+                    await blob.FetchAttributesAsync();
+                    blob.Properties.ContentType = request.Attachment.ContentType;
+                    blob.Properties.CacheControl = "max-age=2419200";
+                    await blob.SetPropertiesAsync();
+
+                    // tipo de contenido
+                    if (contentType.Contains("video"))
+                    {
+                        messageType = MessageType.Video;
+                    }
+                    else if (contentType.Contains("image"))
+                    {
+                        messageType = MessageType.Image;
+                    }
+
+                    message = new Message
+                    {
+                        Type = messageType,
+                        Data = $"/api/chats/{chatId}/messages/attachment/{id}",
+                        Remitent = HttpContext.User.Identity.Name,
+                        Date = DateTime.UtcNow,
+                        AttachmentId = id
+                    };
+
+                    if (messageType == MessageType.Other)
+                    {
+                        message.AttachmentName = request.Attachment.FileName;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    return StatusCode(500, new {message = "Error uploading file"});
+                }
+            }
+
+
+            chat.Messages.Add(message);
+
+            await _chatHub.Clients.Group(chat.Id).SendAsync("receiveMessage", new
+            {
+                message.Data,
+                message.Date,
+                message.Type,
+                message.AttachmentId,
+                message.AttachmentName,
+                Remitent = (await Database.Collection("User").DocumentAsync<User>(message.Remitent)).Username
+            });
+
+            await Database.UpdateByIdAsync<Chat>(chat.Id, chat);
+            return Ok();
+        }
+
+        [HttpGet("{chatId}/messages/attachment/{attachmentId}")]
+        public async Task<IActionResult> GetAttachmentData(string chatId, string attachmentId)
+        {
+            var isMember = Database.CreateStatement<bool>($@"return (FOR u in 1..1 OUTBOUND 'Chat/{chatId}'
+                        GRAPH 'ChatsUsersGraph'
+                        PRUNE u._key == '{HttpContext.User.Identity.Name}'
+                        FILTER u._key == '{HttpContext.User.Identity.Name}'
+                        return u) != []").ToList().FirstOr(false);
+            if (!isMember)
+            {
+                return NotFound();
+            }
+
+            var blob = BlobContainer.GetBlockBlobReference($"chats/{chatId}/{attachmentId}");
+            if (!await blob.ExistsAsync())
+            {
+                return NotFound();
+            }
+
+            var sasConstraints = new SharedAccessBlobPolicy
+            {
+                SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5),
+                SharedAccessExpiryTime = DateTime.UtcNow.AddHours(2),
+                Permissions = SharedAccessBlobPermissions.Read
+            };
+
+            var sasBlobToken = blob.GetSharedAccessSignature(sasConstraints);
+            return Ok(new
+            {
+                Url = blob.Uri + sasBlobToken,
+                Mime = blob.Properties.ContentType
+            });
         }
 
         /// <summary>

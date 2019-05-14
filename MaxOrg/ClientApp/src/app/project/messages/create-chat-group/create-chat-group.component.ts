@@ -53,7 +53,6 @@ export class CreateChatGroupComponent implements OnInit {
   addMember(event: MatChipInputEvent) {
     const input = event.input;
     const value = event.value;
-    console.log('Texto');
     if (!this.matAutocomplete.isOpen) {
       if ((value || '').trim()) {
         const index = (this.data.members as Array<any>).findIndex(u => u.username === value.trim());

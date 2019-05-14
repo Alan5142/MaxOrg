@@ -31,7 +31,7 @@
     <div fxLayout="column" fxLayoutGap="15px">
       <h1 fxLayoutAlign="center" i18n mat-dialog-title>O utiliza una cuenta</h1>
 
-      <button i18n mat-raised-button (click)="googleLogin()">
+      <button i18n mat-raised-button (click)="googleLogin()" *ngIf="isNotChromeMobile()">
         <img class="social-logo-img"
              src="/images/logos/google-logo-icon.png">
         Cuenta de Google

@@ -15,7 +15,6 @@ export class RecordComponent implements OnInit {
     while (this.data.length < 20) {
       this.data.push(this.generateTestData());
     }
-    console.log(this.data);
   }
 
   ngOnInit() {

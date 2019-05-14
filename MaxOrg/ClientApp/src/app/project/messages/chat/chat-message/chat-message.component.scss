@@ -6,7 +6,10 @@
   float: left;
   min-height: 50px;
   min-width: 150px;
-  max-width: 300px;
+  max-width: 400px;
+  @media only screen and (max-width: 959px) {
+    max-width: 85%;
+  }
   position: relative;
   background: #dbdbdb;
   border-radius: .4em;

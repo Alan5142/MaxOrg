@@ -176,6 +176,7 @@ namespace MaxOrg
             services.AddSingleton(new HttpClient());
 
             services.AddSingleton<IScheduledTask, RemoveExpiredTokens>();
+            services.AddSingleton<IScheduledTask, RemoveEmptyUsers>();
             services.AddScheduler((sender, args) => { args.SetObserved(); });
             services.AddSignalR();
 

@@ -4,13 +4,15 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using ArangoDB.Client;
-using MaxOrg.Models;
 using MaxOrg.Models.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Octokit;
+using Notification = MaxOrg.Models.Notification;
+using User = MaxOrg.Models.Users.User;
 
 namespace MaxOrg.Controllers
 {
@@ -18,17 +20,17 @@ namespace MaxOrg.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private PasswordHasher<User> m_passwordHasher;
-        private readonly IConfiguration m_configuration;
-        private readonly CloudBlobContainer Container;
-        private readonly IArangoDatabase Database;
+        private PasswordHasher<User> PasswordHasher { get; }
+        private IConfiguration Configuration { get; }
+        private CloudBlobContainer Container { get; }
+        private IArangoDatabase Database { get; }
         
         public UsersController(IConfiguration configuration, CloudBlobContainer container, IArangoDatabase database)
         {
             Database = database;
             Container = container;
-            m_configuration = configuration;
-            m_passwordHasher = new PasswordHasher<User>();
+            Configuration = configuration;
+            PasswordHasher = new PasswordHasher<User>();
         }
 
         /// <summary>
@@ -55,39 +57,39 @@ namespace MaxOrg.Controllers
                         u.Occupation,
                         birthday = AQL.DateFormat(u.Birthday, "%dd/%mm/%yyyy")
                     };
-                if (options.name != null)
+                if (options.Name != null)
                 {
-                    query = query.Where(u => AQL.Contains(AQL.Lower(u.Username), AQL.Lower(options.name)));
+                    query = query.Where(u => AQL.Contains(AQL.Lower(u.Username), AQL.Lower(options.Name)));
                 }
 
-                if (options.email != null)
+                if (options.Email != null)
                 {
                     query = from u in query
-                        where AQL.Lower(u.Email) == AQL.Lower(options.email)
+                        where AQL.Lower(u.Email) == AQL.Lower(options.Email)
                         select u;
                 }
 
-                if (options.limit.HasValue)
+                if (options.Limit.HasValue)
                 {
-                    query = query.Take(options.limit.Value);
+                    query = query.Take(options.Limit.Value);
                 }
 
-                if (options.sorted.HasValue && options.sorted.Value == true)
+                if (options.Sorted.HasValue && options.Sorted.Value == true)
                 {
                     query = query.OrderBy(user => user.Username);
                 }
 
                 var defaultValue = query.FirstOrDefault();
                 var queryCount = query.Count();
-                if (query.Count() >= 250 || options.page.HasValue)
+                if (query.Count() >= 250 || options.Page.HasValue)
                 {
-                    var skipValue = (options.page ?? 0) * 250;
+                    var skipValue = (options.Page ?? 0) * 250;
                     query = query.Skip(skipValue).Take(250).Select(u => u);
                 }
 
-                if (options.maxElements.HasValue && options.maxElements.Value > 0)
+                if (options.MaxElements.HasValue && options.MaxElements.Value > 0)
                 {
-                    query = query.Take(options.maxElements.Value);
+                    query = query.Take(options.MaxElements.Value);
                 }
 
                 return Ok(query);
@@ -113,7 +115,8 @@ namespace MaxOrg.Controllers
                 user.Birthday,
                 user.Occupation,
                 user.Key,
-                ProfilePicture = $"{m_configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
+                user.NotificationPreference,
+                ProfilePicture = $"{Configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
             });
         }
         
@@ -153,7 +156,7 @@ namespace MaxOrg.Controllers
             var saltAsString = Convert.ToBase64String(salt);
 
             var userToInsert = new User(user);
-            userToInsert.Password = m_passwordHasher.HashPassword(userToInsert, saltAsString + user.Password);
+            userToInsert.Password = PasswordHasher.HashPassword(userToInsert, saltAsString + user.Password);
             userToInsert.Salt = saltAsString;
 
             var createdUser = await db.InsertAsync<User>(userToInsert);
@@ -198,7 +201,7 @@ namespace MaxOrg.Controllers
                     user.Birthday,
                     user.Occupation,
                     user.Key,
-                    ProfilePicture = $"{m_configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
+                    ProfilePicture = $"{Configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
                 });
             }
         }
@@ -211,6 +214,7 @@ namespace MaxOrg.Controllers
             {
                 return NotFound();
             }
+            
             var sasConstraints = new SharedAccessBlobPolicy
             {
                 SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5),
@@ -239,12 +243,13 @@ namespace MaxOrg.Controllers
                 }
 
                 user.Password = userData.Password != null
-                    ? m_passwordHasher.HashPassword(user, userData.Password)
+                    ? PasswordHasher.HashPassword(user, userData.Password)
                     : user.Password;
                 user.RealName = userData.RealName ?? user.RealName;
                 user.Description = userData.Description ?? user.Description;
                 user.Birthday = userData.Birthday ?? user.Birthday;
                 user.Occupation = userData.Occupation ?? user.Occupation;
+                user.NotificationPreference = userData.Preferences ?? user.NotificationPreference;
                 if (userData.ProfilePicture != null || userData.ProfilePictureAsBase64 != null)
                 {
                     var blob = Container.GetBlockBlobReference($"users/{user.Key}/profile.jpeg");
@@ -257,6 +262,7 @@ namespace MaxOrg.Controllers
                         catch (Exception e)
                         {
                             Console.Error.WriteLine(e.Message);
+                            return StatusCode(500);
                         }
                     }
                     else
@@ -269,9 +275,13 @@ namespace MaxOrg.Controllers
                         catch (Exception e)
                         {
                             Console.Error.WriteLine(e);
+                            return StatusCode(500);
                         }
-                        
                     }
+
+                    await blob.FetchAttributesAsync();
+                    blob.Properties.ContentType = "image/jpeg";
+                    await blob.SetPropertiesAsync();
                 }
 
                 await db.UpdateByIdAsync<User>(user.Key, user);
@@ -389,6 +399,34 @@ namespace MaxOrg.Controllers
             }
         }
         
+        #endregion
+
+        #region GitHub user stuff
+
+        [Authorize]
+        [HttpGet("repos")]
+        public async Task<IActionResult> GetUserRepos()
+        {
+            var user = await Database.Collection("User").DocumentAsync<User>(HttpContext.User.Identity.Name);
+            if (user?.Password == null)
+            {
+                return NotFound();
+            }
+            
+            var client = new GitHubClient(new ProductHeaderValue("maxorg"));
+            
+            var tokenAuth = new Credentials(user.GithubToken); // NOTE: not real token
+            client.Credentials = tokenAuth;
+
+            var repos = await client.Repository.GetAllForCurrent();
+            return Ok(repos.Where(repo => !repo.Archived).Select(repo => new
+            {
+                repo.Description,
+                repo.Name,
+                repo.FullName
+            }));
+        }
+
         #endregion
     }
 }

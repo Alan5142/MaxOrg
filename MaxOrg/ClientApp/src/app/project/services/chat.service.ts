@@ -1,16 +1,17 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams, HttpRequest} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
-import {ChatModel, GetUserChatsResponse} from "./chat-model";
+import {ChatModel, GetUserChatsResponse, Message} from "./chat-model";
 import {HubConnection, HubConnectionBuilder, LogLevel} from "@aspnet/signalr";
 import {UserService} from "../../services/user.service";
-import {from, Observable} from "rxjs";
+import {from, Observable, Subject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
 
+  private messageObserver = new Subject<Message>();
   hubConnection: HubConnection;
   private chatObservable: Observable<any>;
   private onConnected: Observable<any>;
@@ -19,13 +20,13 @@ export class ChatService {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl('/chat-hub', {accessTokenFactory: () => userService.userToken, logger: LogLevel.None})
       .build();
-    this.onConnected = from(this.hubConnection.start().then(ok => {
-      this.chatObservable = new Observable<any>(observer => {
-        this.hubConnection.on('receiveMessage', (message: string, date: Date, sender: string) => {
-          observer.next({message: message, date: date, sender: sender});
-        });
+    this.onConnected = from(this.hubConnection.start());
+    this.onConnected.subscribe(ok => {
+      this.hubConnection.on('receiveMessage', (message: Message) => {
+        console.log(message);
+        this.messageObserver.next(message);
       });
-    }));
+    });
   }
 
   get onConnectedObservable() {
@@ -33,7 +34,7 @@ export class ChatService {
   }
 
   public connect(chatId: string) {
-    this.hubConnection.send('JoinGroup', chatId).then(() => console.log(':D'));
+    this.hubConnection.send('JoinGroup', chatId).then(() => {});
 
   }
 
@@ -42,7 +43,7 @@ export class ChatService {
   }
 
   get observeMessages() {
-    return this.chatObservable;
+    return this.messageObserver.asObservable();
   }
 
   userChats(projectId: string) {
@@ -65,7 +66,6 @@ export class ChatService {
   }
 
   getChatWithId(chatId: string) {
-    console.log(`chatId: ${chatId}`);
     const headers = new HttpHeaders().append('Authorization', `Bearer ${localStorage.getItem('token')}`);
     return this.http.get<ChatModel>( `${environment.apiUrl}chats/${chatId}`,
       {
@@ -74,7 +74,27 @@ export class ChatService {
   }
 
   sendMessage(chatId: string, message: string) {
-    const headers = new HttpHeaders().append('Authorization', `Bearer ${localStorage.getItem('token')}`);
-    return this.http.post(`${environment.apiUrl}chats/${chatId}/messages`, {message: message}, {headers: headers});
+    const formData: FormData = new FormData();
+    formData.append('message', message);
+    return this.http.post(`${environment.apiUrl}chats/${chatId}/messages`, formData);
+  }
+
+  public getAttachmentData(serverUrl: string): Observable<any> {
+    return this.http.get<any>(serverUrl);
+  }
+
+  sendFile(chatId: string, file: File) {
+    const formData = new FormData();
+    formData.append('attachment', file);
+
+    const uploadReq = new HttpRequest('POST', `${environment.apiUrl}chats/${chatId}/messages`, formData, {
+      reportProgress: true,
+    });
+
+    return this.http.post(`${environment.apiUrl}chats/${chatId}/messages`, formData, {
+      reportProgress: true,
+      observe: "events",
+      headers: {'ngsw-bypass': ''}
+    });
   }
 }

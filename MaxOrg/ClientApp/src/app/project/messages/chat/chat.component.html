@@ -19,10 +19,17 @@
   <virtual-scroller #scroll
                     [bufferAmount]="100"
                     [enableUnequalChildrenSizes]="true"
-                    [items]="(chat | async)?.messages"
+                    [items]="chatMessages"
                     class="height-100">
-      <app-chat-message *ngFor="let message of scroll?.viewPortItems;" class="chat-element chat-view" fxLayout="column"
-                        [message]="message.data" [sender]="message.remitent" [selfMessage]="user.username === message.remitent"></app-chat-message>
+      <app-chat-message *ngFor="let message of scroll?.viewPortItems; let i = index"
+                        class="chat-element chat-view"
+                        fxLayout="column"
+                        (refresh)="scrollToBottom(scroll?.viewPortItems.length - 1)"
+                        [lastMessage]="i === scroll.viewPortItems.length - 1"
+                        [message]="message.data"
+                        [sender]="message.remitent"
+                        [messageData]="message"
+                        [selfMessage]="user.username === message.remitent"></app-chat-message>
 
   </virtual-scroller>
 
@@ -38,8 +45,18 @@
 -->
   <mat-form-field appearance="outline" class="width-100" fxFlexAlign="end">
     <textarea #message cdkTextareaAutosize matInput placeholder="mensaje"></textarea>
-    <button color="primary" fxFlexAlign="top" mat-fab matSuffix (click)="sendMessage(message.value)">
-      <mat-icon>message</mat-icon>
-    </button>
   </mat-form-field>
+
+  <app-speed-dial-fab
+    [canClick]="message.value.length === 0"
+    [fabIcon]="message.value.length > 0 ? 'message' : 'attach_file'"
+    [fabButtons]="speedDialFabButtons"
+    (fabClick)="onSpeedDialFabClicked($event)"
+    (fabToggleClick)="sendMessage(message.value); message.value = ''"
+    yPosition="bottom" xPosition="right">
+  </app-speed-dial-fab>
+
+
 </div>
+<input (change)="uploadImageToServer($event)" #uploadImage type="file" hidden accept="image/*" name="uploadImage">
+<input (change)="uploadImageToServer($event)" #uploadFile type="file" hidden accept="*" name="uploadFile">

@@ -17,5 +17,7 @@ namespace MaxOrg.Models.Users
         public IFormFile ProfilePicture { get; set; } = null;
         
         public string ProfilePictureAsBase64 { get; set; } = null;
+        
+        public NotificationPreference? Preferences { get; set; }
     }
 }

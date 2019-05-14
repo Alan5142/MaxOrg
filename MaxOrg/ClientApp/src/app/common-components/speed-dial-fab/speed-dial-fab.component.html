@@ -1,0 +1,31 @@
+<div *ngIf="show"
+  (appClickOutside)="close()"
+  class="speed-dial-container"
+  [ngClass]="[yPosition, xPosition]">
+
+  <div class='fab-container'
+    [style.flexDirection]="reverseColumnDirection?'column-reverse':'column'">
+
+    <button mat-fab class="fab-toggler" type="button"
+      (click)="onToggleFab()">
+      <i class="material-icons" [@fabToggler]="{value: fabTogglerState}">{{fabIcon}}</i>
+    </button>
+
+    <div [className]="reverseColumnDirection?'column-reverse':'column'"
+      [@speedDialStagger]="buttons.length">
+
+    <button *ngFor="let btn of buttons"
+        mat-mini-fab
+        matTooltip="{{btn.tooltip}}"
+        color="{{btn.color}}"
+        (click)="onClickFab(btn)"
+        disabled="{{btn.disabled}}"
+        type="button">
+        <i class="material-icons">{{btn.icon}}</i>
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

@@ -185,12 +185,7 @@ namespace MaxOrg.Controllers
 
                 var notificationMessage = string.Format($"{currentUser.Username} te ha agregado " +
                                                         $"al proyecto '{projectGroup.Name}'", projectGroup.Name);
-
-                // enviar la notificación
-                await NotificationHub.Clients
-                    .Group("Users/" + user.Key)
-                    .SendAsync("notificationReceived", notificationMessage, NotificationPriority.Medium);
-
+                
                 var notification = new Notification
                 {
                     Read = false,
@@ -198,6 +193,12 @@ namespace MaxOrg.Controllers
                     Priority = NotificationPriority.Medium,
                     Context = $"project/{createdGroup.Key}"
                 };
+
+                // enviar la notificación
+                await NotificationHub.Clients
+                    .Group("Users/" + user.Key)
+                    .SendAsync("notificationReceived", notification);
+
                 user.Notifications.Add(notification);
                 await db.UpdateByIdAsync<User>(user.Id, user);
             }

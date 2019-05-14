@@ -1,12 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  Inject,
-  OnInit,
-  ViewChildren,
-  ViewEncapsulation
-} from '@angular/core';
+import {Component, Inject, OnInit, ViewEncapsulation} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar} from '@angular/material';
 import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
@@ -35,7 +27,8 @@ export class NavbarComponent implements OnInit {
   constructor(private dialog: MatDialog,
               public userService: UserService,
               private router: Router,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              public authService: AuthService) {
     this.notifications = userService.getUserNotifications();
   }
 
@@ -59,8 +52,6 @@ export class NavbarComponent implements OnInit {
       .catch(() => this.snackBar.open('Error al intentar navegar a la notificación', 'OK', {duration: 1500}));
   }
 }
-
-declare const gapi;
 
 @Component({
   selector: 'app-navbar-dialog',
@@ -97,8 +88,34 @@ export class NavbarDialogComponent {
   }
 
   googleLogin() {
-    this.authService.signIn(GoogleLoginProvider.PROVIDER_ID);
-    this.authService.authState.subscribe(c => {console.log(c)}, err => {});
+    this.authService.signOut(true).then(() => {}).catch(() => {
+    });
+    console.log(GoogleLoginProvider.PROVIDER_ID);
+    this.authService.signIn(GoogleLoginProvider.PROVIDER_ID).then(ok => {
+      this.userService.googleLogin(ok.id).subscribe(userData => {
+          localStorage.setItem('token', userData.token);
+          localStorage.setItem('refreshToken', userData.refreshToken);
+          localStorage.setItem('userId', userData.refreshToken);
+          this.router.navigate(['/start/index']);
+          this.dialogRef.close();
+        },
+        error => {
+          this.router.navigate(['/start/google-login'], {
+            queryParams: {
+              email: ok.email,
+              photoUrl: ok.photoUrl,
+              googleId: ok.id
+            }
+          });
+          this.dialogRef.close();
+        });
+    }).catch(error => {
+      console.log(error);
+    });
+  }
+
+  isNotChromeMobile() {
+    return !/^(?=.*\bChrome\b)(?=.*\bAndroid\b).*$/i.test(navigator.userAgent);
   }
 }
 

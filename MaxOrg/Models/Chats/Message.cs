@@ -1,15 +1,8 @@
-﻿using System;
+using System;
 using ArangoDB.Client;
 
-namespace MaxOrg.Models
+namespace MaxOrg.Models.Chats
 {
-    public enum MessageType
-    {
-        Text,
-        Image,
-        Video
-    }
-
     /// <summary>
     /// Representa un mensaje dentro de un chat
     /// </summary>
@@ -36,5 +29,16 @@ namespace MaxOrg.Models
         /// Datos del mensaje, puede ser texto o un enlace en caso de que sea video o imágen
         /// </summary>
         public string Data { get; set; }
+        
+        /// <summary>
+        /// Identificador unico del archivo, se utiliza un string de 30 digitos con la finalidad de evitar colisiones con cualquier archivo que se desee enviar en
+        /// el chat
+        /// </summary>
+        public string AttachmentId { get; set; }
+        
+        /// <summary>
+        /// Nombre del archivo que se subió al chat, es utilizado para mostrar el nombre del archivo de una manera amigable dentro del chat
+        /// </summary>
+        public string AttachmentName { get; set; }
     }
 }

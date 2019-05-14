@@ -61,7 +61,10 @@ import {KanbanIndexComponent} from './kanban-board/kanban-index/kanban-index.com
 import {ChatMessageComponent} from './messages/chat/chat-message/chat-message.component';
 import {VirtualScrollerModule} from 'ngx-virtual-scroller';
 import {CodeComponent} from './code/code.component';
-import {CommonComponentsModule} from '../common-components/common-components.module';
+import {
+  CommonComponentsModule,
+  CommonComponentsModule as AppCommonComponentsModule
+} from '../common-components/common-components.module';
 import {OrgChartComponent} from './org-chart/org-chart.component';
 import {TreeComponent} from './org-chart/tree/tree.component';
 import {GroupCardComponent} from './org-chart/group-card/group-card.component';
@@ -90,7 +93,8 @@ import {CardDetailedComponent} from './kanban-board/board/card-detailed/card-det
 import {CardDeleteComponent} from './kanban-board/board/card-delete/card-delete.component';
 import {ModifyMembersComponent} from './kanban-board/modify-members/modify-members.component';
 import {CreateChatGroupComponent} from './messages/create-chat-group/create-chat-group.component';
-
+import {UploadFileComponent} from './messages/chat/upload-file/upload-file.component';
+import {LinkToGithubComponent} from './admin-dashboard/link-to-github/link-to-github.component';
 
 @NgModule({
   entryComponents: [
@@ -113,7 +117,9 @@ import {CreateChatGroupComponent} from './messages/create-chat-group/create-chat
     CardDetailedComponent,
     CardDeleteComponent,
     ModifyMembersComponent,
-    CreateChatGroupComponent
+    CreateChatGroupComponent,
+    UploadFileComponent,
+    LinkToGithubComponent
   ],
   imports: [
     CommonModule,
@@ -158,7 +164,8 @@ import {CreateChatGroupComponent} from './messages/create-chat-group/create-chat
     MatSnackBarModule,
     MatBadgeModule,
     MatButtonToggleModule,
-    MatRadioModule
+    MatRadioModule,
+    AppCommonComponentsModule
   ],
   declarations: [
     ProjectComponent,
@@ -205,7 +212,9 @@ import {CreateChatGroupComponent} from './messages/create-chat-group/create-chat
     CardDetailedComponent,
     CardDeleteComponent,
     ModifyMembersComponent,
-    CreateChatGroupComponent
+    CreateChatGroupComponent,
+    UploadFileComponent,
+    LinkToGithubComponent
   ],
   bootstrap: [
     ProjectComponent

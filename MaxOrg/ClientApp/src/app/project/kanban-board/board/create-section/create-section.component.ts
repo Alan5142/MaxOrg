@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {MatDialogRef} from '@angular/material';
 
@@ -15,7 +15,7 @@ export class CreateSectionComponent implements OnInit {
 
   ngOnInit() {
     this.createSectionForm = this.formBuilder.group({
-      sectionName: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(15)]]
+      sectionName: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(30)]]
     });
   }
 

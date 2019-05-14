@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace MaxOrg.Requests.Chat
 {
@@ -10,10 +10,11 @@ namespace MaxOrg.Requests.Chat
     public class SendMessageRequest
     {
         /// <summary>
-        /// Mensaje de texto que el usuario desea enviar al chat, este campo es requerido
+        /// Mensaje de texto que el usuario desea enviar al chat
         /// </summary>
-        [Required]
         public string Message { get; set; }
+        
+        public IFormFile Attachment { get; set; }
     }
 
     /// <summary>

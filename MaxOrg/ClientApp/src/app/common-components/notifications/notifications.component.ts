@@ -1,6 +1,6 @@
 import {Component, OnInit, Output} from '@angular/core';
 import {merge, Observable} from "rxjs";
-import {Notification as UserNotification, UserService} from "../../services/user.service";
+import {Notification as UserNotification, NotificationPriority, UserService} from "../../services/user.service";
 import {MatSnackBar} from "@angular/material";
 import {Router} from "@angular/router";
 import {map, share, shareReplay} from "rxjs/operators";
@@ -12,6 +12,8 @@ import {NotificationService} from "../../services/notification.service";
   styleUrls: ['./notifications.component.scss']
 })
 export class NotificationsComponent implements OnInit {
+
+  NotificationPriority = NotificationPriority;
 
   notifications: Observable<UserNotification[]> = null;
 

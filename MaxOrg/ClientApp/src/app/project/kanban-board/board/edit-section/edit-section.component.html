@@ -5,7 +5,7 @@
       <input type="text" matInput [(ngModel)]="group.name" name="name">
       <mat-label>Nombre</mat-label>
       <mat-error *ngIf="group.name === ''">No puede estar vacio</mat-error>
-      <mat-error *ngIf="group.name.length > 15">No puede tener mas de 15 caracteres</mat-error>
+      <mat-error *ngIf="group.name.length > 50">No puede tener mas de 50 caracteres</mat-error>
     </mat-form-field>
     <mat-form-field>
       <input type="color" matInput [(ngModel)]="group.color" name="color">
