@@ -16,6 +16,7 @@ import {SpeedDialFabComponent} from "./speed-dial-fab/speed-dial-fab.component";
 import {ClickOutsideDirective} from "./shared/click-outside.directive";
 import {DomChangeDirective} from "./shared/dom-change.directive";
 import {InViewportDirective} from "./shared/in-viewport.directive";
+import {TimeAgoPipe} from './time-ago.pipe';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import {InViewportDirective} from "./shared/in-viewport.directive";
     SpeedDialFabComponent,
     ClickOutsideDirective,
     DomChangeDirective,
-    InViewportDirective
+    InViewportDirective,
+    TimeAgoPipe
   ],
   imports: [
     CommonModule,
@@ -40,7 +42,8 @@ import {InViewportDirective} from "./shared/in-viewport.directive";
   exports: [
     ContextMenuComponent,
     NotificationsComponent,
-    SpeedDialFabComponent
+    SpeedDialFabComponent,
+    TimeAgoPipe
   ]
 })
 export class CommonComponentsModule {
