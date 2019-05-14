@@ -10,6 +10,7 @@ import {
   MatDialogModule,
   MatFormFieldModule,
   MatInputModule,
+  MatSnackBarModule,
   MatToolbarModule,
   MatTooltipModule
 } from '@angular/material';
@@ -43,6 +44,7 @@ import {AuthServiceConfig, GoogleLoginProvider, SocialLoginModule} from "angular
     ReactiveFormsModule,
     SocialLoginModule,
     MatTooltipModule,
+    MatSnackBarModule,
     ServiceWorkerModule.register('service-worker.js', {enabled: environment.production})
   ],
   providers: [

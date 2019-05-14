@@ -42,7 +42,6 @@ export class NavbarComponent implements OnInit {
     this.router.paramMap.subscribe(params => {
       this.projectInfo = this.groupsService.getGroupInfo(params.get('id')).pipe(shareReplay(1));
       this.projectInfo.subscribe(() => {}, error => {
-        console.log(error);
         this.navRouter.navigate(['/start-page/not-found']);
       })
     });

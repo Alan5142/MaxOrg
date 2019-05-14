@@ -1,7 +1,8 @@
 import {Component} from '@angular/core';
 import {ThemeService} from "./services/theme.service";
 import {UserService} from "./services/user.service";
-import {SwPush} from "@angular/service-worker";
+import {SwUpdate} from "@angular/service-worker";
+import {MatSnackBar} from "@angular/material";
 
 @Component({
   selector: 'app-root',
@@ -10,7 +11,10 @@ import {SwPush} from "@angular/service-worker";
 })
 
 export class AppComponent {
-  constructor(public theme: ThemeService, userService: UserService, private push: SwPush) {
+  constructor(public theme: ThemeService,
+              private userService: UserService,
+              private update: SwUpdate,
+              private snackBar: MatSnackBar) {
     Notification.requestPermission().then((result) => {
       if (result === "denied") {
         alert('Puedes activar las notificaciones en la configuración de tu navegador');
@@ -20,7 +24,14 @@ export class AppComponent {
       return;
     }
     navigator.serviceWorker.ready.then(registration => {
-      console.log('Succesfully registered service worker');
+      update.available.subscribe(updateAvailable => {
+        const snack = this.snackBar.open('Hay una actualización disponible', 'Recargar', {duration: 15000});
+        snack
+          .onAction()
+          .subscribe(() => {
+            window.location.reload();
+          });
+      })
     })
   }
 }

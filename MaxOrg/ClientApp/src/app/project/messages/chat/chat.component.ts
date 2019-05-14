@@ -120,9 +120,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const behaviourSubject = new Subject<number | boolean>();
     const dialog = this.dialog.open(UploadFileComponent, {data: behaviourSubject.asObservable()});
-    this.chatService.sendFile(this.chatId, $event.target.files[0]).subscribe(result => {
-      console.log('Type: ' + result.type);
-      console.log(`Result: ${result}`);
+    const observable = this.chatService.sendFile(this.chatId, $event.target.files[0]).subscribe(result => {
       if (result.type === HttpEventType.UploadProgress) {
         behaviourSubject.next(Math.round(100 * result.loaded / result.total));
       } else if (result instanceof HttpResponse) {
@@ -132,6 +130,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     }, error => {
       this.snackbar.open('No se pudo subir', 'OK', {duration: 2000});
       dialog.close();
+    });
+    dialog.afterClosed().subscribe(closed => {
+      observable.unsubscribe();
     });
   }
 }

@@ -40,7 +40,6 @@ export class ChatMessageComponent implements OnInit, AfterViewInit {
           sourceTag.src = data.url;
           this.videoElement.nativeElement.appendChild(sourceTag);
           this.videoElement.nativeElement.onloadedmetadata = () => {
-            console.log('loaded metadata');
             this.refresh.next()
           }
         }
