@@ -43,7 +43,7 @@ import {AuthServiceConfig, GoogleLoginProvider, SocialLoginModule} from "angular
     ReactiveFormsModule,
     SocialLoginModule,
     MatTooltipModule,
-    ServiceWorkerModule.register('service-worker/ngsw-worker.js', {enabled: environment.production})
+    ServiceWorkerModule.register('service-worker.js', {enabled: environment.production})
   ],
   providers: [
     {provide: HAMMER_GESTURE_CONFIG, useClass: GestureConfig},
