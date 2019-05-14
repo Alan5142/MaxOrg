@@ -123,9 +123,6 @@ namespace MaxOrg.Controllers
             // get an access token
             var tokenResponse = await GetGitHubAccessToken(loginParameters.AccessToken);
 
-            var hasPassword = true;
-            User userToAuth;
-
             var githubClient = new GitHubClient(new Octokit.ProductHeaderValue("MaxOrg"));
 
             Credentials tokenAuth;
@@ -171,7 +168,7 @@ namespace MaxOrg.Controllers
                 });
             }
 
-            userToAuth = userWithSameId;
+            var userToAuth = userWithSameId;
 
             if (userToAuth.GithubToken != tokenResponse.AccessToken)
             {
@@ -382,7 +379,7 @@ namespace MaxOrg.Controllers
                 var blob = Container.GetBlockBlobReference($"users/{user.Key}/profile.jpeg");
                 await blob.UploadFromStreamAsync(await image.Content.ReadAsStreamAsync());
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // ignored
             }

@@ -373,7 +373,7 @@ namespace MaxOrg.Controllers
             
             List<KanbanGroupMember> newMembers = new List<KanbanGroupMember>();
 
-            foreach (var newMember in request.NewMembers)
+            foreach (var newMember in request.MembersToEdit)
             {
                 var user = Database.CreateStatement<User>($@"
                     FOR v in 1 INBOUND 'Group/{groupId}' GRAPH 'GroupUsersGraph' 

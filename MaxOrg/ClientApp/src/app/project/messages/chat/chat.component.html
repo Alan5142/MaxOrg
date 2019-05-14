@@ -19,7 +19,7 @@
   <virtual-scroller #scroll
                     [bufferAmount]="100"
                     [enableUnequalChildrenSizes]="true"
-                    [items]="(chat | async)?.messages"
+                    [items]="chatMessages"
                     class="height-100">
       <app-chat-message *ngFor="let message of scroll?.viewPortItems; let i = index"
                         class="chat-element chat-view"

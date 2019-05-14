@@ -50,7 +50,6 @@ export class ChatMessageComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    console.log('Loaded');
     setTimeout(() => this.refresh.next(), 300);
     this.refresh.next();
   }

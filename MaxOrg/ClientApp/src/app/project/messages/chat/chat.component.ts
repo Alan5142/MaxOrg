@@ -5,8 +5,8 @@ import {VirtualScrollerComponent} from 'ngx-virtual-scroller';
 import {ActivatedRoute, Router} from "@angular/router";
 import {merge, Observable, Subject} from "rxjs";
 import {ChatService} from "../../services/chat.service";
-import {shareReplay} from "rxjs/operators";
-import {ChatModel, MessageType} from "../../services/chat-model";
+import {map, shareReplay} from "rxjs/operators";
+import {ChatModel, Message, MessageType} from "../../services/chat-model";
 import {User, UserService} from "../../../services/user.service";
 import {FabButton} from "../../../common-components/speed-dial-fab/fab-button.model";
 import {MatDialog, MatSnackBar} from "@angular/material";
@@ -31,6 +31,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   receiveMessages: Observable<any>;
   chatId: string;
   currentUser: Observable<User> = null;
+  chatMessages: Message[];
 
   speedDialFabButtons: FabButton[] = [
     new FabButton({
@@ -60,27 +61,27 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.chatId === null || this.chatId === '') {
           return;
         }
-        this.chat = chatService.getChatWithId(this.chatId).pipe(shareReplay(1));
-        this.chat.subscribe(c =>
-            setTimeout(() => this.virtualScroll.scrollToIndex(c.messages.length - 1, true, 0, 0), 600),
+        this.chat = chatService.getChatWithId(this.chatId).pipe(shareReplay(1)).pipe(map<ChatModel, ChatModel>(model => {
+          return model;
+        }));
+        this.chat.subscribe(c => {
+          this.chatMessages = c.messages;
+            setTimeout(() => this.virtualScroll.scrollToIndex(c.messages.length - 1, true, 0, 0), 600)
+          },
           error => this.router.navigate(['not-found'], {relativeTo: this.route.parent}));
       });
   }
 
-  updateMessages() {
-    const newMessages = this.chatService.getChatWithId(this.chatId).pipe(shareReplay(1));
-    this.chat = merge(this.chat, newMessages);
-    this.chat.subscribe(c => setTimeout(() =>
-      this.virtualScroll.scrollToIndex(c.messages.length - 1, true, 0, 0), 1000));
-  }
-
   ngOnInit() {
+    this.receiveMessages = this.chatService.observeMessages;
+    this.receiveMessages.subscribe(message => {
+      this.chatMessages.push(message);
+      setTimeout(() =>
+        this.virtualScroll.scrollToIndex(this.chatMessages.length - 1, true, 0, 0), 50);
+    });
+    this.chat = merge(this.chat, this.receiveMessages);
     this.chatService.onConnectedObservable.subscribe(() => {
       this.chatService.connect(this.chatId);
-      this.receiveMessages = this.chatService.observeMessages;
-      this.receiveMessages.subscribe(messageReceived => {
-        this.updateMessages();
-      });
     });
 
   }
@@ -97,7 +98,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     this.chatService.sendMessage(this.chatId, message).subscribe(r => {
-      this.updateMessages();
     })
   }
 

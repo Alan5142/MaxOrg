@@ -57,39 +57,39 @@ namespace MaxOrg.Controllers
                         u.Occupation,
                         birthday = AQL.DateFormat(u.Birthday, "%dd/%mm/%yyyy")
                     };
-                if (options.name != null)
+                if (options.Name != null)
                 {
-                    query = query.Where(u => AQL.Contains(AQL.Lower(u.Username), AQL.Lower(options.name)));
+                    query = query.Where(u => AQL.Contains(AQL.Lower(u.Username), AQL.Lower(options.Name)));
                 }
 
-                if (options.email != null)
+                if (options.Email != null)
                 {
                     query = from u in query
-                        where AQL.Lower(u.Email) == AQL.Lower(options.email)
+                        where AQL.Lower(u.Email) == AQL.Lower(options.Email)
                         select u;
                 }
 
-                if (options.limit.HasValue)
+                if (options.Limit.HasValue)
                 {
-                    query = query.Take(options.limit.Value);
+                    query = query.Take(options.Limit.Value);
                 }
 
-                if (options.sorted.HasValue && options.sorted.Value == true)
+                if (options.Sorted.HasValue && options.Sorted.Value == true)
                 {
                     query = query.OrderBy(user => user.Username);
                 }
 
                 var defaultValue = query.FirstOrDefault();
                 var queryCount = query.Count();
-                if (query.Count() >= 250 || options.page.HasValue)
+                if (query.Count() >= 250 || options.Page.HasValue)
                 {
-                    var skipValue = (options.page ?? 0) * 250;
+                    var skipValue = (options.Page ?? 0) * 250;
                     query = query.Skip(skipValue).Take(250).Select(u => u);
                 }
 
-                if (options.maxElements.HasValue && options.maxElements.Value > 0)
+                if (options.MaxElements.HasValue && options.MaxElements.Value > 0)
                 {
-                    query = query.Take(options.maxElements.Value);
+                    query = query.Take(options.MaxElements.Value);
                 }
 
                 return Ok(query);

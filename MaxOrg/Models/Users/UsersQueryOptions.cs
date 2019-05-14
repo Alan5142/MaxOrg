@@ -2,11 +2,11 @@ namespace MaxOrg.Models.Users
 {
     public class UsersQueryOptions
     {
-        public string name { get; set; }
-        public bool? sorted { get; set; }
-        public int? limit { get; set; }
-        public int? page { get; set; }
-        public string email { get; set; }
-        public int? maxElements { get; set; }
+        public string Name { get; set; }
+        public bool? Sorted { get; set; }
+        public int? Limit { get; set; }
+        public int? Page { get; set; }
+        public string Email { get; set; }
+        public int? MaxElements { get; set; }
     }
 }

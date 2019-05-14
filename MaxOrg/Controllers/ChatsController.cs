@@ -45,7 +45,7 @@ namespace MaxOrg.Controllers
         private IArangoDatabase Database { get; }
 
         private CloudBlobContainer BlobContainer { get; }
-        
+
         private IConfiguration Configuration { get; }
 
         /// <summary>
@@ -109,7 +109,8 @@ namespace MaxOrg.Controllers
                 GRAPH 'ChatsUsersGraph'
                 FILTER c.isGroup == false
                 FILTER c.projectId == '{rootGroup.Key}'
-                return {{key: c._key, id: c._id, projectId: c.projectId, name: c.name, description: c.description}}").ToListAsync();
+                return {{key: c._key, id: c._id, projectId: c.projectId, name: c.name, description: c.description}}")
+                .ToListAsync();
 
             // Devolvemos un "Ok" (Http 200) junto con los chats grupales y los chats entre 2 personas
             return Ok(new {groupChats, pairChats});
@@ -298,7 +299,7 @@ namespace MaxOrg.Controllers
                     blob.Properties.ContentType = request.Attachment.ContentType;
                     blob.Properties.CacheControl = "max-age=2419200";
                     await blob.SetPropertiesAsync();
-                    
+
                     // tipo de contenido
                     if (contentType.Contains("video"))
                     {
@@ -326,14 +327,22 @@ namespace MaxOrg.Controllers
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
-                    return StatusCode(500, new{message = "Error uploading file"});
+                    return StatusCode(500, new {message = "Error uploading file"});
                 }
             }
 
 
             chat.Messages.Add(message);
 
-            await _chatHub.Clients.Group(chat.Id).SendAsync("receiveMessage", request.Message);
+            await _chatHub.Clients.Group(chat.Id).SendAsync("receiveMessage", new
+            {
+                message.Data,
+                message.Date,
+                message.Type,
+                message.AttachmentId,
+                message.AttachmentName,
+                Remitent = (await Database.Collection("User").DocumentAsync<User>(message.Remitent)).Username
+            });
 
             await Database.UpdateByIdAsync<Chat>(chat.Id, chat);
             return Ok();
@@ -351,13 +360,13 @@ namespace MaxOrg.Controllers
             {
                 return NotFound();
             }
-            
+
             var blob = BlobContainer.GetBlockBlobReference($"chats/{chatId}/{attachmentId}");
             if (!await blob.ExistsAsync())
             {
                 return NotFound();
             }
-            
+
             var sasConstraints = new SharedAccessBlobPolicy
             {
                 SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5),
@@ -371,9 +380,8 @@ namespace MaxOrg.Controllers
                 Url = blob.Uri + sasBlobToken,
                 Mime = blob.Properties.ContentType
             });
-            
         }
-        
+
         /// <summary>
         /// Añade un usuario, definido en la petición, al chat que cuente con el identificador proporcionado por el usuario que desea agregar otro miembro al chat,
         /// este método crea un vinculo a través de grafos entre el chat al que se le desea agregar un miembro y el miembro que será agregado.
