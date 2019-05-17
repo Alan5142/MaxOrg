@@ -415,7 +415,7 @@ namespace MaxOrg.Controllers
             
             var client = new GitHubClient(new ProductHeaderValue("maxorg"));
             
-            var tokenAuth = new Credentials(user.GithubToken); // NOTE: not real token
+            var tokenAuth = new Credentials(user.GithubToken);
             client.Credentials = tokenAuth;
 
             var repos = await client.Repository.GetAllForCurrent();
@@ -423,7 +423,8 @@ namespace MaxOrg.Controllers
             {
                 repo.Description,
                 repo.Name,
-                repo.FullName
+                repo.FullName,
+                repo.Id
             }));
         }
 

@@ -95,6 +95,8 @@ import {ModifyMembersComponent} from './kanban-board/modify-members/modify-membe
 import {CreateChatGroupComponent} from './messages/create-chat-group/create-chat-group.component';
 import {UploadFileComponent} from './messages/chat/upload-file/upload-file.component';
 import {LinkToGithubComponent} from './admin-dashboard/link-to-github/link-to-github.component';
+import {EventComponent} from './calendar/event/event.component';
+import {DayEventsComponent} from './calendar/day-events/day-events.component';
 
 @NgModule({
   entryComponents: [
@@ -119,7 +121,9 @@ import {LinkToGithubComponent} from './admin-dashboard/link-to-github/link-to-gi
     ModifyMembersComponent,
     CreateChatGroupComponent,
     UploadFileComponent,
-    LinkToGithubComponent
+    LinkToGithubComponent,
+    EventComponent,
+    DayEventsComponent
   ],
   imports: [
     CommonModule,
@@ -214,7 +218,9 @@ import {LinkToGithubComponent} from './admin-dashboard/link-to-github/link-to-gi
     ModifyMembersComponent,
     CreateChatGroupComponent,
     UploadFileComponent,
-    LinkToGithubComponent
+    LinkToGithubComponent,
+    EventComponent,
+    DayEventsComponent
   ],
   bootstrap: [
     ProjectComponent

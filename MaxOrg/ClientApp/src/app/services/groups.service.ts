@@ -25,6 +25,14 @@ export interface GetGroupMembersResponse {
   members: User[];
 }
 
+export interface EditGroupRequest {
+  linkedRepositoryId?: number;
+  name?: string;
+  groupOwner?: string;
+  description?: string
+  readOnly?: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -66,4 +74,7 @@ export class GroupsService {
     return this.http.get<GetGroupMembersResponse>(`${environment.apiUrl}groups/${groupId}/members`);
   }
 
+  changeGroupInfo(groupId: string, editRequest: EditGroupRequest): Observable<void> {
+    return this.http.put<void>(`${environment.apiUrl}groups/${groupId}`, editRequest);
+  }
 }

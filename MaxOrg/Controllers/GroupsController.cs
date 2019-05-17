@@ -6,15 +6,19 @@ using ArangoDB.Client;
 using MaxOrg.Hubs;
 using MaxOrg.Hubs.Clients;
 using MaxOrg.Models;
+using MaxOrg.Models.Calendar;
 using MaxOrg.Models.Group;
 using MaxOrg.Models.Kanban;
 using MaxOrg.Models.Tasks;
-using MaxOrg.Models.Users;
+using MaxOrg.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
+using Octokit;
+using Notification = MaxOrg.Models.Notification;
+using User = MaxOrg.Models.Users.User;
 
 namespace MaxOrg.Controllers
 {
@@ -26,11 +30,37 @@ namespace MaxOrg.Controllers
     [ApiController]
     public class GroupsController : ControllerBase
     {
+        /// <summary>
+        /// Referencia a una conexión a la base de datos, es construida por ASP.NET Core e inyectada dentro de la clase
+        /// </summary>
         private IArangoDatabase Database { get; }
+
+        /// <summary>
+        /// Referencia a "KanbanHub", el cual es un "Hub" de SignalR, este hub maneja la conexión
+        /// en tiempo real con los clientes que esten observando un tablero Kanban, es inyectado por ASP.NET Core
+        /// </summary>
         private IHubContext<KanbanHub, IKanbanClient> KanbanHub { get; }
+
+        /// <summary>
+        /// Referencia a "NotificationHub", el cual es un "Hub" de SignalR, este hub maneja la conexión
+        /// con los clientes para enviarles notificaciones en tiempo real, es inyectado a la clase por ASP.NET Core
+        /// </summary>
         private IHubContext<NotificationHub> NotificationHub { get; }
+
+        /// <summary>
+        /// Parametros de configuración de la aplicación, es inyectado por ASP.NET Core
+        /// </summary>
         private IConfiguration Configuration { get; }
 
+        /// <summary>
+        /// Constructor de la clase, es invocado por ASP.NET Core al momento de tener que manejar una petición, al mismo tiempo
+        /// le inyecta la base de datos, el "Hub" para el tablero, el "Hub" para las notificaciones y los parametros de
+        /// configuración de la aplicación 
+        /// </summary>
+        /// <param name="database"></param>
+        /// <param name="kanbanHub"></param>
+        /// <param name="notificationHub"></param>
+        /// <param name="configuration"></param>
         public GroupsController(IArangoDatabase database,
             IHubContext<KanbanHub, IKanbanClient> kanbanHub,
             IHubContext<NotificationHub> notificationHub,
@@ -43,7 +73,7 @@ namespace MaxOrg.Controllers
         }
 
         /// <summary>
-        /// Crea un grupo dentro de un grupo o un proyecto
+        /// Crea un grupo dentro de un grupo o un proyecto, es invocado por SignalR
         /// </summary>
         /// <param name="createGroup">Información requerida para poder crear el grupo</param>
         /// <returns>
@@ -133,6 +163,39 @@ namespace MaxOrg.Controllers
         }
 
         /// <summary>
+        /// Modifica la información de un proyecto, solo se le permite al administrador del grupo o a los
+        /// administradores de jerarquía superior, este método es invocado por ASP.NET Core e invoca a "IsAdmin"
+        /// de la clase IArangoDatabase, el cuál es un extension method, devuelve un código de error 404 en caso de que
+        /// no exista el grupo, un 401 en caso de que no este autorizado y un 200 en caso de que se haya modificado con exito
+        /// la información del grupo
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="editGroupData"></param>
+        /// <returns></returns>
+        [HttpPut("{groupId}")]
+        public async Task<IActionResult> EditGroup(string groupId, [FromBody] EditGroupRequest editGroupData)
+        {
+            var group = await Database.DocumentAsync<Group>(groupId);
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            if (!await Database.IsAdmin(HttpContext.User.Identity.Name, groupId))
+            {
+                return Unauthorized();
+            }
+
+            group.Name = editGroupData.Name ?? group.Name;
+            group.LinkedRepositoryName = editGroupData.LinkedRepositoryName ?? group.LinkedRepositoryName;
+            group.GroupOwner = editGroupData.GroupOwner ?? group.GroupOwner;
+            group.Description = editGroupData.Description ?? group.Description;
+
+            await Database.UpdateByIdAsync<Group>(group.Id, group);
+            return Ok();
+        }
+
+        /// <summary>
         /// Cambia la descripción del grupo
         /// </summary>
         /// <param name="groupId">Grupo al que se desea cambiar la descripción</param> 
@@ -212,7 +275,7 @@ namespace MaxOrg.Controllers
 
             var members = GetGroupMembers(groupId).Select(u => new
             {
-                u.Key, 
+                u.Key,
                 u.Username,
                 ProfilePicture = $"{Configuration["AppSettings:DefaultURL"]}/api/users/{u.Key}/profile.jpeg"
             }).ToList();
@@ -222,9 +285,115 @@ namespace MaxOrg.Controllers
             {
                 return Unauthorized();
             }
-            
+
             return Ok(new {Members = members});
         }
+
+        #region Calendar events
+
+        [HttpGet("{groupId}/calendar")]
+        public async Task<IActionResult> GetGroupEvents(string groupId)
+        {
+            var rootGroup = await Database.GetRootGroup(groupId);
+            if (rootGroup == null)
+            {
+                return NotFound();
+            }
+
+            if (!await Database.IsGroupMember(HttpContext.User.Identity.Name, rootGroup.Key))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(rootGroup.Events);
+        }
+
+        [HttpPost("{groupId}/calendar")]
+        public async Task<IActionResult> CreateEvent(string groupId, [FromBody] CreateEventRequest eventRequest)
+        {
+            var rootGroup = await Database.GetRootGroup(groupId);
+            if (rootGroup == null)
+            {
+                return NotFound();
+            }
+
+            if (!await Database.IsGroupMember(HttpContext.User.Identity.Name, rootGroup.Key))
+            {
+                return Unauthorized();
+            }
+
+            rootGroup.Events.Add(new Event
+            {
+                Description = eventRequest.Description,
+                Title = eventRequest.Title,
+                Priority = eventRequest.Priority,
+                OnlyForMe = eventRequest.OnlyForMe,
+                CreatorId = HttpContext.User.Identity.Name,
+                EventDate = eventRequest.EventDate
+            });
+
+            await Database.UpdateByIdAsync<Group>(rootGroup.Id, rootGroup);
+            return Ok();
+        }
+
+        [HttpPut("{groupId}/calendar/{eventId}")]
+        public async Task<IActionResult> EditEvent(string groupId, string eventId,
+            [FromBody] ModifyEventRequest eventRequest)
+        {
+            var rootGroup = await Database.GetRootGroup(groupId);
+            if (rootGroup == null)
+            {
+                return NotFound();
+            }
+
+            if (!await Database.IsGroupMember(HttpContext.User.Identity.Name, rootGroup.Key))
+            {
+                return Unauthorized();
+            }
+
+            var ev = rootGroup.Events.Find(e => e.Id == eventId);
+            if (ev == null || ev?.CreatorId != HttpContext.User.Identity.Name ||
+                !await Database.IsAdmin(HttpContext.User.Identity.Name, groupId))
+            {
+                return NotFound();
+            }
+
+            ev.Description = eventRequest.Description ?? ev.Description;
+            ev.Priority = eventRequest.Priority ?? ev.Priority;
+            ev.Title = eventRequest.Title ?? ev.Title;
+            ev.EventDate = eventRequest.EventDate ?? ev.EventDate;
+            ev.OnlyForMe = eventRequest.OnlyForMe ?? ev.OnlyForMe;
+            await Database.UpdateByIdAsync<Group>(rootGroup.Id, rootGroup);
+            return Ok();
+        }
+
+        [HttpDelete("{groupId}/calendar/{eventId}")]
+        public async Task<IActionResult> DeleteEvent(string groupId, string eventId)
+        {
+            var rootGroup = await Database.GetRootGroup(groupId);
+            if (rootGroup == null)
+            {
+                return NotFound();
+            }
+
+            if (!await Database.IsGroupMember(HttpContext.User.Identity.Name, rootGroup.Key))
+            {
+                return Unauthorized();
+            }
+
+            var ev = rootGroup.Events.Find(e => e.Id == eventId);
+            if (ev == null || ev?.CreatorId != HttpContext.User.Identity.Name ||
+                !await Database.IsAdmin(HttpContext.User.Identity.Name, groupId))
+            {
+                return NotFound();
+            }
+
+            rootGroup.Events.Remove(ev);
+            await Database.UpdateByIdAsync<Group>(rootGroup.Id, rootGroup);
+            return Ok();
+        }
+
+        #endregion
 
         #region Kanban Boards
 
@@ -370,7 +539,7 @@ namespace MaxOrg.Controllers
             {
                 return Unauthorized();
             }
-            
+
             List<KanbanGroupMember> newMembers = new List<KanbanGroupMember>();
 
             foreach (var newMember in request.MembersToEdit)
@@ -390,7 +559,7 @@ namespace MaxOrg.Controllers
                     newMembers.Add(exists);
                     continue;
                 }
-                
+
                 string notificationMessage;
 
                 if (exists != null && exists.MemberPermissions != KanbanMemberPermissions.Admin) // si existe
@@ -425,7 +594,7 @@ namespace MaxOrg.Controllers
             }
 
             kanbanBoard.Members = newMembers;
-            
+
             await Database.UpdateByIdAsync<Group>(group.Id, group);
             await KanbanHub.Clients.Group($"Group/${groupId}/Kanban/${boardId}").UpdateBoard();
             return Ok();
@@ -666,7 +835,7 @@ namespace MaxOrg.Controllers
                     Priority = NotificationPriority.Low,
                     Context = $"project/{groupId}/board/{boardId}"
                 };
-                
+
                 // enviar la notificación
                 await NotificationHub.Clients
                     .Group($"Users/{user.Key}")
@@ -1127,6 +1296,86 @@ namespace MaxOrg.Controllers
         #endregion
 
         #region GitHub repo
+
+        [HttpGet("{groupId}/github/code")]
+        public async Task<IActionResult> GetCode(string groupId)
+        {
+            var root = await Database.GetRootGroup(groupId);
+            if (root == null || await Database.IsGroupMember(HttpContext.User.Identity.Name, root?.Key))
+            {
+                return NotFound();
+            }
+
+            if (root.LinkedRepositoryName == null)
+            {
+                return StatusCode(403);
+            }
+
+            var admin = await Database.DocumentAsync<User>(root.GroupOwner);
+            var client = new GitHubClient(new ProductHeaderValue("maxorg"));
+
+            var tokenAuth = new Credentials(admin.GithubToken);
+            client.Credentials = tokenAuth;
+            var repo = await client.Repository.Get(root.LinkedRepositoryName.Value);
+
+            var codeRequest = new SearchCodeRequest("auth", repo.Owner.Login, repo.Name)
+            {
+                In = new[] {CodeInQualifier.File, CodeInQualifier.Path}
+            };
+
+            var code = await client.Search.SearchCode(codeRequest);
+
+            return Ok(new {code.Items});
+        }
+
+        [HttpGet("{groupId}/github/issues")]
+        public async Task<IActionResult> GetIssues(string groupId)
+        {
+            var root = await Database.GetRootGroup(groupId);
+            if (root == null || await Database.IsGroupMember(HttpContext.User.Identity.Name, root?.Key))
+            {
+                return NotFound();
+            }
+
+            if (root.LinkedRepositoryName == null)
+            {
+                return StatusCode(403);
+            }
+
+            var admin = await Database.DocumentAsync<User>(root.GroupOwner);
+            var client = new GitHubClient(new ProductHeaderValue("maxorg"));
+
+            var tokenAuth = new Credentials(admin.GithubToken);
+            client.Credentials = tokenAuth;
+
+            var issues = await client.Issue.GetAllForRepository(root.LinkedRepositoryName.Value);
+
+            return Ok(new {issues});
+        }
+
+        [HttpGet("{groupId}/github/commits")]
+        public async Task<IActionResult> GetCommits(string groupId)
+        {
+            var root = await Database.GetRootGroup(groupId);
+            if (root == null || await Database.IsGroupMember(HttpContext.User.Identity.Name, root?.Key))
+            {
+                return NotFound();
+            }
+
+            if (root.LinkedRepositoryName == null)
+            {
+                return StatusCode(403);
+            }
+
+            var admin = await Database.DocumentAsync<User>(root.GroupOwner);
+            var client = new GitHubClient(new ProductHeaderValue("maxorg"));
+
+            var tokenAuth = new Credentials(admin.GithubToken);
+            client.Credentials = tokenAuth;
+            var commits = await client.Repository.Commit.GetAll(root.LinkedRepositoryName.Value);
+
+            return Ok(new {commits});
+        }
 
         #endregion
 

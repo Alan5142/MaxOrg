@@ -6,6 +6,8 @@ import {ChangeDescriptionComponent} from './change-description/change-descriptio
 import {ActivatedRoute} from '@angular/router';
 import {LinkToGithubComponent} from "./link-to-github/link-to-github.component";
 import {UserService} from "../../services/user.service";
+import {FormBuilder} from "@angular/forms";
+import {GroupsService} from "../../services/groups.service";
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -36,7 +38,9 @@ export class AdminDashboardComponent implements OnInit {
               public dialog: MatDialog,
               public route: ActivatedRoute,
               private userService: UserService,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              private formBuilder: FormBuilder,
+              private groupService: GroupsService) {
     route.parent.params.subscribe(params => {
       this.groupId = params['id'];
     });
@@ -64,5 +68,21 @@ export class AdminDashboardComponent implements OnInit {
       error => {
         this.snackBar.open('No se pudieron listar los repositorios, verifica que tu cuenta este vinculada a GitHub', 'OK');
       });
+  }
+
+  editInfo(checked: boolean, name: string) {
+    if (name.trim() === '') {
+      this.snackBar.open('Nombre no puede estar vacio o contener solo espacios', 'OK', {duration: 2000});
+      return;
+    }
+
+    this.groupService.changeGroupInfo(this.groupId, {
+      name: name,
+      readOnly: checked
+    }).subscribe(() => {
+      this.snackBar.open('Información editada con éxito', 'OK', {duration: 2000});
+    }, error => {
+      this.snackBar.open('No se pudo editar la información', 'OK', {duration: 2000});
+    });
   }
 }

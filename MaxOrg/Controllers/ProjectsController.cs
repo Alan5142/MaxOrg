@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ArangoDB.Client;
 using MaxOrg.Hubs;
 using MaxOrg.Models;
+using MaxOrg.Models.Calendar;
 using MaxOrg.Models.Group;
 using MaxOrg.Models.Kanban;
 using MaxOrg.Models.Requirements;
@@ -143,7 +144,9 @@ namespace MaxOrg.Controllers
                 IsRoot = true,
                 Description =
                     $"# {data.Name}\nEsta descripción es generada automaticamente, si eres el administrador puedes cambiarla en el panel de administrador",
-                KanbanBoards = new List<KanbanBoard> {new KanbanBoard(data.Name)}
+                KanbanBoards = new List<KanbanBoard> {new KanbanBoard(data.Name)},
+                Events = new List<Event>(),
+                PreviousProject = data.PreviousProject
             };
 
             // Default kanban creation
@@ -295,6 +298,20 @@ namespace MaxOrg.Controllers
             });
         }
 
+        [HttpPut("{projectId}/finish")]
+        public async Task<IActionResult> ConcludeProject(string projectId)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(projectId);
+            if (group == null || !group.IsRoot)
+            {
+                return StatusCode(403);
+            }
+
+            group.Finished = true;
+            await Database.UpdateByIdAsync<Group>(group.Id, group);
+            return Ok();
+        }
+        
         #region Requirements
 
         /// <summary>

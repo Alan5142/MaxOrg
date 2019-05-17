@@ -152,11 +152,11 @@
           <div fxLayout="row" fxLayout.lt-md="column">
             <form class="options-container" fxFlex="50" fxLayout="column">
               <div fxFlexAlign="start">
-                <mat-slide-toggle color="primary" style="width: min-content;">Solo lectura</mat-slide-toggle>
+                <mat-slide-toggle #readOnly color="primary" style="width: min-content;" name="readOnly">Solo lectura</mat-slide-toggle>
               </div>
               <p class="text-left">Cambiar nombre</p>
               <mat-form-field>
-                <input matInput maxlength="30" placeholder="Nombre del proyecto" type="text">
+                <input #projectName matInput maxlength="30" placeholder="Nombre del proyecto" type="text" name="name">
                 <mat-hint>Longitud máxima de 30 caracteres</mat-hint>
               </mat-form-field>
               <p class="text-left">Agregar usuarios</p>
@@ -168,7 +168,7 @@
                 <textarea cdkTextareaAutosize matInput placeholder="Nombre de usuario"></textarea>
               </mat-form-field>
               <button (click)="changeDescription()" color="accent" mat-flat-button>Cambiar descripción</button>
-              <button color="primary" mat-flat-button>Guardar cambios</button>
+              <button color="primary" type="submit" mat-flat-button (click)="editInfo(readOnly.checked, projectName.value)">Guardar cambios</button>
             </form>
 
             <form class="options-container" fxFlex="50" fxLayout="column">
