@@ -63,7 +63,7 @@ namespace MaxOrg.Models.Group
         /// <summary>
         /// Lista de eventos para el calendario, solo los tiene el grupo raíz
         /// </summary>
-        public List<Event> Events { get; set; }
+        public List<CalendarEvent> Events { get; set; }
 
         /// <summary>
         /// Indica si un proyecto esta terminado, solo es válido para proyectos (IsRoot = true)

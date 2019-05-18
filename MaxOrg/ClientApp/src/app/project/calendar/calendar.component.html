@@ -1,43 +1,176 @@
-<div class="calendar-container" style="overflow-x: hidden">
-  <div class="month">
-    <ul>
-      <li class="prev">
-        <button (click)="goToPreviousMonth()" mat-icon-button>
-          ❮
-        </button>
-      </li>
-      <li class="next">
-        <button (click)="goToNextMonth()" mat-icon-button>
-          ❯
-        </button>
-      </li>
-      <li>{{getMonthName()}}<br><span>{{calendarFilterDate.getFullYear()}}</span></li>
-    </ul>
+<div class="width-100">
+  <div fxLayout="column" fxLayoutAlign="start center">
+    <mat-button-toggle-group #buttonToggleGroup="matButtonToggleGroup" name="viewType" aria-label="Calendar view type">
+      <mat-button-toggle value="month" (click)="setView(CalendarView.Month)" checked>Mes</mat-button-toggle>
+      <mat-button-toggle value="week" (click)="setView(CalendarView.Week)">Semana</mat-button-toggle>
+      <mat-button-toggle value="day" (click)="setView(CalendarView.Day)">Dia</mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <div>
+      <button mat-flat-button
+              mwlCalendarPreviousView
+              [view]="view"
+              [(viewDate)]="viewDate"
+              (viewDateChange)="closeOpenMonthViewDay()"
+              color="accent">
+        Previo
+      </button>
+
+      <button mat-flat-button
+              mwlCalendarToday
+              [(viewDate)]="viewDate"
+              color="accent">
+        Hoy
+      </button>
+
+      <button mat-flat-button
+              color="accent"
+              [view]="view"
+              [(viewDate)]="viewDate"
+              (viewDateChange)="closeOpenMonthViewDay()"
+              mwlCalendarNextView>
+        Siguiente
+      </button>
+    </div>
+
   </div>
 
-  <ul class="weekdays">
-    <li>D</li>
-    <li>L</li>
-    <li>M</li>
-    <li>X</li>
-    <li>J</li>
-    <li>V</li>
-    <li>S</li>
-  </ul>
+  <h2 style="text-align: center">{{ viewDate | calendarDate:(view + 'ViewTitle'):'es-MX' }}</h2>
 
-  <ul class="days">
-    <li *ngFor="let day of dates">
-    <span>
-      <button *ngIf="compareDates() && day?.getDate() === currentDate.getDate(); else elseStatement"
-              color="primary" mat-flat-button mat-icon-button>
-        {{day?.getDate()}}
-      </button>
-      <ng-template #elseStatement>
-        <button *ngIf="day !== null" mat-icon-button (click)="openDayEvents(day)">
-          {{day?.getDate()}}
-        </button>
-      </ng-template>
-    </span>
-    </li>
-  </ul>
+  <div [ngClass]="{'calendar-dark-theme': themeService.isDarkTheme | async}">
+    <mwl-calendar-month-view
+      *ngIf="buttonToggleGroup.value === 'month'"
+      class="width-100 height-100"
+      [viewDate]="viewDate"
+      [events]="events"
+      [refresh]="refresh"
+      [activeDayIsOpen]="activeDayIsOpen"
+      (dayClicked)="dayClicked($event.day)"
+      (eventClicked)="handleEvent('Clicked', $event.event)"
+      (eventTimesChanged)="eventTimesChanged($event)"
+      locale="es-MX">
+    </mwl-calendar-month-view>
+    <mwl-calendar-week-view
+      *ngIf="buttonToggleGroup.value === 'week'"
+      class="width-100 height-100"
+      [viewDate]="viewDate"
+      [events]="events"
+      [refresh]="refresh"
+      (eventClicked)="handleEvent('Clicked', $event.event)"
+      (eventTimesChanged)="eventTimesChanged($event)"
+      locale="es-MX"
+    >
+    </mwl-calendar-week-view>
+    <mwl-calendar-day-view
+      *ngIf="buttonToggleGroup.value === 'day'"
+      class="width-100 height-100"
+      [viewDate]="viewDate"
+      [events]="events"
+      [refresh]="refresh"
+      (eventClicked)="handleEvent('Clicked', $event.event)"
+      (eventTimesChanged)="eventTimesChanged($event)"
+      locale="es-MX"
+    >
+    </mwl-calendar-day-view>
+  </div>
+
+  <mat-form-field class="width-100">
+    <input class="width-100" matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+    <mat-icon matPrefix>search</mat-icon>
+  </mat-form-field>
+  <div class="width-100" style="height: 400px; overflow: auto">
+
+    <table #addEventTable="matTable" mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef> Titulo</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-form-field>
+            <input matInput type="text" [disabled]="!element.canEdit" [(ngModel)]="element.title" (keyup)="refresh.next()">
+          </mat-form-field>
+        </td>
+        <td mat-footer-cell *matFooterCellDef> Titulo</td>
+      </ng-container>
+
+      <ng-container matColumnDef="priority">
+        <th mat-header-cell *matHeaderCellDef>Prioridad</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-form-field>
+            <mat-select (keyup)="refresh.next()"
+                        [(ngModel)]="element.color"
+                        [disabled]="!element.canEdit"
+                        placeholder="Prioridad">
+              <mat-option [value]="colors.low">Baja</mat-option>
+              <mat-option [value]="colors.medium">Media</mat-option>
+              <mat-option [value]="colors.high">Alta</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </td>
+        <td mat-footer-cell *matFooterCellDef> Color principal</td>
+      </ng-container>
+
+      <ng-container matColumnDef="starts">
+        <th mat-header-cell *matHeaderCellDef> Fecha de inicio</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-form-field>
+            <input matInput
+                   [disabled]="!element.canEdit"
+                   [matDatepicker]="picker" placeholder="Escoge una fecha" [(ngModel)]="element.start"
+                   (dateChange)="refresh.next()"
+                   (keyup)="refresh.next()">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </td>
+        <td mat-footer-cell *matFooterCellDef> Fecha de inicio</td>
+      </ng-container>
+
+      <ng-container matColumnDef="ends">
+        <th mat-header-cell *matHeaderCellDef> Fecha de termino</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-form-field>
+            <input matInput [matDatepicker]="picker"
+                   placeholder="Escoge una fecha"
+                   [(ngModel)]="element.end"
+                   [disabled]="!element.canEdit"
+                   (dateChange)="refresh.next()"
+                   (keyup)="refresh.next()">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </td>
+        <td mat-footer-cell *matFooterCellDef> Fecha de termino</td>
+      </ng-container>
+
+      <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef>Eliminar</th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button color="warn" [disabled]="!element.canEdit" (click)="deleteEvent(element)">
+            <mat-icon>delete_forever</mat-icon>
+          </button>
+        </td>
+        <td mat-footer-cell *matFooterCellDef>
+          <button mat-flat-button mat-icon-button color="accent"
+                  (click)="addEvent();">
+            <mat-icon>add</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="save">
+        <th mat-header-cell *matHeaderCellDef>Editar</th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button color="accent" [disabled]="!element.canEdit" (click)="modifyEvent(element)">
+            <mat-icon>save</mat-icon>
+          </button>
+        </td>
+        <td mat-footer-cell *matFooterCellDef>Editar
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+  </div>
 </div>

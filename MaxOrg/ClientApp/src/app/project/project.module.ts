@@ -1,15 +1,15 @@
 import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {CommonModule, registerLocaleData} from '@angular/common';
 import {ProjectComponent} from './project.component';
 import {
-  GestureConfig,
+  GestureConfig, MAT_DATE_LOCALE,
   MatAutocompleteModule,
   MatBadgeModule,
   MatButtonModule,
   MatButtonToggleModule,
   MatCardModule,
   MatCheckboxModule,
-  MatChipsModule,
+  MatChipsModule, MatDatepickerModule,
   MatDialogModule,
   MatDividerModule,
   MatExpansionModule,
@@ -97,7 +97,12 @@ import {UploadFileComponent} from './messages/chat/upload-file/upload-file.compo
 import {LinkToGithubComponent} from './admin-dashboard/link-to-github/link-to-github.component';
 import {EventComponent} from './calendar/event/event.component';
 import {DayEventsComponent} from './calendar/day-events/day-events.component';
+import {CalendarModule, DateAdapter} from "angular-calendar";
+import {adapterFactory} from "angular-calendar/date-adapters/date-fns";
+import localeEs from '@angular/common/locales/es-MX';
+import {MatMomentDateModule} from "@angular/material-moment-adapter";
 
+registerLocaleData(localeEs);
 @NgModule({
   entryComponents: [
     ProjectComponent,
@@ -169,7 +174,13 @@ import {DayEventsComponent} from './calendar/day-events/day-events.component';
     MatBadgeModule,
     MatButtonToggleModule,
     MatRadioModule,
-    AppCommonComponentsModule
+    AppCommonComponentsModule,
+    CalendarModule.forRoot({
+      provide: DateAdapter,
+      useFactory: adapterFactory
+    }),
+    MatDatepickerModule,
+    MatMomentDateModule
   ],
   declarations: [
     ProjectComponent,
@@ -227,7 +238,8 @@ import {DayEventsComponent} from './calendar/day-events/day-events.component';
   ],
   providers: [
     {provide: HAMMER_GESTURE_CONFIG, useClass: GestureConfig},
-    ChatService
+    ChatService,
+    {provide: MAT_DATE_LOCALE, useValue: 'es-MX'},
   ]
 })
 export class ProjectModule {

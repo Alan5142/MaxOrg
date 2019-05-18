@@ -300,16 +300,31 @@ namespace MaxOrg.Controllers
                 return NotFound();
             }
 
-            if (!await Database.IsGroupMember(HttpContext.User.Identity.Name, rootGroup.Key))
+            var userId = HttpContext.User.Identity.Name;
+            
+            if (!await Database.IsGroupMember(userId, rootGroup.Key))
             {
                 return Unauthorized();
             }
 
-            return Ok(rootGroup.Events);
+            var isAdmin = await Database.IsAdmin(userId, groupId);
+            
+            return Ok(rootGroup.Events.Select(e => new
+            {
+                e.Id,
+                e.Title,
+                e.Color,
+                e.End,
+                e.Meta,
+                e.Resizable,
+                e.Start,
+                e.AllDay,
+                CanEdit = isAdmin || e.Creator == userId
+            }));
         }
 
         [HttpPost("{groupId}/calendar")]
-        public async Task<IActionResult> CreateEvent(string groupId, [FromBody] CreateEventRequest eventRequest)
+        public async Task<IActionResult> CreateEvent(string groupId, [FromBody] CalendarEvent eventRequest)
         {
             var rootGroup = await Database.GetRootGroup(groupId);
             if (rootGroup == null)
@@ -322,14 +337,17 @@ namespace MaxOrg.Controllers
                 return Unauthorized();
             }
 
-            rootGroup.Events.Add(new Event
+            rootGroup.Events.Add(new CalendarEvent
             {
                 Description = eventRequest.Description,
                 Title = eventRequest.Title,
-                Priority = eventRequest.Priority,
-                OnlyForMe = eventRequest.OnlyForMe,
-                CreatorId = HttpContext.User.Identity.Name,
-                EventDate = eventRequest.EventDate
+                Color = eventRequest.Color,
+                Creator = HttpContext.User.Identity.Name,
+                End = eventRequest.End,
+                Meta = eventRequest.Meta,
+                Resizable = eventRequest.Resizable,
+                Start = eventRequest.Start,
+                AllDay = eventRequest.AllDay
             });
 
             await Database.UpdateByIdAsync<Group>(rootGroup.Id, rootGroup);
@@ -338,7 +356,7 @@ namespace MaxOrg.Controllers
 
         [HttpPut("{groupId}/calendar/{eventId}")]
         public async Task<IActionResult> EditEvent(string groupId, string eventId,
-            [FromBody] ModifyEventRequest eventRequest)
+            [FromBody] CalendarEvent eventRequest)
         {
             var rootGroup = await Database.GetRootGroup(groupId);
             if (rootGroup == null)
@@ -352,17 +370,20 @@ namespace MaxOrg.Controllers
             }
 
             var ev = rootGroup.Events.Find(e => e.Id == eventId);
-            if (ev == null || ev?.CreatorId != HttpContext.User.Identity.Name ||
+            if (ev == null || ev?.Creator != HttpContext.User.Identity.Name ||
                 !await Database.IsAdmin(HttpContext.User.Identity.Name, groupId))
             {
                 return NotFound();
             }
 
+            ev.Color = eventRequest.Color ?? ev.Color;
             ev.Description = eventRequest.Description ?? ev.Description;
-            ev.Priority = eventRequest.Priority ?? ev.Priority;
             ev.Title = eventRequest.Title ?? ev.Title;
-            ev.EventDate = eventRequest.EventDate ?? ev.EventDate;
-            ev.OnlyForMe = eventRequest.OnlyForMe ?? ev.OnlyForMe;
+            ev.End = eventRequest.End;
+            ev.Meta = eventRequest.Meta;
+            ev.Resizable = eventRequest.Resizable;
+            ev.Start = eventRequest.Start;
+            ev.AllDay = eventRequest.AllDay;
             await Database.UpdateByIdAsync<Group>(rootGroup.Id, rootGroup);
             return Ok();
         }
@@ -382,7 +403,7 @@ namespace MaxOrg.Controllers
             }
 
             var ev = rootGroup.Events.Find(e => e.Id == eventId);
-            if (ev == null || ev?.CreatorId != HttpContext.User.Identity.Name ||
+            if (ev == null || ev?.Creator != HttpContext.User.Identity.Name ||
                 !await Database.IsAdmin(HttpContext.User.Identity.Name, groupId))
             {
                 return NotFound();

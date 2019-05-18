@@ -34,6 +34,9 @@ $ClientApp-theme: mat-light-theme($ClientApp-primary, $ClientApp-accent, $Client
 @import '~prismjs/themes/prism-okaidia.css';
 @import '~prismjs/plugins/line-numbers/prism-line-numbers.css';
 
+// angular calendar
+@import "../node_modules/angular-calendar/css/angular-calendar.css";
+
 html, body {
   height: 100%;
   margin: 0;

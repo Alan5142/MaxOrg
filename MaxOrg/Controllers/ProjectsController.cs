@@ -145,7 +145,7 @@ namespace MaxOrg.Controllers
                 Description =
                     $"# {data.Name}\nEsta descripción es generada automaticamente, si eres el administrador puedes cambiarla en el panel de administrador",
                 KanbanBoards = new List<KanbanBoard> {new KanbanBoard(data.Name)},
-                Events = new List<Event>(),
+                Events = new List<CalendarEvent>(),
                 PreviousProject = data.PreviousProject
             };
 

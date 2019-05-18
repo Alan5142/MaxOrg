@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ArangoDB.Client;
@@ -18,6 +19,10 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage.Blob;
 using shortid;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing;
 
 namespace MaxOrg.Controllers
 {
@@ -294,11 +299,7 @@ namespace MaxOrg.Controllers
                     var blob = BlobContainer.GetBlockBlobReference($"chats/{chatId}/{id}");
                     var messageType = MessageType.Other;
                     var contentType = request.Attachment.ContentType;
-                    await blob.UploadFromStreamAsync(request.Attachment.OpenReadStream());
-                    await blob.FetchAttributesAsync();
-                    blob.Properties.ContentType = request.Attachment.ContentType;
-                    blob.Properties.CacheControl = "max-age=2419200";
-                    await blob.SetPropertiesAsync();
+                    var stream = request.Attachment.OpenReadStream();
 
                     // tipo de contenido
                     if (contentType.Contains("video"))
@@ -307,9 +308,40 @@ namespace MaxOrg.Controllers
                     }
                     else if (contentType.Contains("image"))
                     {
+                        var image = Image.Load(request.Attachment.OpenReadStream());
+                        stream = new MemoryStream();
+
+                        if (contentType.Contains("gif"))
+                        {
+                            image.SaveAsGif(stream);
+                        }
+                        else if(contentType.Contains("png"))
+                        {
+                            image.SaveAsPng(stream, new PngEncoder()
+                            {
+                                CompressionLevel = 8
+                            });
+                            stream.Position = 0;
+                        }
+                        else
+                        {
+                            contentType = "image/jpeg";
+                            image.SaveAsJpeg(stream, new JpegEncoder()
+                            {
+                                Quality = 50
+                            });
+                            stream.Position = 0;
+                        }
+
                         messageType = MessageType.Image;
                     }
 
+                    await blob.UploadFromStreamAsync(stream);
+
+                    await blob.FetchAttributesAsync();
+                    blob.Properties.ContentType = contentType;
+                    blob.Properties.CacheControl = "max-age=2419200";
+                    await blob.SetPropertiesAsync();
                     message = new Message
                     {
                         Type = messageType,

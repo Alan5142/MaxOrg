@@ -22,12 +22,16 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
     <PackageReference Include="Octokit" Version="0.32.0" />
     <PackageReference Include="shortid" Version="2.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-dev002674" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
     <Content Remove="$(SpaRoot)**" />
+    <Content Include=".nuget\NuGet.Config">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
@@ -37,6 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\project\calendar\custom-date-formatter.provider.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\services\prism-include.ts" />
   </ItemGroup>
 
