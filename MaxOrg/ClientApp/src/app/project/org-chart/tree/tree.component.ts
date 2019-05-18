@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import { NewSubgroupComponent } from '../new-subgroup/new-subgroup.component';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-tree',
@@ -14,7 +14,7 @@ export class TreeComponent implements OnInit {
   @Input() userId;
   @Input() adminId: string=null;
   @Input() isAdmin:boolean=false;
-  constructor(public dialog: MatDialog) {
+  constructor(public dialog: MatDialog, public snackBar:MatSnackBar) {
     
   }
 
@@ -30,5 +30,10 @@ export class TreeComponent implements OnInit {
       minWidth: '300px',
       data: {parentId}
     });
+    dialogRef.afterClosed().subscribe(r=>{
+      if(r)
+      this.snackBar.open("grupo creado","OK");
+      
+    },error=>{this.snackBar.open("no se pudo crear :(", "OK")});
   }
 }

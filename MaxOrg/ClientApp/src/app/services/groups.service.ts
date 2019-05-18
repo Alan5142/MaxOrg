@@ -53,13 +53,11 @@ export class GroupsService {
     });
   }
 
-  createGroup(newGroupData: CreateGroupData): Observable<boolean> {
+  createGroup(newGroupData: CreateGroupData) {
     let headers = new HttpHeaders();
     headers = headers.append('Content-Type', 'application/json');
     headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
-    return this.http.post(environment.apiUrl + 'groups', newGroupData, {headers: headers}).pipe(map<any, boolean>(response => {
-      return response;
-    }));
+    return this.http.post(environment.apiUrl + 'groups', newGroupData, {headers: headers});
   }
 
   getMembers(groupId: string): Observable<GetGroupMembersResponse> {

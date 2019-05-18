@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 export interface CreateTaskRequest{
   name:string;
   description:string;
+  deliveryDate?:Date;
   referenceRequirement?:string;
   referenceTask?:string;
   contributionPercentage?:string;

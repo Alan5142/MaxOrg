@@ -32,7 +32,9 @@ import {
   MatTableModule,
   MatTabsModule,
   MatToolbarModule,
-  MatTreeModule
+  MatTreeModule,
+  MatDatepickerModule,
+  MatNativeDateModule
 } from '@angular/material';
 import {ProjectRoutingModule} from './project-routing.module';
 import {DescriptionComponent} from './description/description.component';
@@ -136,6 +138,7 @@ import {LinkToGithubComponent} from './admin-dashboard/link-to-github/link-to-gi
     FlexLayoutModule,
     MatCardModule,
     MatFormFieldModule,
+    MatNativeDateModule,
     DragDropModule,
     ServicesModule,
     FormsModule,
@@ -165,7 +168,8 @@ import {LinkToGithubComponent} from './admin-dashboard/link-to-github/link-to-gi
     MatBadgeModule,
     MatButtonToggleModule,
     MatRadioModule,
-    AppCommonComponentsModule
+    AppCommonComponentsModule,
+    MatDatepickerModule
   ],
   declarations: [
     ProjectComponent,

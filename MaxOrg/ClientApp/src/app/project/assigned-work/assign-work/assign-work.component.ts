@@ -1,6 +1,6 @@
 import {Component, OnInit, Inject} from '@angular/core';
 import { TasksService, Task, CreateTaskRequest } from 'src/app/services/tasks.service';
-import { MAT_DIALOG_DATA } from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
 @Component({
   selector: 'app-assign-work',
@@ -10,7 +10,7 @@ import { MAT_DIALOG_DATA } from '@angular/material';
 export class AssignWorkComponent implements OnInit {
   task:CreateTaskRequest;
   groupId:string;
-  constructor(private taskService:TasksService,
+  constructor(public dialogRef:MatDialogRef<any>,private taskService:TasksService,
                @Inject(MAT_DIALOG_DATA)  groupId: string) {
     this.groupId=groupId;
   }
@@ -22,7 +22,8 @@ export class AssignWorkComponent implements OnInit {
       name:taskName.value,
       description:taskDescription.value
     }
-    this.taskService.createGroupTask(this.groupId,this.task).subscribe(r=>{console.log(r)});
+    
+    this.dialogRef.close(this.taskService.createGroupTask(this.groupId,this.task));
   }
 
 }

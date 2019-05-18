@@ -5,8 +5,14 @@
       <input matInput type="text" placeholder="Nombre" #taskName>
     </mat-form-field>
     <mat-form-field>
+      <input matInput [matDatepicker]="dp3" placeholder="Fecha estimada de entrega" disabled>
+      <mat-datepicker-toggle matSuffix [for]="dp3"></mat-datepicker-toggle>
+      <mat-datepicker #dp3 disabled="false"></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field class="description">
       <textarea matInput cdkTextareaAutosize placeholder="Descripción" #taskDescription></textarea>
     </mat-form-field>
+    
   </form>
 </div>
 <div mat-dialog-actions>

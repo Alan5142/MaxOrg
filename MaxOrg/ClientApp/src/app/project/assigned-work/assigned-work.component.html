@@ -5,7 +5,7 @@
       <mat-divider></mat-divider>
       <div ngClass="" ngClass.gt-md="group-members-container" >
         <mat-accordion >
-          <mat-expansion-panel *ngFor="let group of adminGroupsFlat">
+          <mat-expansion-panel *ngFor="let group of adminGroupsFlat; let index=index">
             <mat-expansion-panel-header>
               <mat-panel-title class="text-bold">
                 {{group.name}}
@@ -19,6 +19,7 @@
                 <div class="width-100" fxLayout="column" fxLayout.gt-md="row">
                   <p fxFlex="33">Asignada en: {{task.creationDate}}</p>
                   <p fxFlex="33">Fecha estimada: TODO</p>
+                  <p>Descripción:<br>{{task.description}}</p>
                   <p fxFlex="33">
                     progreso: {{task.progress}}%
                     <mat-progress-bar mode="determinate" value="{{task.progress}}"></mat-progress-bar>
@@ -28,7 +29,7 @@
             </mat-accordion>
 
             <div class="width-100" fxLayout="row" fxLayoutAlign="end center">
-              <button (click)="openAssignTask(group.id)" color="primary" mat-flat-button mat-icon-button>
+              <button (click)="openAssignTask(group.id,index)" color="primary" mat-flat-button mat-icon-button>
                 <mat-icon>add</mat-icon>
               </button>
             </div>
