@@ -1,4 +1,4 @@
-<mat-toolbar color="primary" fxLayout="row">
+<mat-toolbar color="primary" fxLayout="row" *ngIf="!(hideNavbar.hide | async)">
   <div fxFlex="33">
     <button (click)="sidenav.toggle()" mat-icon-button>
       <mat-icon>menu</mat-icon>

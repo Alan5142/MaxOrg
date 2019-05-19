@@ -181,6 +181,7 @@ namespace MaxOrg
 
             services.AddSingleton<IScheduledTask, RemoveExpiredTokens>();
             services.AddSingleton<IScheduledTask, RemoveEmptyUsers>();
+            services.AddSingleton<IScheduledTask, CheckCalendar>();
             services.AddScheduler((sender, args) => { args.SetObserved(); });
             services.AddSignalR();
 

@@ -9,7 +9,7 @@ namespace MaxOrg.Models.Calendar
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
         public string Title { get; set; }
-        public dynamic Color { get; set; }
+        public EventColor Color { get; set; }
         public dynamic Resizable { get; set; }
         public string Meta { get; set; }
         public bool AllDay { get; set; } = false;

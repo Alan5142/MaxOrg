@@ -4,10 +4,6 @@
     <mat-icon>group</mat-icon>
     Nuevo grupo
   </button>
-  <button mat-menu-item>
-    <mat-icon>message</mat-icon>
-    Nuevo mensaje
-  </button>
 </mat-menu>
 
 <!--Mobile view-->
@@ -28,7 +24,7 @@
       </button>
     </div>
     <mat-list>
-      <h3 mat-subheader>Grupos</h3>
+      <h3 mat-subheader>Chats</h3>
       <div>
         <div *ngIf="chats | async as chats">
           <mat-list-item matRipple *ngFor="let groupChat of chats.groupChats" routerLink="./"
@@ -37,20 +33,6 @@
             <h5 class="no-select" mat-line style="font-weight: bold; word-wrap: break-word">{{groupChat.name}}</h5>
           </mat-list-item>
         </div>
-      </div>
-      <mat-divider></mat-divider>
-      <h3 mat-subheader>Conversaciones</h3>
-      <div>
-        <mat-list-item matRipple>
-          <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
-          <h5 class="no-select" mat-line style="font-weight: bold;">Nombre de usuario</h5>
-          <p class="no-select" mat-line>Ultimo mensaje</p>
-        </mat-list-item>
-        <mat-list-item matRipple>
-          <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
-          <h5 class="no-select" mat-line style="font-weight: bold;">Nombre de usuario</h5>
-          <p class="no-select" mat-line>Ultimo mensaje</p>
-        </mat-list-item>
       </div>
     </mat-list>
   </div>
@@ -69,7 +51,7 @@
         </button>
       </div>
       <mat-list>
-        <h3 mat-subheader>Grupos</h3>
+        <h3 mat-subheader>Chats</h3>
         <div>
           <div *ngIf="chats | async as chats">
             <mat-list-item matRipple *ngFor="let groupChat of chats.groupChats" routerLink="./"
@@ -78,20 +60,6 @@
               <h5 class="no-select" mat-line style="font-weight: bold; word-wrap: break-word">{{groupChat.name}}</h5>
             </mat-list-item>
           </div>
-        </div>
-        <mat-divider></mat-divider>
-        <h3 mat-subheader>Conversaciones</h3>
-        <div>
-          <mat-list-item matRipple>
-            <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
-            <h5 class="no-select" mat-line style="font-weight: bold;">Nombre de usuario</h5>
-            <p class="no-select" mat-line>Ultimo mensaje</p>
-          </mat-list-item>
-          <mat-list-item matRipple>
-            <img mat-list-avatar src="https://material.angular.io/assets/img/examples/shiba1.jpg">
-            <h5 class="no-select" mat-line style="font-weight: bold;">Nombre de usuario</h5>
-            <p class="no-select" mat-line>Ultimo mensaje</p>
-          </mat-list-item>
         </div>
       </mat-list>
     </mat-sidenav>

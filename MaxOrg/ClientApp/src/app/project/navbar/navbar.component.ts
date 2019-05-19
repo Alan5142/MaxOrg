@@ -8,6 +8,7 @@ import {Observable} from "rxjs";
 import {User, UserService} from "../../services/user.service";
 import {shareReplay} from "rxjs/operators";
 import {MediaObserver} from "@angular/flex-layout";
+import {HideNavbarService} from "../services/hide-navbar.service";
 
 @Component({
   selector: 'app-project-navbar',
@@ -29,7 +30,8 @@ export class NavbarComponent implements OnInit {
               private router: ActivatedRoute,
               private userService: UserService,
               private navRouter: Router,
-              public mediaObserver: MediaObserver) {
+              public mediaObserver: MediaObserver,
+              public hideNavbar: HideNavbarService) {
     iconRegistry.addSvgIcon(
       'github',
       sanitizer.bypassSecurityTrustResourceUrl('/icons/github.svg'));
