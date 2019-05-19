@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ArangoDB.Client;
@@ -19,10 +18,6 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage.Blob;
 using shortid;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Processing;
 
 namespace MaxOrg.Controllers
 {
@@ -308,31 +303,6 @@ namespace MaxOrg.Controllers
                     }
                     else if (contentType.Contains("image"))
                     {
-                        var image = Image.Load(request.Attachment.OpenReadStream());
-                        stream = new MemoryStream();
-
-                        if (contentType.Contains("gif"))
-                        {
-                            image.SaveAsGif(stream);
-                        }
-                        else if(contentType.Contains("png"))
-                        {
-                            image.SaveAsPng(stream, new PngEncoder()
-                            {
-                                CompressionLevel = 8
-                            });
-                            stream.Position = 0;
-                        }
-                        else
-                        {
-                            contentType = "image/jpeg";
-                            image.SaveAsJpeg(stream, new JpegEncoder()
-                            {
-                                Quality = 50
-                            });
-                            stream.Position = 0;
-                        }
-
                         messageType = MessageType.Image;
                     }
 
