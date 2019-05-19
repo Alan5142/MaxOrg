@@ -12,7 +12,9 @@
               </mat-panel-title>
             </mat-expansion-panel-header>
             <mat-accordion class="assigned-task-container">
-              <mat-expansion-panel class="assigned-task" *ngFor="let task of group.tasks | async">
+              <mat-expansion-panel
+                [ngClass]="{'assigned-task': !(themeService.isDarkTheme | async), 'assigned-task-dark': themeService.isDarkTheme | async}"
+                *ngFor="let task of group.tasks | async">
                 <mat-expansion-panel-header class="text-bold">
                   {{task.name}}
                 </mat-expansion-panel-header>
@@ -54,7 +56,8 @@
               </mat-panel-title>
             </mat-expansion-panel-header>
             <mat-accordion class="assigned-task-container">
-              <mat-expansion-panel class="assigned-task" *ngFor="let member of group.members">
+              <mat-expansion-panel [ngClass]="{'assigned-task': !(themeService.isDarkTheme | async), 'assigned-task-dark': themeService.isDarkTheme | async}"
+                                   *ngFor="let member of group.members">
                 <mat-expansion-panel-header class="text-bold">
                   {{member.username}}
                 </mat-expansion-panel-header>

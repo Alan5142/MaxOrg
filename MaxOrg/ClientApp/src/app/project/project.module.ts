@@ -2,14 +2,16 @@ import {NgModule} from '@angular/core';
 import {CommonModule, registerLocaleData} from '@angular/common';
 import {ProjectComponent} from './project.component';
 import {
-  GestureConfig, MAT_DATE_LOCALE,
+  GestureConfig,
+  MAT_DATE_LOCALE,
   MatAutocompleteModule,
   MatBadgeModule,
   MatButtonModule,
   MatButtonToggleModule,
   MatCardModule,
   MatCheckboxModule,
-  MatChipsModule, MatDatepickerModule,
+  MatChipsModule,
+  MatDatepickerModule,
   MatDialogModule,
   MatDividerModule,
   MatExpansionModule,
@@ -19,6 +21,7 @@ import {
   MatInputModule,
   MatListModule,
   MatMenuModule,
+  MatNativeDateModule,
   MatPaginatorModule,
   MatProgressBarModule,
   MatProgressSpinnerModule,
@@ -32,9 +35,7 @@ import {
   MatTableModule,
   MatTabsModule,
   MatToolbarModule,
-  MatTreeModule,
-  MatDatepickerModule,
-  MatNativeDateModule
+  MatTreeModule
 } from '@angular/material';
 import {ProjectRoutingModule} from './project-routing.module';
 import {DescriptionComponent} from './description/description.component';
@@ -103,9 +104,9 @@ import {CalendarModule, DateAdapter} from "angular-calendar";
 import {adapterFactory} from "angular-calendar/date-adapters/date-fns";
 import localeEs from '@angular/common/locales/es-MX';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
-import { ShowCodeComponent } from './code/show-code/show-code.component';
-import { ShowIssuesComponent } from './code/show-issues/show-issues.component';
-import { ShowCommitsComponent } from './code/show-commits/show-commits.component';
+import {ShowCodeComponent} from './code/show-code/show-code.component';
+import {ShowIssuesComponent} from './code/show-issues/show-issues.component';
+import {ShowCommitsComponent} from './code/show-commits/show-commits.component';
 
 registerLocaleData(localeEs);
 @NgModule({
@@ -180,7 +181,7 @@ registerLocaleData(localeEs);
     MatBadgeModule,
     MatButtonToggleModule,
     MatRadioModule,
-    AppCommonComponentsModule,  
+    AppCommonComponentsModule,
     CalendarModule.forRoot({
       provide: DateAdapter,
       useFactory: adapterFactory
