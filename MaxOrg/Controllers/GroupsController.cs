@@ -258,8 +258,30 @@ namespace MaxOrg.Controllers
 
             var members = GetGroupMembers(groupId).Select(u => new {u.Key, u.Username, u.Email});
 
+            string repoUrl = null;
+            var root = await Database.GetRootGroup(groupId);
+            if (root.LinkedRepositoryName.HasValue)
+            {
+                var admin = await Database.DocumentAsync<User>(root.GroupOwner);
+                var client = new GitHubClient(new ProductHeaderValue("maxorg"));
+
+                var tokenAuth = new Credentials(admin.GithubToken);
+                client.Credentials = tokenAuth;
+
+                var repo = await client.Repository.Get(root.LinkedRepositoryName.Value);
+                repoUrl = repo.HtmlUrl;
+            }
+
             return Ok(new
-                {@group.Name, @group.Key, @group.GroupOwner, @group.CreationDate, @group.Description, members});
+            {
+                @group.Name,
+                @group.Key,
+                @group.GroupOwner,
+                @group.CreationDate,
+                @group.Description,
+                members,
+                repoUrl
+            });
         }
 
         [HttpGet("{groupId}/members")]
@@ -301,14 +323,14 @@ namespace MaxOrg.Controllers
             }
 
             var userId = HttpContext.User.Identity.Name;
-            
+
             if (!await Database.IsGroupMember(userId, rootGroup.Key))
             {
                 return Unauthorized();
             }
 
             var isAdmin = await Database.IsAdmin(userId, groupId);
-            
+
             return Ok(rootGroup.Events.Select(e => new
             {
                 e.Id,
@@ -1318,11 +1340,45 @@ namespace MaxOrg.Controllers
 
         #region GitHub repo
 
-        [HttpGet("{groupId}/github/code")]
-        public async Task<IActionResult> GetCode(string groupId)
+        [HttpPut("{groupId}/github/link")]
+        public async Task<IActionResult> LinkToRepository(string groupId,
+            [FromBody] (long id, object dummy) repositoryId)
         {
             var root = await Database.GetRootGroup(groupId);
-            if (root == null || await Database.IsGroupMember(HttpContext.User.Identity.Name, root?.Key))
+            var repoId = repositoryId.Item1;
+            if (root == null)
+            {
+                return NotFound();
+            }
+
+            if (!await Database.IsAdmin(HttpContext.User.Identity.Name, groupId))
+            {
+                return Unauthorized();
+            }
+
+            var admin = await Database.DocumentAsync<User>(root.GroupOwner);
+            var client = new GitHubClient(new ProductHeaderValue("maxorg"));
+
+            var tokenAuth = new Credentials(admin.GithubToken);
+            client.Credentials = tokenAuth;
+
+            var repo = await client.Repository.Get(repoId);
+            if (repo == null)
+            {
+                return BadRequest();
+            }
+
+            root.LinkedRepositoryName = repoId;
+            await Database.UpdateByIdAsync<Group>(root.Id, root);
+            return Ok();
+        }
+
+        [HttpGet("{groupId}/github/code")]
+        public async Task<IActionResult> GetCode(string groupId, [FromQuery] string path = "/")
+        {
+            var root = await Database.GetRootGroup(groupId);
+            var isGroupMember = await Database.IsGroupMember(HttpContext.User.Identity.Name, root?.Key);
+            if (root == null || !isGroupMember)
             {
                 return NotFound();
             }
@@ -1337,23 +1393,23 @@ namespace MaxOrg.Controllers
 
             var tokenAuth = new Credentials(admin.GithubToken);
             client.Credentials = tokenAuth;
-            var repo = await client.Repository.Get(root.LinkedRepositoryName.Value);
 
-            var codeRequest = new SearchCodeRequest("auth", repo.Owner.Login, repo.Name)
+            var contents = await client.Repository.Content.GetAllContents(root.LinkedRepositoryName.Value, path);
+
+            return Ok(contents.Select(c => new
             {
-                In = new[] {CodeInQualifier.File, CodeInQualifier.Path}
-            };
-
-            var code = await client.Search.SearchCode(codeRequest);
-
-            return Ok(new {code.Items});
+                c.HtmlUrl,
+                Type = c.Type.StringValue,
+                c.Name,
+                c.Path
+            }).OrderBy(c => c.Type == "file"));
         }
 
         [HttpGet("{groupId}/github/issues")]
         public async Task<IActionResult> GetIssues(string groupId)
         {
             var root = await Database.GetRootGroup(groupId);
-            if (root == null || await Database.IsGroupMember(HttpContext.User.Identity.Name, root?.Key))
+            if (root == null || !await Database.IsGroupMember(HttpContext.User.Identity.Name, root?.Key))
             {
                 return NotFound();
             }
@@ -1371,14 +1427,20 @@ namespace MaxOrg.Controllers
 
             var issues = await client.Issue.GetAllForRepository(root.LinkedRepositoryName.Value);
 
-            return Ok(new {issues});
+            return Ok(issues.Select(i => new
+            {
+                i.HtmlUrl,
+                i.Id,
+                i.Title,
+                i.Number
+            }));
         }
 
         [HttpGet("{groupId}/github/commits")]
         public async Task<IActionResult> GetCommits(string groupId)
         {
             var root = await Database.GetRootGroup(groupId);
-            if (root == null || await Database.IsGroupMember(HttpContext.User.Identity.Name, root?.Key))
+            if (root == null || !await Database.IsGroupMember(HttpContext.User.Identity.Name, root?.Key))
             {
                 return NotFound();
             }
@@ -1395,7 +1457,12 @@ namespace MaxOrg.Controllers
             client.Credentials = tokenAuth;
             var commits = await client.Repository.Commit.GetAll(root.LinkedRepositoryName.Value);
 
-            return Ok(new {commits});
+            return Ok(commits.Select(c => new
+            {
+                c.HtmlUrl,
+                c.Commit.Author.Name,
+                c.Commit.Message
+            }));
         }
 
         #endregion

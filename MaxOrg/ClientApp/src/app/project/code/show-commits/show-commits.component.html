@@ -1,0 +1,22 @@
+<mat-card class="code-card" style="overflow-y: hidden">
+  <mat-toolbar color="accent">
+    <h1>Commits</h1>
+  </mat-toolbar>
+  <mat-card-content>
+    <ng-template #progressBar>
+      <mat-progress-bar mode="query"></mat-progress-bar>
+    </ng-template>
+    <mat-list *ngIf="commits | async as commits$; else progressBar" style="max-height: 400px; overflow-y: auto">
+      <mat-list-item *ngIf="commits$.length === 0">
+        Parece que no hay issues :)
+      </mat-list-item>
+      <a target="_blank" style="text-decoration: none; color: inherit" *ngFor="let commit of commits$" [href]="commit?.htmlUrl">
+        <mat-list-item matRipple>
+          <p>{{commit.name}}:</p>
+          <p style="text-overflow: ellipsis; overflow-y: hidden">{{commit.message.substr(0, 40)}}{{commit.message.length > 40 ? '...' : ''}}</p>
+          <mat-divider></mat-divider>
+        </mat-list-item>
+      </a>
+    </mat-list>
+  </mat-card-content>
+</mat-card>

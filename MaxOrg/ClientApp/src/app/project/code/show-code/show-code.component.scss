@@ -1,0 +1,33 @@
+.code-card {
+  min-height: 300px;
+  margin-top: 1px;
+}
+mat-card > mat-toolbar {
+  margin: -16px 0 0 -16px;
+  width: calc(100% + 32px);
+}
+
+
+.mat-ripple-dummy {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+a:link {
+  text-decoration: none;
+}
+
+a:visited {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+a:active {
+  text-decoration: none;
+}

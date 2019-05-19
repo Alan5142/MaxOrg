@@ -101,6 +101,9 @@ import {CalendarModule, DateAdapter} from "angular-calendar";
 import {adapterFactory} from "angular-calendar/date-adapters/date-fns";
 import localeEs from '@angular/common/locales/es-MX';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
+import { ShowCodeComponent } from './code/show-code/show-code.component';
+import { ShowIssuesComponent } from './code/show-issues/show-issues.component';
+import { ShowCommitsComponent } from './code/show-commits/show-commits.component';
 
 registerLocaleData(localeEs);
 @NgModule({
@@ -231,7 +234,10 @@ registerLocaleData(localeEs);
     UploadFileComponent,
     LinkToGithubComponent,
     EventComponent,
-    DayEventsComponent
+    DayEventsComponent,
+    ShowCodeComponent,
+    ShowIssuesComponent,
+    ShowCommitsComponent
   ],
   bootstrap: [
     ProjectComponent

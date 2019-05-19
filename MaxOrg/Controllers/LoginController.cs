@@ -121,7 +121,7 @@ namespace MaxOrg.Controllers
         public async Task<IActionResult> Github([FromBody] GitHubLogin loginParameters)
         {
             // get an access token
-            var tokenResponse = await GetGitHubAccessToken(loginParameters.AccessToken);
+            var tokenResponse = await GetGitHubAccessToken(loginParameters.AccessToken, Configuration);
 
             var githubClient = new GitHubClient(new Octokit.ProductHeaderValue("MaxOrg"));
 
@@ -289,15 +289,15 @@ namespace MaxOrg.Controllers
         /// </summary>
         /// <param name="code">Código que servirá para generar el token (vease la documentación de GitHub respecto a OAuth)</param>
         /// <returns>Un response con el token de acceso, el tipo y el alcance</returns>
-        private async Task<GitHubTokenResponse> GetGitHubAccessToken(string code)
+        public static async Task<GitHubTokenResponse> GetGitHubAccessToken(string code, IConfiguration configuration)
         {
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var httpResult = await client.PostAsJsonAsync("https://github.com/login/oauth/access_token",
                 new
                 {
-                    client_id = Configuration["AppSettings:GitHub:ClientID"],
-                    client_secret = Configuration["AppSettings:GitHub:ClientSecret"],
+                    client_id = configuration["AppSettings:GitHub:ClientID"],
+                    client_secret = configuration["AppSettings:GitHub:ClientSecret"],
                     code
                 });
             var data = await httpResult.Content.ReadAsStringAsync();

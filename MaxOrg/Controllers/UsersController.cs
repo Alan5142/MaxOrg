@@ -404,6 +404,46 @@ namespace MaxOrg.Controllers
         #region GitHub user stuff
 
         [Authorize]
+        [HttpPut("github-link")]
+        public async Task<IActionResult> LinkToGitHub([FromQuery] string accessToken)
+        {
+            if (accessToken == null)
+            {
+                return BadRequest();
+            }
+            var tokenResponse = await LoginController.GetGitHubAccessToken(accessToken, Configuration);
+            var githubClient = new GitHubClient(new Octokit.ProductHeaderValue("MaxOrg"));
+
+            Credentials tokenAuth;
+            try
+            {
+                tokenAuth = new Credentials(tokenResponse.AccessToken);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+            githubClient.Credentials = tokenAuth;
+            var githubUser = await githubClient.User.Current();
+
+            var existsUser = await Database.Query<User>()
+                .Where(u => u.GithubId == githubUser.Id)
+                .Select(u => u)
+                .FirstOrDefaultAsync();
+            if (existsUser != null)
+            {
+                return BadRequest();
+            }
+            var user = await Database.Collection("User").DocumentAsync<User>(HttpContext.User.Identity.Name);
+            user.GithubToken = tokenResponse.AccessToken;
+            user.GithubId = githubUser.Id;
+
+            await Database.UpdateByIdAsync<User>(user.Id, user);
+            
+            return Ok();
+        }
+        
+        [Authorize]
         [HttpGet("repos")]
         public async Task<IActionResult> GetUserRepos()
         {

@@ -11,6 +11,7 @@ export interface GroupInfo {
   groupOwner: string;
   creationDate: Date;
   members: User[];
+  repoUrl: string;
 }
 
 export interface CreateGroupData {
@@ -76,5 +77,23 @@ export class GroupsService {
 
   changeGroupInfo(groupId: string, editRequest: EditGroupRequest): Observable<void> {
     return this.http.put<void>(`${environment.apiUrl}groups/${groupId}`, editRequest);
+  }
+
+  linkToGitHub(groupId: string, id: number) {
+    return this.http.put(`/api/groups/${groupId}/github/link`, {id: id});
+  }
+
+  getRepositoryCode(groupId: string, path: string = '/'): Observable<any[]> {
+    if (path.trim() === '')
+      path = '/';
+    return this.http.get<any[]>(`/api/groups/${groupId}/github/code?path=${path}`);
+  }
+
+  getRepositoryIssues(groupId: string): Observable<any[]> {
+    return this.http.get<any[]>(`/api/groups/${groupId}/github/issues`);
+  }
+
+  getRepositoryCommits(groupId: string): Observable<any[]> {
+    return this.http.get<any[]>(`/api/groups/${groupId}/github/commits`);
   }
 }

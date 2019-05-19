@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using ArangoDB.Client;
+using M6T.Core.TupleModelBinder;
 using MaxOrg.Hubs;
 using MaxOrg.Services.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -61,7 +62,10 @@ namespace MaxOrg
         {
             services.AddCors();
 
-            services.AddMvc()
+            services.AddMvc(options =>
+                {
+                    options.ModelBinderProviders.Insert(0, new TupleModelBinderProvider());
+                })
                 .SetCompatibilityVersion(CompatibilityVersion.Latest)
                 .AddJsonOptions(options =>
                 {

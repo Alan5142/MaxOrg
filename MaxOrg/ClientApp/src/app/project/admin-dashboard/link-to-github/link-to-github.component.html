@@ -3,7 +3,7 @@
 </h2>
 
 <mat-dialog-content>
-  <mat-radio-group fxLayout="column" fxLayoutGap="5px" style="height: 300px;">
+  <mat-radio-group #radioGroup="matRadioGroup" fxLayout="column" fxLayoutGap="5px" style="height: 300px;">
     <mat-radio-button *ngFor="let repo of data" [value]="repo.fullName">
       {{repo.fullName}}
     </mat-radio-button>
@@ -11,6 +11,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions style="float: end;">
-  <button mat-button [mat-dialog-close]="">CERRAR</button>
-  <button mat-button [mat-dialog-close]="">VINCULAR</button>
+  <button mat-button [mat-dialog-close]="null">CERRAR</button>
+  <button mat-button (click)="returnGroupId(radioGroup.value)">VINCULAR</button>
 </mat-dialog-actions>

@@ -137,6 +137,10 @@ export class MyAccountComponent implements OnInit {
   changeTheme($event: MatSlideToggleChange) {
     this.theme.darkTheme = $event.checked;
   }
+
+  githubLink() {
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${environment.githubAuth.clientId}`;
+  }
 }
 
 @Component({

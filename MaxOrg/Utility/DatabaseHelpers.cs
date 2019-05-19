@@ -32,7 +32,7 @@ namespace MaxOrg.Utility
             }
 
             var isMember = await database.CreateStatement<bool>(
-                $@"return (FOR v in 1 INBOUND 'Group/288872' Graph 'GroupUsersGraph' 
+                $@"return (FOR v in 1 INBOUND 'Group/{groupId}' Graph 'GroupUsersGraph' 
 FILTER v._key == '{userId}'
 return v) != []").ToListAsync();
 

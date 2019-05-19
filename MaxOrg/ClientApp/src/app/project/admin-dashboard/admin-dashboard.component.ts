@@ -64,6 +64,17 @@ export class AdminDashboardComponent implements OnInit {
           maxHeight: '500px',
           maxWidth: '400px'
         });
+        dialogRef.afterClosed().subscribe(r => {
+          console.log(r);
+          if (r === null || r === undefined) {
+            return;
+          }
+          this.groupService.linkToGitHub(this.groupId, r.id).subscribe(() => {
+            this.snackBar.open('Vinculado con exito', 'OK', {duration: 2000});
+          }, err => {
+            this.snackBar.open('No fue posible vincularlo', 'OK', {duration: 2000});
+          })
+        })
       },
       error => {
         this.snackBar.open('No se pudieron listar los repositorios, verifica que tu cuenta este vinculada a GitHub', 'OK');

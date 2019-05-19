@@ -18,7 +18,7 @@ const routes: Routes = [
       {path: '', component: IndexComponent, canActivate: [IsNotLoggedInGuard]},
       {path: 'register', component: RegisterComponent, canActivate: [IsNotLoggedInGuard]},
       {path: 'google-login', component: GoogleLoginComponent, canActivate: [IsNotLoggedInGuard]},
-      {path: 'github-login', component: GithubLoginComponent, canActivate: [IsNotLoggedInGuard]},
+      {path: 'github-login', component: GithubLoginComponent},
       {path: 'index', component: UserStartComponent, canActivate: [IsLoggedInGuard]},
       {path: 'my_account', component: MyAccountComponent, canActivate: [IsLoggedInGuard]},
       {path: 'todos', component: TodosComponent, canActivate: [IsLoggedInGuard]},
