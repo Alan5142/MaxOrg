@@ -32,7 +32,9 @@ import {
   MatTableModule,
   MatTabsModule,
   MatToolbarModule,
-  MatTreeModule
+  MatTreeModule,
+  MatDatepickerModule,
+  MatNativeDateModule
 } from '@angular/material';
 import {ProjectRoutingModule} from './project-routing.module';
 import {DescriptionComponent} from './description/description.component';
@@ -65,7 +67,7 @@ import {
   CommonComponentsModule,
   CommonComponentsModule as AppCommonComponentsModule
 } from '../common-components/common-components.module';
-import {OrgChartComponent} from './org-chart/org-chart.component';
+import {OrgChartComponent, reloadChart} from './org-chart/org-chart.component';
 import {TreeComponent} from './org-chart/tree/tree.component';
 import {GroupCardComponent} from './org-chart/group-card/group-card.component';
 import {RequirementsComponent} from './requirements/requirements.component';
@@ -148,6 +150,7 @@ registerLocaleData(localeEs);
     FlexLayoutModule,
     MatCardModule,
     MatFormFieldModule,
+    MatNativeDateModule,
     DragDropModule,
     ServicesModule,
     FormsModule,
@@ -177,7 +180,7 @@ registerLocaleData(localeEs);
     MatBadgeModule,
     MatButtonToggleModule,
     MatRadioModule,
-    AppCommonComponentsModule,
+    AppCommonComponentsModule,  
     CalendarModule.forRoot({
       provide: DateAdapter,
       useFactory: adapterFactory
@@ -237,7 +240,8 @@ registerLocaleData(localeEs);
     DayEventsComponent,
     ShowCodeComponent,
     ShowIssuesComponent,
-    ShowCommitsComponent
+    ShowCommitsComponent,
+    reloadChart
   ],
   bootstrap: [
     ProjectComponent

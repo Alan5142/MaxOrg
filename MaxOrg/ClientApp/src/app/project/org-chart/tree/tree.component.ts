@@ -1,6 +1,7 @@
-import {Component, Input, OnInit} from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NewSubgroupComponent } from '../new-subgroup/new-subgroup.component';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-tree',
@@ -10,25 +11,31 @@ import { MatDialog } from '@angular/material';
 export class TreeComponent implements OnInit {
 
   @Input() treeData: [];
-  @Input() parentId: string=null;
+  @Input() parentId: string = null;
   @Input() userId;
-  @Input() adminId: string=null;
-  @Input() isAdmin:boolean=false;
-  constructor(public dialog: MatDialog) {
-    
+  @Input() adminId: string = null;
+  @Input() isAdmin: boolean = false;
+  constructor(public dialog: MatDialog, public snackBar: MatSnackBar, public router: Router, public route: ActivatedRoute) {
+
   }
 
   ngOnInit() {
-    if(this.isAdmin)
+    if (this.isAdmin)
       return;
-    if(this.userId==this.adminId)
-      this.isAdmin=true;
+    if (this.userId == this.adminId)
+      this.isAdmin = true;
   }
   openDialog(parentId): void {
     const dialogRef = this.dialog.open(NewSubgroupComponent, {
       width: '50%',
       minWidth: '300px',
-      data: {parentId}
+      data: { parentId }
     });
+    dialogRef.afterClosed().subscribe(r => {
+      if (r) {
+        this.snackBar.open("grupo creado", "OK");
+        this.router.navigate(["../reload-chart"],{relativeTo:this.route});
+      }
+    }, error => { this.snackBar.open("no se pudo crear :(", "OK") });
   }
 }

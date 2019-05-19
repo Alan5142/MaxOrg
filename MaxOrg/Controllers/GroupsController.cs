@@ -1103,7 +1103,8 @@ namespace MaxOrg.Controllers
             var task = new ToDoTask
             {
                 Name = request.Name,
-                Description = request.Description
+                Description = request.Description,
+                DeliveryDate = request.DeliveryDate
             };
             await Database.InsertAsync<ToDoTask>(task);
 
@@ -1123,6 +1124,7 @@ namespace MaxOrg.Controllers
                         task.Name,
                         task.Description,
                         task.CreationDate,
+                        task.DeliveryDate,
                         error = "Specified requirement cannot be found"
                     });
                 }
@@ -1163,7 +1165,8 @@ namespace MaxOrg.Controllers
                 Id = task.Key,
                 task.Name,
                 task.Description,
-                task.CreationDate
+                task.CreationDate,
+                task.DeliveryDate
             });
         }
 
@@ -1198,6 +1201,7 @@ namespace MaxOrg.Controllers
                 t.Name,
                 t.Description,
                 t.CreationDate,
+                t.DeliveryDate,
                 t.Progress
             }));
         }
@@ -1220,6 +1224,7 @@ namespace MaxOrg.Controllers
             return Ok(new
             {
                 Id = task.Key,
+                task.DeliveryDate,
                 task.CreationDate,
                 task.Description,
                 task.Name,

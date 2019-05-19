@@ -1,10 +1,11 @@
 import {AfterViewInit, Component, OnInit, ViewChildren} from '@angular/core';
 import {MediaObserver} from '@angular/flex-layout';
-import {MatDialog, MatTab, MatTabGroup} from '@angular/material';
+import {MatDialog, MatTab, MatTabGroup, MatSnackBar} from '@angular/material';
 import {AssignWorkComponent} from './assign-work/assign-work.component';
 import { ProjectsService } from 'src/app/services/projects.service';
 import { ActivatedRoute } from '@angular/router';
 import { TasksService, Task } from 'src/app/services/tasks.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-assigned-work',
@@ -23,10 +24,14 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
   adminGroupsFlat=[];
   object={};
   userId;
-  
-  constructor(public mediaObserver: MediaObserver, public dialog: MatDialog, public route:ActivatedRoute, public projectService:ProjectsService, private taskService:TasksService) {
+  taskGroupId;
+  url;
+  constructor(public snackBar:MatSnackBar,public mediaObserver: MediaObserver, public dialog: MatDialog,
+     public route:ActivatedRoute, public projectService:ProjectsService, private taskService:TasksService) {
     this.userId=localStorage.getItem('userId');
+    this.taskGroupId=localStorage.getItem("taskGroup");
     this.route.parent.params.subscribe(params => {
+      this.url="/project/"+params['id']+"/requirements";
       this.projectService.getProject(params['id']).subscribe(project => {
         this.groups=project;
         if(this.groups.groupOwner==this.userId)
@@ -52,7 +57,7 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
     }
   }
   flat(toFlat){
-    toFlat.forEach(group => {
+    toFlat.forEach((group) => {
       this.adminGroupsFlat.push({
         name:group.name,
         id:group.id,
@@ -60,11 +65,13 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
         tasks: this.taskService.getGroupTasks(group.id)
       });
       this.flat(group.subgroups);
+      if(this.taskGroupId==group.id)
+        this.openAssignTask(this.taskGroupId,this.adminGroupsFlat.length-1);
     });
   }
   
   ngOnInit() {
-    
+      
   }
 
   ngAfterViewInit() {
@@ -81,11 +88,24 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
     }
   }
 
-  openAssignTask(groupId:string) {
+  openAssignTask(groupId:string,index:number) {
+    localStorage.setItem("url",this.url);
+    console.log(this.url);
     const dialogRef = this.dialog.open(AssignWorkComponent, {
-      width: '250px',
-      maxWidth: '400px',
+      width: '50%',
+      maxWidth: '500px',
+      minWidth: '250px',
       data: groupId
     });
+    dialogRef.afterClosed().subscribe(r=>{
+      if(r){
+        r.subscribe(
+          r=>this.adminGroupsFlat[index].tasks=
+          this.adminGroupsFlat[index].tasks.pipe(map<Task[],any>(tasks=>{return tasks;}))
+        );
+        this.snackBar.open("Tarea agregada","cerrar");
+      }
+    });
   }
+  
 }

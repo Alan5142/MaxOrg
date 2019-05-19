@@ -1,12 +1,30 @@
-<h1 mat-dialog-title>Agregar tarea</h1>
+
+<p mat-dialog-title >Agregar tarea
+    <button class="float-right" mat-stroked-button color="primary" (click)="reference()" *ngIf="!references">Referenciar Requerimiento</button>
+    <mat-chip-list><mat-chip *ngIf="references" class="float-right" color="primary"
+    [removable]="true"
+    (removed)="unreference()">Ref Requerimiento
+    <mat-icon matChipRemove >cancel</mat-icon></mat-chip></mat-chip-list>
+</p>
 <div mat-dialog-content>
-  <form>
+  <form><p>
+      <mat-form-field *ngIf="references">
+          <input matInput type="number" min="1" max="100" placeholder="Porcentaje">
+          <mat-hint>Este campo puede estar vacio
+          </mat-hint>
+        </mat-form-field></p>
     <mat-form-field>
       <input matInput type="text" placeholder="Nombre" #taskName>
     </mat-form-field>
     <mat-form-field>
+      <input matInput [matDatepicker]="dp3" placeholder="Fecha estimada de entrega" disabled  [(ngModel)] = "date" name="date">
+      <mat-datepicker-toggle matSuffix [for]="dp3"></mat-datepicker-toggle>
+      <mat-datepicker #dp3 disabled="false"></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field class="description">
       <textarea matInput cdkTextareaAutosize placeholder="Descripción" #taskDescription></textarea>
     </mat-form-field>
+    
   </form>
 </div>
 <div mat-dialog-actions>

@@ -9,6 +9,7 @@ namespace MaxOrg.Models.Tasks
         [Required]
         public string Description { get; set; }
 
+        public string DeliveryDate { get; set; }
         public string ReferenceRequirement { get; set; } = null;
         public string ReferenceTask { get; set; } = null;
 
