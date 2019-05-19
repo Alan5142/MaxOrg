@@ -67,7 +67,7 @@ import {
   CommonComponentsModule,
   CommonComponentsModule as AppCommonComponentsModule
 } from '../common-components/common-components.module';
-import {OrgChartComponent} from './org-chart/org-chart.component';
+import {OrgChartComponent, reloadChart} from './org-chart/org-chart.component';
 import {TreeComponent} from './org-chart/tree/tree.component';
 import {GroupCardComponent} from './org-chart/group-card/group-card.component';
 import {RequirementsComponent} from './requirements/requirements.component';
@@ -218,7 +218,8 @@ import {LinkToGithubComponent} from './admin-dashboard/link-to-github/link-to-gi
     ModifyMembersComponent,
     CreateChatGroupComponent,
     UploadFileComponent,
-    LinkToGithubComponent
+    LinkToGithubComponent,
+    reloadChart
   ],
   bootstrap: [
     ProjectComponent

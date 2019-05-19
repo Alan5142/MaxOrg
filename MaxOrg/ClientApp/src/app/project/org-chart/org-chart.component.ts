@@ -1,5 +1,5 @@
 import {Component, OnInit, OnChanges} from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProjectsService } from 'src/app/services/projects.service';
 
 @Component({
@@ -41,5 +41,13 @@ export class OrgChartComponent implements OnInit,OnChanges {
     });
   }
   ngOnChanges(): void {
+  }
+}
+@Component({
+  template:""
+})
+export class reloadChart{
+  constructor(router:Router,route:ActivatedRoute){
+    router.navigate(["../org-chart"],{relativeTo:route});
   }
 }
