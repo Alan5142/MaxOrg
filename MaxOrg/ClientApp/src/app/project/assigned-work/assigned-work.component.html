@@ -17,8 +17,8 @@
                   {{task.name}}
                 </mat-expansion-panel-header>
                 <div class="width-100" fxLayout="column" fxLayout.gt-md="row">
-                  <p fxFlex="33">Asignada en: {{task.creationDate}}</p>
-                  <p fxFlex="33">Fecha estimada: TODO</p>
+                  <p fxFlex="33">Asignada en: {{task.creationDate | date: 'dd/MM/yyyy'}}</p>
+                  <p fxFlex="33">Fecha estimada: {{task.deliveryDate | date: 'dd/MM/yyyy'}}</p>
                   <p>Descripción:<br>{{task.description}}</p>
                   <p fxFlex="33">
                     progreso: {{task.progress}}%

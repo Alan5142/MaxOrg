@@ -24,10 +24,14 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
   adminGroupsFlat=[];
   object={};
   userId;
-  
-  constructor(public snackBar:MatSnackBar,public mediaObserver: MediaObserver, public dialog: MatDialog, public route:ActivatedRoute, public projectService:ProjectsService, private taskService:TasksService) {
+  taskGroupId;
+  url;
+  constructor(public snackBar:MatSnackBar,public mediaObserver: MediaObserver, public dialog: MatDialog,
+     public route:ActivatedRoute, public projectService:ProjectsService, private taskService:TasksService) {
     this.userId=localStorage.getItem('userId');
+    this.taskGroupId=localStorage.getItem("taskGroup");
     this.route.parent.params.subscribe(params => {
+      this.url="/project/"+params['id']+"/requirements";
       this.projectService.getProject(params['id']).subscribe(project => {
         this.groups=project;
         if(this.groups.groupOwner==this.userId)
@@ -53,7 +57,7 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
     }
   }
   flat(toFlat){
-    toFlat.forEach(group => {
+    toFlat.forEach((group) => {
       this.adminGroupsFlat.push({
         name:group.name,
         id:group.id,
@@ -61,11 +65,13 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
         tasks: this.taskService.getGroupTasks(group.id)
       });
       this.flat(group.subgroups);
+      if(this.taskGroupId==group.id)
+        this.openAssignTask(this.taskGroupId,this.adminGroupsFlat.length-1);
     });
   }
   
   ngOnInit() {
-    
+      
   }
 
   ngAfterViewInit() {
@@ -83,7 +89,8 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
   }
 
   openAssignTask(groupId:string,index:number) {
-    console.log(index);
+    localStorage.setItem("url",this.url);
+    console.log(this.url);
     const dialogRef = this.dialog.open(AssignWorkComponent, {
       width: '50%',
       maxWidth: '500px',
@@ -94,7 +101,7 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
       if(r){
         r.subscribe(
           r=>this.adminGroupsFlat[index].tasks=
-          this.adminGroupsFlat[index].tasks.pipe(map<Task[],any>(tasks=>{tasks.push(r); return tasks;}))
+          this.adminGroupsFlat[index].tasks.pipe(map<Task[],any>(tasks=>{return tasks;}))
         );
         this.snackBar.open("Tarea agregada","cerrar");
       }

@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
-import { map } from 'rxjs/operators';
+import { map, shareReplay } from 'rxjs/operators';
 
 export interface CreateTaskRequest{
   name:string;
   description:string;
-  deliveryDate?:Date;
+  deliveryDate?:string;
   referenceRequirement?:string;
   referenceTask?:string;
   contributionPercentage?:string;
@@ -43,9 +43,7 @@ export class TasksService {
   getGroupTasks(groupId: string){
     const url= environment.apiUrl + 'groups/' + groupId + '/tasks';
     
-    return this.http.get(url).pipe(map<Task[],any>(tasks=>{tasks.forEach(task => {
-      task.creationDate=this.formatDate(task.creationDate);
-    }); return tasks;}));
+    return this.http.get(url);
     
   
   }
