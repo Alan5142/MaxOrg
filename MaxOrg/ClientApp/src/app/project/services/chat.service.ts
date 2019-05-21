@@ -86,11 +86,9 @@ export class ChatService {
   sendFile(chatId: string, file: File) {
     const formData = new FormData();
     formData.append('attachment', file);
-
-    const uploadReq = new HttpRequest('POST', `${environment.apiUrl}chats/${chatId}/messages`, formData, {
+    new HttpRequest('POST', `${environment.apiUrl}chats/${chatId}/messages`, formData, {
       reportProgress: true,
     });
-
     return this.http.post(`${environment.apiUrl}chats/${chatId}/messages`, formData, {
       reportProgress: true,
       observe: "events",

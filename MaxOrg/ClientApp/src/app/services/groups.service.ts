@@ -94,4 +94,14 @@ export class GroupsService {
   getRepositoryCommits(groupId: string): Observable<any[]> {
     return this.http.get<any[]>(`/api/groups/${groupId}/github/commits`);
   }
+
+  uploadAttachment(groupId: string, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`/api/groups/${groupId}/attachments`, formData, {
+      reportProgress: true,
+      observe: "events",
+      headers: {'ngsw-bypass': ''}
+    });
+  }
 }

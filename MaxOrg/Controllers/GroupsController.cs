@@ -12,11 +12,15 @@ using MaxOrg.Models.Kanban;
 using MaxOrg.Models.Tasks;
 using MaxOrg.Utility;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Octokit;
+using shortid;
 using Notification = MaxOrg.Models.Notification;
 using User = MaxOrg.Models.Users.User;
 
@@ -52,6 +56,8 @@ namespace MaxOrg.Controllers
         /// </summary>
         private IConfiguration Configuration { get; }
 
+        private CloudBlobContainer BlobContainer { get; }
+
         /// <summary>
         /// Constructor de la clase, es invocado por ASP.NET Core al momento de tener que manejar una petición, al mismo tiempo
         /// le inyecta la base de datos, el "Hub" para el tablero, el "Hub" para las notificaciones y los parametros de
@@ -61,11 +67,14 @@ namespace MaxOrg.Controllers
         /// <param name="kanbanHub"></param>
         /// <param name="notificationHub"></param>
         /// <param name="configuration"></param>
+        /// <param name="container"></param>
         public GroupsController(IArangoDatabase database,
             IHubContext<KanbanHub, IKanbanClient> kanbanHub,
             IHubContext<NotificationHub> notificationHub,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            CloudBlobContainer container)
         {
+            BlobContainer = container;
             Configuration = configuration;
             KanbanHub = kanbanHub;
             Database = database;
@@ -1472,9 +1481,68 @@ namespace MaxOrg.Controllers
 
         #endregion
 
-        #region Azure DevOps
+        #region Upload options
+
+        [HttpPost("{groupId}/attachments")]
+        public async Task<IActionResult> UploadFile(string groupId, IFormFile file)
+        {
+            var root = await Database.GetRootGroup(groupId);
+            if (root == null)
+            {
+                return NotFound();
+            }
+            
+            var blobList = await BlobContainer.ListBlobsSegmentedAsync($"project/{root.Key}/attachments", true, BlobListingDetails.All,
+                int.MaxValue, null, new BlobRequestOptions(), new OperationContext());
+
+            var size = blobList.Results.OfType<CloudBlockBlob>().Sum(blob => blob.Properties.Length);
+            if (size > 524288000)
+            {
+                return BadRequest(new {message = "Size exceded"});
+            }
+            
+            var extension = System.IO.Path.GetExtension(file.FileName);
+            var attachmentName = $"{ShortId.Generate(true, false, 20)}" +
+                                 $"{extension}";
+            var attachment =
+                BlobContainer.GetBlockBlobReference($"project/{root.Key}/attachments/{attachmentName}");
+            await attachment.UploadFromStreamAsync(file.OpenReadStream());
+            await attachment.FetchAttributesAsync();
+            attachment.Properties.ContentType = file.ContentType;
+            await attachment.SetPropertiesAsync();
+            return Ok(new
+            {
+                Url = $"/api/groups/{groupId}/attachments/{attachmentName}",
+                file.FileName
+            });
+        }
         
-        
+        [HttpGet("{groupId}/attachments/{attachmentName}")]
+        public async Task<IActionResult> GetAttachment(string groupId, string attachmentName)
+        {
+            var root = await Database.GetRootGroup(groupId);
+            if (root == null)
+            {
+                return NotFound();
+            }
+
+            var attachment =
+                BlobContainer.GetBlockBlobReference($"project/{root.Key}/attachments/{attachmentName}");
+            if (!await attachment.ExistsAsync())
+            {
+                return NotFound();
+            }
+
+            var sasConstraints = new SharedAccessBlobPolicy
+            {
+                SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5),
+                SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(10),
+                Permissions = SharedAccessBlobPermissions.Read
+            };
+
+            var sasBlobToken = attachment.GetSharedAccessSignature(sasConstraints);
+            return Redirect(attachment.Uri + sasBlobToken);
+        }
 
         #endregion
 

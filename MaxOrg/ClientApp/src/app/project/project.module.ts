@@ -107,6 +107,7 @@ import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {ShowCodeComponent} from './code/show-code/show-code.component';
 import {ShowIssuesComponent} from './code/show-issues/show-issues.component';
 import {ShowCommitsComponent} from './code/show-commits/show-commits.component';
+import {MarkdownEditorComponent} from './markdown-editor/markdown-editor.component';
 
 registerLocaleData(localeEs);
 @NgModule({
@@ -134,7 +135,8 @@ registerLocaleData(localeEs);
     UploadFileComponent,
     LinkToGithubComponent,
     EventComponent,
-    DayEventsComponent
+    DayEventsComponent,
+    MarkdownEditorComponent
   ],
   imports: [
     CommonModule,
@@ -242,7 +244,8 @@ registerLocaleData(localeEs);
     ShowCodeComponent,
     ShowIssuesComponent,
     ShowCommitsComponent,
-    reloadChart
+    reloadChart,
+    MarkdownEditorComponent
   ],
   bootstrap: [
     ProjectComponent
