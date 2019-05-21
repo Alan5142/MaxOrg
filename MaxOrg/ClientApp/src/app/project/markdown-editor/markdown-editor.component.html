@@ -1,0 +1,40 @@
+<div class="height-100">
+  <mat-toolbar *ngIf="!mediaObserver.isActive('lt-md')" fxLayout="row">
+    <h1 fxFlex>{{title}}</h1>
+    <button mat-icon-button (click)="addImage()">
+      <mat-icon>add_photo_alternate</mat-icon>
+    </button>
+    <button mat-icon-button (click)="uploadFile()">
+      <mat-icon>attach_file</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <mat-toolbar *ngIf="mediaObserver.isActive('lt-md')">
+    <mat-toolbar-row>
+      <h1>{{title}}</h1>
+    </mat-toolbar-row>
+    <mat-toolbar-row fxLayout="row" fxLayoutAlign="end">
+      <button mat-icon-button (click)="addImage()">
+        <mat-icon>add_photo_alternate</mat-icon>
+      </button>
+      <button mat-icon-button (click)="uploadFile()">
+        <mat-icon>attach_file</mat-icon>
+      </button>
+    </mat-toolbar-row>
+  </mat-toolbar>
+  <mat-progress-bar *ngIf="value !== 0" #progressBar mode="determinate" [value]="value" name="uploadProgress"></mat-progress-bar>
+  <mat-form-field class="width-100">
+    <textarea #descriptionField class="width-100" matInput cdkTextareaAutosize cdkAutosizeMinRows="15" cdkAutosizeMaxRows="20"
+              [(ngModel)]="text"></textarea>
+    <mat-hint>Puedes utilizar markdown</mat-hint>
+  </mat-form-field>
+
+  <input (change)="uploadFileToServer($event)" #fileInput type="file" hidden>
+  <input (change)="uploadFileToServer($event)" #imageInput type="file" accept="image/*" hidden>
+  <div style="float: right">
+
+  <button mat-button (click)="cancel()">CANCELAR</button>
+  <button mat-flat-button color="primary" (click)="save()">{{okButtonText}}
+  </button>
+  </div>
+</div>
