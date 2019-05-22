@@ -1,4 +1,3 @@
-using System;
 using ArangoDB.Client;
 
 namespace MaxOrg.Models.Tests
@@ -19,7 +18,5 @@ namespace MaxOrg.Models.Tests
         public string Test { get; set; }
 
         public string CreatorId { get; set; }
-        
-        public string Description { get; set; }
     }
 }

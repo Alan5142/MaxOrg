@@ -1,6 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {MatDialog} from "@angular/material";
 import {CreateReportDialogComponent} from "./create-report-dialog/create-report-dialog.component";
+import {TestsService} from "../../../services/tests.service";
+import {merge, Observable} from "rxjs";
+import {ActivatedRoute} from "@angular/router";
+import {shareReplay} from "rxjs/operators";
+import {CreateTestDialogComponent} from "../create-test/create-test-dialog/create-test-dialog.component";
 
 @Component({
   selector: 'app-record',
@@ -11,10 +16,21 @@ export class RecordComponent implements OnInit {
 
   data = [];
 
-  constructor(public dialog: MatDialog) {
+  tests: Observable<any>;
+
+  groupId: string;
+
+  constructor(public dialog: MatDialog,
+              private testsService: TestsService,
+              private activatedRoute: ActivatedRoute) {
     while (this.data.length < 20) {
       this.data.push(this.generateTestData());
     }
+    this.activatedRoute.parent.parent.params.subscribe(params => {
+      console.log(params);
+      this.groupId = params['id'];
+      this.tests = testsService.getTests(this.groupId).pipe(shareReplay(1));
+    });
   }
 
   ngOnInit() {
@@ -34,11 +50,26 @@ export class RecordComponent implements OnInit {
     };
   }
 
-  openCreateReportDialog(): void {
+  openCreateReportDialog(id: string): void {
     const dialogRef = this.dialog.open(CreateReportDialogComponent, {
       minWidth: '70%',
-      minHeight: '70%'
+      minHeight: '70%',
+      data: {
+        groupId: this.groupId,
+        testId: id
+      }
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      const newTests = this.testsService.getTests(this.groupId).pipe(shareReplay(1));
+      this.tests = merge(this.tests, newTests);
     });
   }
 
+  queueTest() {
+    const dialogRef = this.dialog.open(CreateTestDialogComponent, {data: {id: this.groupId}});
+    dialogRef.afterClosed().subscribe(() => {
+      const newTests = this.testsService.getTests(this.groupId).pipe(shareReplay(1));
+      this.tests = merge(this.tests, newTests);
+    });
+  }
 }

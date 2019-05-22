@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using ArangoDB.Client;
 using MaxOrg.Hubs;
@@ -20,14 +19,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Protocols;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using Newtonsoft.Json;
 using Octokit;
 using shortid;
 using Notification = MaxOrg.Models.Notification;
-using ProductHeaderValue = Octokit.ProductHeaderValue;
 using User = MaxOrg.Models.Users.User;
 
 namespace MaxOrg.Controllers
@@ -1646,7 +1642,6 @@ namespace MaxOrg.Controllers
             return Ok();
         }
 
-
         [HttpPost("{groupId}/tests")]
         public async Task<IActionResult> QueueBuild(string groupId, [FromBody] (int definitionId, string name) data)
         {
@@ -1700,15 +1695,58 @@ namespace MaxOrg.Controllers
             return BadRequest();
         }
 
+        [HttpPut("{groupId}/tests/{testId}")]
+        public async Task<IActionResult> UpdateTest(string groupId, string testId,
+            [FromBody] (string description, object dummy) description)
+        {
+            var test = (await Database.CreateStatement<Test>($@"FOR c, e, v in 1..1 INBOUND 'Tests/{testId}'
+ GRAPH 'TestBuilds'
+ FILTER c._key == '{groupId}' && e.creatorId == '{HttpContext.User.Identity.Name}'
+ return v.vertices[0]").ToListAsync()).FirstOrDefault();
+            if (test == null)
+            {
+                return NotFound();
+            }
+
+            test.Description = description.description;
+            await Database.UpdateByIdAsync<Test>(test.Id, test);
+
+            return Ok();
+        }
+
+        [HttpGet("{groupId}/tests/{testId}")]
+        public async Task<IActionResult> GetTest(string groupId, string testId)
+        {
+            var test = (await Database.CreateStatement<Test>($@"FOR c, e, v in 1..1 INBOUND 'Tests/{testId}'
+ GRAPH 'TestBuilds'
+ FILTER c._key == '{groupId}'
+ return v.vertices[0]").ToListAsync()).FirstOrDefault();
+            if (test == null || !await Database.IsAdmin(HttpContext.User.Identity.Name, groupId))
+            {
+                return NotFound();
+            }
+
+            return Ok(new
+            {
+                test.Failed,
+                Id = test.Key,
+                test.Succeeded,
+                test.Name,
+                test.CreationDate,
+                test.BuildId,
+                test.Description
+            });
+        }
+        
         private async Task<IActionResult> GetUserTest(string groupId)
         {
             var rootGroup = await Database.GetRootGroup(groupId);
             if (rootGroup == null) return NotFound();
             var tests = await Database.CreateStatement<Test>($@"FOR c, e in 1..1 OUTBOUND 'Group/{groupId}'
  GRAPH 'TestBuilds'
- FILTER e.creatorId == '{HttpContext.User.Identity.Name}'
+ FILTER e.creatorId == '{HttpContext.User.Identity.Name}' && c.description == null
  return c").ToListAsync();
-            
+
             var token = await DevOpsHelper.GetAccessToken(Configuration, rootGroup, HttpClient, Database);
             if (token == null) return BadRequest();
 
@@ -1723,8 +1761,20 @@ namespace MaxOrg.Controllers
                 test.Failed = testResult.IncompleteTests;
                 await Database.UpdateByIdAsync<Test>(test.Id, test);
             }
-            
-            return Ok(tests);
+
+            return Ok(new
+            {
+                Tests = tests.Select(t => new
+                {
+                    t.Failed,
+                    Id = t.Key,
+                    t.Succeeded,
+                    t.Name,
+                    t.CreationDate,
+                    t.BuildId
+                }),
+                IsAdmin = false
+            });
         }
 
         private async Task<IActionResult> GetAdminTestReports(string groupId)
@@ -1733,17 +1783,22 @@ namespace MaxOrg.Controllers
  GRAPH 'TestBuilds'
  FILTER c.description != null
  return c").ToListAsync();
-            return Ok(tests.Select(t => new
+            return Ok(new
             {
-                t.Failed,
-                Id = t.Key,
-                t.Succeeded,
-                t.Name,
-                t.CreationDate,
-                t.BuildId
-            }));
+                Tests = tests.Select(t => new
+                {
+                    t.Failed,
+                    Id = t.Key,
+                    t.Succeeded,
+                    t.Name,
+                    t.CreationDate,
+                    t.BuildId,
+                    t.Description
+                }),
+                IsAdmin = true
+            });
         }
-        
+
         [HttpGet("{groupId}/tests/build-definitions")]
         public async Task<IActionResult> GetBuildDefinitions(string groupId)
         {
@@ -1759,7 +1814,7 @@ namespace MaxOrg.Controllers
             if (token == null) return BadRequest();
             var buildDefinitions =
                 await DevOpsHelper.GetBuildDefinitions(token, root.DevOpsOrgName, root.DevOpsProjectName, HttpClient);
-            return Ok(buildDefinitions);
+            return Ok(buildDefinitions.Value);
         }
 
         #endregion

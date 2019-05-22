@@ -42,7 +42,7 @@ const routes: Routes = [
       {path: 'not-found', component: NotFoundComponent},
       {path: 'tests', component: TestsComponent, children: [
           {path: '', component: RecordComponent},
-          {path: 'reports', component: ReportsComponent}
+          {path: 'reports/:testId', component: ReportsComponent}
         ]},
       {path: '**', redirectTo: 'not-found'}
     ]
