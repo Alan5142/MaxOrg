@@ -10,6 +10,7 @@ import {
   ValidatorFn,
   Validators
 } from "@angular/forms";
+import {MatSnackBar} from "@angular/material";
 
 @Component({
   selector: 'app-github-login',
@@ -47,7 +48,8 @@ export class GithubLoginComponent implements OnInit {
   constructor(private activatedRoute: ActivatedRoute,
               private userService: UserService,
               private router: Router,
-              private _formBuilder: FormBuilder) {
+              private _formBuilder: FormBuilder,
+              private snackbar: MatSnackBar) {
   }
 
   ngOnInit() {
@@ -64,8 +66,17 @@ export class GithubLoginComponent implements OnInit {
     this.requiredInformation.get('email').setAsyncValidators(this.emailExists(this.userService));
 
     this.activatedRoute.queryParamMap.subscribe(params => {
-      console.log(params);
       this.codeParam = params.get('code');
+      if (this.userService.userToken !== null) {
+        this.userService.linkToGitHub(this.codeParam).subscribe(() => {
+          this.snackbar.open('Vinculación correcta', 'Ok', {duration: 2000});
+          this.router.navigate(['/start/my_account']);
+        }, err => {
+          this.snackbar.open('No se pudo vincular', 'Ok', {duration: 2000});
+          this.router.navigate(['/start/my_account']);
+        });
+        return;
+      }
       if (this.codeParam) {
         this.userService.githubInfo(this.codeParam).subscribe(result => {
           if (result.token !== undefined) {

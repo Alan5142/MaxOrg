@@ -17,7 +17,8 @@
     </div>
 
     <mat-divider></mat-divider>
-    <mat-slide-toggle (change)="changeTheme($event)" [checked]="theme.isDarkTheme | async">Modo oscuro</mat-slide-toggle>
+    <mat-slide-toggle (change)="changeTheme($event)" [checked]="theme.isDarkTheme | async">Modo oscuro
+    </mat-slide-toggle>
     <form fxLayout="column" [formGroup]="userDataForm" class="height-100" style="margin-bottom: 80px;">
       <h2>{{currentUser === null ? '' : currentUser.username}}</h2>
 
@@ -61,7 +62,7 @@
       </mat-form-field>
       <mat-form-field>
         <mat-select i18n-placeholder
-                    placeholder="Sonido de notificaciones"password
+                    placeholder="Sonido de notificaciones" password
                     value="{{userNotificationPreference | async}}"
                     formControlName="preferences">
           <mat-option i18n value="1">Todas las prioridades</mat-option>
@@ -71,6 +72,10 @@
 
       </mat-form-field>
       <button color="accent" i18n mat-flat-button type="submit" (click)="updateUserData()">GUARDAR CAMBIOS</button>
+      <button (click)="githubLink()" class="github-logo-button" i18n mat-raised-button>
+        <img class="social-logo-img" src="/images/logos/GitHub-Mark-Light-64px.png">
+        VINCULAR CON GITHUB
+      </button>
     </form>
   </div>
 </div>

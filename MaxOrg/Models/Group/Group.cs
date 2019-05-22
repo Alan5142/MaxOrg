@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ArangoDB.Client;
+using MaxOrg.Models.Calendar;
 using MaxOrg.Models.Kanban;
 
 namespace MaxOrg.Models.Group
@@ -43,8 +44,22 @@ namespace MaxOrg.Models.Group
         /// Representa si el grupo es la raíz de todos los grupos, al ser la raíz es un proyecto
         /// </summary>
         public bool IsRoot { get; set; }
-        
-        public string LinkedRepositoryName { get; set; }
+
+        /// <summary>
+        /// Identificador del repositorio en GitHub al que esta vinculado este proyecto
+        /// </summary>
+        public long? LinkedRepositoryName { get; set; } = null;
+
+        /// <summary>
+        /// Token utilizado para generar nuevos tokens en la plataforma de Azure DevOps
+        /// </summary>
+        public string DevOpsRefreshToken { get; set; } = null;
+
+        public string DevOpsToken { get; set; } = null;
+        public DateTime? DevOpsExpirationTime { get; set; } = null;
+
+        public string DevOpsOrgName { get; set; } = null;
+        public string DevOpsProjectName { get; set; } = null;
 
         /// <summary>
         /// Fecha de creación del proyecto/grupo
@@ -55,5 +70,20 @@ namespace MaxOrg.Models.Group
         /// Tarjetas kanban del proyecto, puede tener "n" cantidada
         /// </summary>
         public List<KanbanBoard> KanbanBoards { get; set; } = new List<KanbanBoard>();
+
+        /// <summary>
+        /// Lista de eventos para el calendario, solo los tiene el grupo raíz
+        /// </summary>
+        public List<CalendarEvent> Events { get; set; }
+
+        /// <summary>
+        /// Indica si un proyecto esta terminado, solo es válido para proyectos (IsRoot = true)
+        /// </summary>
+        public bool Finished { get; set; } = false;
+
+        /// <summary>
+        /// Indica el proyecto anterior a este proyecto, solo disponible si "IsRoot" = true
+        /// </summary>
+        public string PreviousProject { get; set; } = null;
     }
 }

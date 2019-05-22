@@ -1,9 +1,5 @@
-﻿using ArangoDB.Client;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MaxOrg.Models
 {
@@ -11,5 +7,7 @@ namespace MaxOrg.Models
     {
         [Required] public string Name { get; set; }
         public List<string> Members { get; set; }
+
+        public string PreviousProject { get; set; } = null;
     }
 }

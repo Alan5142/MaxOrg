@@ -2,6 +2,8 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {MediaObserver} from '@angular/flex-layout';
 import {GroupsService} from '../../../services/groups.service';
+import {Observable} from "rxjs";
+import {share} from "rxjs/operators";
 
 @Component({
   selector: 'app-change-description',
@@ -9,7 +11,7 @@ import {GroupsService} from '../../../services/groups.service';
   styleUrls: ['./change-description.component.scss']
 })
 export class ChangeDescriptionComponent implements OnInit {
-  description: string;
+  description: Observable<string>;
   groupId: string;
 
   constructor(public dialogRef: MatDialogRef<ChangeDescriptionComponent>,
@@ -17,9 +19,7 @@ export class ChangeDescriptionComponent implements OnInit {
               private groups: GroupsService,
               @Inject(MAT_DIALOG_DATA) public data: any) {
     this.groupId = data.groupId;
-    groups.getGroupDescription(this.groupId).subscribe(description => {
-      this.description = description;
-    });
+    this.description = groups.getGroupDescription(this.groupId).pipe(share());
   }
 
   ngOnInit() {

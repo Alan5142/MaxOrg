@@ -1,0 +1,674 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Access" MembersFormat="FullSignature">
+  <Class Name="MaxOrg.Controllers.ChatsController">
+    <Position X="5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAEABAAAAACAIQAAAAACEABAAgAAgAAAAAAA=</HashCode>
+      <FileName>Controllers\ChatsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Controllers.GroupsController">
+    <Position X="17.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAIAAAAEIIEBCiAiAcAAEAWBAiAYBEioIEYACAQAQ=</HashCode>
+      <FileName>Controllers\GroupsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Controllers.LoginController">
+    <Position X="17.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAQEKAAQAAAABAAAAACAAAACAAgQAQBACACAA=</HashCode>
+      <FileName>Controllers\LoginController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Controllers.ProjectsController">
+    <Position X="12" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAEAAEAABACAEgKIBAAAAAAAAAIAAgAAAAAAKAA=</HashCode>
+      <FileName>Controllers\ProjectsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Controllers.UsersController">
+    <Position X="10.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAQAQUgAACBAAAAAAAAAA0AAABIAigAAAAEAAAA=</HashCode>
+      <FileName>Controllers\UsersController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Graphs.ChatMembers">
+    <Position X="3.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAADAAAAAAAAAAQAAAAAAAAAAAAAAAgAAAAAAAAAAAA=</HashCode>
+      <FileName>Graphs\ChatMembers.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Hubs.Requests.JoinKanbanHubRequest">
+    <Position X="5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Hubs\Requests\JoinKanbanHubRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Hubs.ChatHub">
+    <Position X="17.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Hubs\ChatHub.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Hubs.KanbanHub">
+    <Position X="13.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Hubs\KanbanHub.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Hubs.NotificationHub">
+    <Position X="5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Hubs\NotificationHub.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Tasks.AssignedGroupTask">
+    <Position X="6.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAEAAAAAAAAQAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Tasks\AssignedGroupTask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Tasks.AssignedUserTask">
+    <Position X="8.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAADAAAAAAAAAAQAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Tasks\AssignedUserTask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Tasks.AssignTaskRequest">
+    <Position X="10.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Tasks\AssignTaskRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Tasks.CreateTaskRequest">
+    <Position X="5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAEAABAAAAAQAABAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>Models\Tasks\CreateTaskRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Tasks.GroupTask">
+    <Position X="3.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAEAAAAAAAAQAAABAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Tasks\GroupTask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Tasks.ModifyTaskRequest">
+    <Position X="15.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAIAEAAAAAAAAA=</HashCode>
+      <FileName>Models\Tasks\ModifyTaskRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Tasks.SubTask">
+    <Position X="13.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAQEAAAAAAAAAAAAAIAAAAAAAAAgAAA=</HashCode>
+      <FileName>Models\Tasks\SubTask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Tasks.TaskReferencingRequirement">
+    <Position X="17.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAACAAAAAAAAAEQAAABAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Tasks\TaskReferencingRequirement.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Tasks.ToDoTask">
+    <Position X="3.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAACAAAAAAAgAAQABAAAAAQAAAAAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>Models\Tasks\ToDoTask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Requirements.CreateRequirementRequest">
+    <Position X="17.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Models\Requirements\CreateRequirementRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Requirements.GroupRequirement">
+    <Position X="15.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAEAAAAAAAAQAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Requirements\GroupRequirement.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Requirements.ModifyRequirementRequest">
+    <Position X="13.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Requirements\ModifyRequirementRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Requirements.Requirement">
+    <Position X="6.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAADAAAAAAAgAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Requirements\Requirements.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Kanban.CreateKanbanBoardRequest">
+    <Position X="13.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Kanban\CreateKanbanBoardRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Kanban.CreateKanbanCardInSectionRequest">
+    <Position X="15.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Kanban\CreateKanbanCardInSectionRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Kanban.CreateSectionRequest">
+    <Position X="3.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Kanban\CreateSectionRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Kanban.KanbanBoard">
+    <Position X="6.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAACAAAAAAACAAAAAAAAAAQAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Models\Kanban\KanbanBoard.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Kanban.KanbanCard">
+    <Position X="8.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAACAAAAAAAgAEAAAAAAAAAAAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Models\Kanban\KanbanCard.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Kanban.KanbanCardSection">
+    <Position X="10.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQIAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Models\Kanban\KanbanCardSection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Kanban.KanbanGroupMember">
+    <Position X="12" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAIAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Kanban\KanbanGroupMember.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Kanban.MemberEdition">
+    <Position X="5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Kanban\MemberEdition.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Kanban.ModifyKanbanMembersRequest">
+    <Position X="10.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Kanban\ModifyKanbanMembersRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Kanban.ModifyKanbanSectionRequest">
+    <Position X="12" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Models\Kanban\ModifyKanbanSectionRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Kanban.MoveKanbanCardRequest">
+    <Position X="17.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Models\Kanban\MoveKanbanCardRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Kanban.SwapCardsRequest">
+    <Position X="15.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAgAAAAAAA=</HashCode>
+      <FileName>Models\Kanban\SwapCardsRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Users.ExternalRegister">
+    <Position X="6.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAggAAAAQAAAAgAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Users\ExternalRegister.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Users.NotificationQueryOptions">
+    <Position X="8.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAQAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Users\NotificationQueryOptions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Users.User">
+    <Position X="5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACBCAAAQACggBAQAASAAAAAAAAAIAAACAQAAAAAAAAA=</HashCode>
+      <FileName>Models\Users\User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Users.UserForm">
+    <Position X="6.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAgAAAAASAAAAAAAAAIAAACAQAAAAAAAAA=</HashCode>
+      <FileName>Models\Users\UserForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Users.UsersQueryOptions">
+    <Position X="13.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAQAAAAAAAAAQQgAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Users\UsersQueryOptions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Users.UserUpdateInfo">
+    <Position X="15.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAgAAAAACAAAAAAAAAIAAACBQAAAAAAAEA=</HashCode>
+      <FileName>Models\Users\UserUpdateInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Calendar.CalendarEvent">
+    <Position X="12" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAICAAAAACAgBEAAAAAAAAAAAAAAAIAAEAEAgAAAAAA=</HashCode>
+      <FileName>Models\Calendar\CalendarEvent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Calendar.CreateEventRequest">
+    <Position X="10.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAgAEAEAAAAAAAAAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>Models\Calendar\CreateEventRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Calendar.Event">
+    <Position X="15.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QgACAAAAAAAgAEAGAAAAAAAAAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>Models\Calendar\Event.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Calendar.EventColor">
+    <Position X="17.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAACAAAA=</HashCode>
+      <FileName>Models\Calendar\EventColor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Calendar.EventResizable">
+    <Position X="3.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>Models\Calendar\EventResizable.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Calendar.EventsQueryRequest">
+    <Position X="5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Models\Calendar\EventsQueryRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Calendar.ModifyEventRequest">
+    <Position X="8.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAgAEAEAAAAAAAAAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>Models\Calendar\ModifyEventRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Chats.Chat">
+    <Position X="15.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAgAAQAAAAAAAQABAAAAAAAAAAAAQAIAAA=</HashCode>
+      <FileName>Models\Chats\Chat.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Chats.Message">
+    <Position X="6.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAQBEBAQAAIAAAAAA=</HashCode>
+      <FileName>Models\Chats\Message.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Group.ChangeGroupDescriptionRequest">
+    <Position X="13.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Group\ChangeGroupDescriptionRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Group.CreateGroupRequest">
+    <Position X="12" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAgEAQAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Models\Group\CreateGroupRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Group.EditGroupRequest">
+    <Position X="13.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAhAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Group\EditGroupRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Group.Group">
+    <Position X="12" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAACAAAAAAAgAAQAAAQAhAQAAgAAAAAABQAAAAAAAAQ=</HashCode>
+      <FileName>Models\Group\Group.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Group.GroupHierarchy">
+    <Position X="13.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAACQAAAAAAgAAAAAAAAgAQAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Models\Group\GroupHierarchy.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Group.UserGroupView">
+    <Position X="8.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAQAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Group\UserGroupView.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Activity">
+    <Position X="3.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAACAAAAAAABAEAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Activity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.GitHubLogin">
+    <Position X="8.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\GitHubLogin.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.GitHubTokenResponse">
+    <Position X="10.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAAAAAAAAAAEAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Models\GitHubLogin.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Login">
+    <Position X="15.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAgAAAAA=</HashCode>
+      <FileName>Models\Login.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.LoginResponse">
+    <Position X="3.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEFAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Login.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.RefreshToken">
+    <Position X="13.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAASACAAAAAAAAQAAAAAAAAAAAAAAAAAIAAAAAABAAA=</HashCode>
+      <FileName>Models\Login.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.RefreshTokenRequest">
+    <Position X="15.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Login.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.RefreshTokenResponse">
+    <Position X="17.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAIAABAAA=</HashCode>
+      <FileName>Models\Login.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Notification">
+    <Position X="3.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAgAgAAAEAAAAAAAgAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Models\Notification.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.NotificationPush">
+    <Position X="6.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Models\Notification.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.ProjectCreationData">
+    <Position X="10.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAEAAAAAAQ=</HashCode>
+      <FileName>Models\Project.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.Subgroup">
+    <Position X="12" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAIQAAAAAQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Subgroup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Models.UsersInGroup">
+    <Position X="12" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAATAECAAAAAAAQAAAAAAAAACAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\UsersInGroup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Requests.Chat.SendMessageRequest">
+    <Position X="10.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Requests\Chat\ChatRequests.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Requests.Chat.AddUserToChatRequest">
+    <Position X="5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Requests\Chat\ChatRequests.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Requests.Chat.CreateChatRequest">
+    <Position X="8.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQABAAAAAAAAAAEAAAIAAA=</HashCode>
+      <FileName>Requests\Chat\ChatRequests.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Services.Tasks.CheckCalendar" BaseTypeListCollapsed="true">
+    <Position X="6.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAAIAAAAAEAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Services\Tasks\CheckCalendar.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="MaxOrg.Services.Tasks.RemoveEmptyUsers" BaseTypeListCollapsed="true">
+    <Position X="3.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Services\Tasks\RemoveEmptyUsers.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="MaxOrg.Services.Tasks.SchedulerExtensions">
+    <Position X="8.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAA=</HashCode>
+      <FileName>Services\Tasks\SchedulerExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Services.Cron.CrontabField">
+    <Position X="6.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AkBgAAAAAAAQAAAEQAAAAAAQAAgAAAAEQEBCAUgQAAA=</HashCode>
+      <FileName>Services\Cron\CrontabField.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Services.Cron.CrontabFieldImpl" BaseTypeListCollapsed="true">
+    <Position X="8.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgIAAAIAlAAAoAAAAAAAgAAIhAgSIEAAEkACAAAUU=</HashCode>
+      <FileName>Services\Cron\CrontabFieldImpl.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="MaxOrg.Services.Cron.CrontabSchedule">
+    <Position X="10.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAACAAQAAAAEAAAAAAAEAAAAAACEAAAIKAAAAAA=</HashCode>
+      <FileName>Services\Cron\CrontabSchedule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Services.HostedService">
+    <Position X="0.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAiAAAAAAAAAAAAAAQAAAAAAAEA=</HashCode>
+      <FileName>Services\HostedService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MaxOrg.Services.SchedulerHostedService">
+    <Position X="0.75" Y="3.5" Width="1.5" />
+    <NestedTypes>
+      <Class Name="MaxOrg.Services.SchedulerHostedService.SchedulerTaskWrapper" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Services\SchedulerHostedService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAEAABAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Services\SchedulerHostedService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Utility.DatabaseHelpers">
+    <Position X="12" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAABAACAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Utility\DatabaseHelpers.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MaxOrg.Services.Tasks.RemoveExpiredTokens" BaseTypeListCollapsed="true">
+    <Position X="7.25" Y="13.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Services\Tasks\RemoveExpiredTokens.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="MaxOrg.Hubs.Clients.IKanbanClient">
+    <Position X="3.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Hubs\Clients\KanbanClient.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="MaxOrg.Services.Tasks.IScheduledTask">
+    <Position X="5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Services\Tasks\IScheduledTask.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="MaxOrg.Models.Requirements.RequirementType">
+    <Position X="17.25" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Requirements\RequirementType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MaxOrg.Models.Kanban.KanbanMemberPermissions">
+    <Position X="6.75" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAgAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Models\Kanban\KanbanMemberPermissions.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MaxOrg.Models.Users.NotificationPreference">
+    <Position X="10.25" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAQAAAAAAAAAIAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Users\NotificationPreference.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MaxOrg.Models.Calendar.EventPriority">
+    <Position X="5" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAgAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>Models\Calendar\EventPriority.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MaxOrg.Models.Chats.MessageType">
+    <Position X="8.5" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAACAAAAAg=</HashCode>
+      <FileName>Models\Chats\MessageType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MaxOrg.Models.NotificationPriority">
+    <Position X="12" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAgAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>Models\Notification.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MaxOrg.Models.NotificationType">
+    <Position X="13.75" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Models\Notification.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MaxOrg.Models.RequirementState">
+    <Position X="15.5" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Models\RequirementState.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MaxOrg.Services.Cron.CrontabFieldKind">
+    <Position X="3.25" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAACIEAAAEAAAAAAA=</HashCode>
+      <FileName>Services\Cron\CrontabFieldKind.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Delegate Name="MaxOrg.Services.Cron.CrontabFieldAccumulator">
+    <Position X="3.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAAAAAAAAAAAAAEAAAACAAAAAAAAAA=</HashCode>
+      <FileName>Services\Cron\CrontabFieldAccumulator.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

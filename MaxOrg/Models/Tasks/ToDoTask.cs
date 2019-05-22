@@ -17,6 +17,8 @@ namespace MaxOrg.Models.Tasks
         public string Description { get; set; } = string.Empty;
         
         public DateTime CreationDate { get; set; } = DateTime.UtcNow;
+
+        public string DeliveryDate { get; set; } = DateTime.Today.ToString("d");
         
         public short Progress { get; set; } = 0;
     }

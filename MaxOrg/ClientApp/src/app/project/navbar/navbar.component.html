@@ -1,4 +1,4 @@
-<mat-toolbar color="primary" fxLayout="row">
+<mat-toolbar color="primary" fxLayout="row" *ngIf="!(hideNavbar.hide | async)">
   <div fxFlex="33">
     <button (click)="sidenav.toggle()" mat-icon-button>
       <mat-icon>menu</mat-icon>
@@ -94,12 +94,12 @@
         Asignación de trabajos
       </mat-list-item>
       <mat-divider></mat-divider>
-      <h3 mat-subheader>Código</h3>
-      <mat-list-item routerLink="code">
+      <h3 *ngIf="(projectInfo | async)?.repoUrl !== null" mat-subheader>Código</h3>
+      <mat-list-item *ngIf="(projectInfo | async)?.repoUrl !== null" routerLink="code">
         <mat-icon matListIcon>code</mat-icon>
         Código
       </mat-list-item>
-      <a [href]="'https://github.com/Alan5142/MaxOrg'">
+      <a *ngIf="(projectInfo | async)?.repoUrl !== null" [href]="(projectInfo | async)?.repoUrl">
         <mat-list-item>
           <mat-icon matListIcon svgIcon="github"></mat-icon>
           Ver en github

@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using ArangoDB.Client;
+using M6T.Core.TupleModelBinder;
 using MaxOrg.Hubs;
 using MaxOrg.Services.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -61,7 +62,10 @@ namespace MaxOrg
         {
             services.AddCors();
 
-            services.AddMvc()
+            services.AddMvc(options =>
+                {
+                    options.ModelBinderProviders.Insert(0, new TupleModelBinderProvider());
+                })
                 .SetCompatibilityVersion(CompatibilityVersion.Latest)
                 .AddJsonOptions(options =>
                 {
@@ -117,15 +121,8 @@ namespace MaxOrg
                         OnMessageReceived = context =>
                         {
                             var accessToken = context.Request.Query["access_token"];
-
-                            // If the request is for our hub...
-                            var path = context.HttpContext.Request.Path;
-                            if (!string.IsNullOrEmpty(accessToken) &&
-                                (path.StartsWithSegments("/notification-hub") || 
-                                 path.StartsWithSegments("/chat-hub") ||
-                                 path.StartsWithSegments("/kanban-hub")))
+                            if (accessToken.Count > 0)
                             {
-                                // Read the token out of the query string
                                 context.Token = accessToken;
                             }
 
@@ -177,6 +174,7 @@ namespace MaxOrg
 
             services.AddSingleton<IScheduledTask, RemoveExpiredTokens>();
             services.AddSingleton<IScheduledTask, RemoveEmptyUsers>();
+            services.AddSingleton<IScheduledTask, CheckCalendar>();
             services.AddScheduler((sender, args) => { args.SetObserved(); });
             services.AddSignalR();
 

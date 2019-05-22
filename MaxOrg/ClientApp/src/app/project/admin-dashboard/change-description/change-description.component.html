@@ -1,58 +1,7 @@
-<h2 mat-dialog-title>
-
-  <mat-toolbar *ngIf="!mediaObserver.isActive('lt-md')" fxLayout="row">
-    <h1 fxFlex>Cambiar descripción</h1>
-    <button mat-icon-button>
-      <mat-icon>add_photo_alternate</mat-icon>
-    </button>
-    <button mat-icon-button>
-      <mat-icon>attach_file</mat-icon>
-    </button>
-    <button mat-icon-button>
-      <mat-icon>insert_link</mat-icon>
-    </button>
-    <button mat-icon-button>
-      <mat-icon>format_list_bulleted</mat-icon>
-    </button>
-    <button mat-icon-button>
-      <mat-icon>format_list_numbered</mat-icon>
-    </button>
-  </mat-toolbar>
-
-  <mat-toolbar *ngIf="mediaObserver.isActive('lt-md')">
-    <mat-toolbar-row>
-      <h1>Cambiar descripción</h1>
-    </mat-toolbar-row>
-    <mat-toolbar-row fxLayout="row" fxLayoutAlign="end">
-      <button mat-icon-button>
-        <mat-icon>add_photo_alternate</mat-icon>
-      </button>
-      <button mat-icon-button>
-        <mat-icon>attach_file</mat-icon>
-      </button>
-      <button mat-icon-button>
-        <mat-icon>insert_link</mat-icon>
-      </button>
-      <button mat-icon-button>
-        <mat-icon>format_list_bulleted</mat-icon>
-      </button>
-      <button mat-icon-button>
-        <mat-icon>format_list_numbered</mat-icon>
-      </button>
-    </mat-toolbar-row>
-  </mat-toolbar>
-</h2>
-
-<mat-dialog-content id="description-container">
-  <mat-form-field class="width-100">
-    <textarea #descriptionField class="width-100" matInput cdkTextareaAutosize cdkAutosizeMinRows="15"
-              [value]="description"></textarea>
-    <mat-label>Descripción</mat-label>
-    <mat-hint>Puedes utilizar markdown</mat-hint>
-  </mat-form-field>
-</mat-dialog-content>
-<mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close cdkFocusInitial>Cancel</button>
-  <button mat-flat-button color="primary" (click)="updateDescription(descriptionField.value)">Cambiar descripción
-  </button>
-</mat-dialog-actions>
+<app-markdown-editor (saveClicked)="updateDescription($event)"
+                     [defaultText]="description"
+                     [groupId]="groupId"
+                     title="Cambiar descripción"
+                     okButtonText="CAMBIAR DESCRIPCIÓN"
+                     (onCancel)="dialogRef.close(null)">
+</app-markdown-editor>

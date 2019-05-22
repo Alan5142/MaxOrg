@@ -294,11 +294,7 @@ namespace MaxOrg.Controllers
                     var blob = BlobContainer.GetBlockBlobReference($"chats/{chatId}/{id}");
                     var messageType = MessageType.Other;
                     var contentType = request.Attachment.ContentType;
-                    await blob.UploadFromStreamAsync(request.Attachment.OpenReadStream());
-                    await blob.FetchAttributesAsync();
-                    blob.Properties.ContentType = request.Attachment.ContentType;
-                    blob.Properties.CacheControl = "max-age=2419200";
-                    await blob.SetPropertiesAsync();
+                    var stream = request.Attachment.OpenReadStream();
 
                     // tipo de contenido
                     if (contentType.Contains("video"))
@@ -310,6 +306,12 @@ namespace MaxOrg.Controllers
                         messageType = MessageType.Image;
                     }
 
+                    await blob.UploadFromStreamAsync(stream);
+
+                    await blob.FetchAttributesAsync();
+                    blob.Properties.ContentType = contentType;
+                    blob.Properties.CacheControl = "max-age=2419200";
+                    await blob.SetPropertiesAsync();
                     message = new Message
                     {
                         Type = messageType,

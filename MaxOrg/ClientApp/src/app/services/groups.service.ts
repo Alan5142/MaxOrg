@@ -11,6 +11,7 @@ export interface GroupInfo {
   groupOwner: string;
   creationDate: Date;
   members: User[];
+  repoUrl: string;
 }
 
 export interface CreateGroupData {
@@ -23,6 +24,14 @@ export interface CreateGroupData {
 
 export interface GetGroupMembersResponse {
   members: User[];
+}
+
+export interface EditGroupRequest {
+  linkedRepositoryId?: number;
+  name?: string;
+  groupOwner?: string;
+  description?: string
+  readOnly?: boolean;
 }
 
 @Injectable({
@@ -53,17 +62,50 @@ export class GroupsService {
     });
   }
 
-  createGroup(newGroupData: CreateGroupData): Observable<boolean> {
+  createGroup(newGroupData: CreateGroupData) {
     let headers = new HttpHeaders();
     headers = headers.append('Content-Type', 'application/json');
     headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
-    return this.http.post(environment.apiUrl + 'groups', newGroupData, {headers: headers}).pipe(map<any, boolean>(response => {
-      return response;
-    }));
+    return this.http.post(environment.apiUrl + 'groups', newGroupData, {headers: headers});
   }
 
   getMembers(groupId: string): Observable<GetGroupMembersResponse> {
     return this.http.get<GetGroupMembersResponse>(`${environment.apiUrl}groups/${groupId}/members`);
   }
 
+  changeGroupInfo(groupId: string, editRequest: EditGroupRequest): Observable<void> {
+    return this.http.put<void>(`${environment.apiUrl}groups/${groupId}`, editRequest);
+  }
+
+  linkToGitHub(groupId: string, id: number) {
+    return this.http.put(`/api/groups/${groupId}/github/link`, {id: id});
+  }
+
+  getRepositoryCode(groupId: string, path: string = '/'): Observable<any[]> {
+    if (path.trim() === '')
+      path = '/';
+    return this.http.get<any[]>(`/api/groups/${groupId}/github/code?path=${path}`);
+  }
+
+  getRepositoryIssues(groupId: string): Observable<any[]> {
+    return this.http.get<any[]>(`/api/groups/${groupId}/github/issues`);
+  }
+
+  getRepositoryCommits(groupId: string): Observable<any[]> {
+    return this.http.get<any[]>(`/api/groups/${groupId}/github/commits`);
+  }
+
+  uploadAttachment(groupId: string, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`/api/groups/${groupId}/attachments`, formData, {
+      reportProgress: true,
+      observe: "events",
+      headers: {'ngsw-bypass': ''}
+    });
+  }
+
+  getAdminInfo(groupId: string): Observable<any> {
+    return this.http.get(`/api/groups/${groupId}/admin-info`);
+  }
 }

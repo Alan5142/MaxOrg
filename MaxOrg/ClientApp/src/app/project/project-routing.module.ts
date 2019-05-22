@@ -9,7 +9,7 @@ import {AdminDashboardComponent} from './admin-dashboard/admin-dashboard.compone
 import {BoardComponent} from './kanban-board/board/board.component';
 import {KanbanIndexComponent} from './kanban-board/kanban-index/kanban-index.component';
 import {CodeComponent} from './code/code.component';
-import {OrgChartComponent} from './org-chart/org-chart.component';
+import {OrgChartComponent, reloadChart} from './org-chart/org-chart.component';
 import {RequirementsComponent} from './requirements/requirements.component';
 import {MembersComponent} from './members/members.component';
 import {NotFoundComponent} from './not-found/not-found.component';
@@ -35,13 +35,14 @@ const routes: Routes = [
       {path: 'dashboard', component: AdminDashboardComponent},
       {path: 'code', component: CodeComponent},
       {path: 'org-chart', component: OrgChartComponent},
+      {path: 'reload-chart', component:reloadChart},
       {path: 'requirements', component: RequirementsComponent},
       {path: 'members', component: MembersComponent},
       {path: 'posts', component: PostsComponent},
       {path: 'not-found', component: NotFoundComponent},
       {path: 'tests', component: TestsComponent, children: [
           {path: '', component: RecordComponent},
-          {path: 'reports', component: ReportsComponent}
+          {path: 'reports/:testId', component: ReportsComponent}
         ]},
       {path: '**', redirectTo: 'not-found'}
     ]

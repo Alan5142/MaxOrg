@@ -64,6 +64,7 @@ export interface Repository {
   description: string;
   name: string;
   fullName: string;
+  id: number;
 }
 
 @Injectable({
@@ -214,4 +215,7 @@ export class UserService {
     return this.http.get<Repository[]>(`${environment.apiUrl}users/repos`);
   }
 
+  linkToGitHub(accessToken: string) {
+    return this.http.put(`/api/users/github-link?accessToken=${accessToken}`, {});
+  }
 }

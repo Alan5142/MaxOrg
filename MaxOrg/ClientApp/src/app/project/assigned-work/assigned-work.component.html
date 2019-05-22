@@ -1,24 +1,71 @@
 <div (swipeleft)="swipe($event.type)" (swiperight)="swipe($event.type)" class="height-100">
   <mat-tab-group #tabGroup [selectedIndex]="selected">
-    <mat-tab label="Asignación de trabajos">
-      <h4>Grupos</h4>
+    <mat-tab label="Asignar trabajos" class="tab" *ngIf="admin">
+      <div style="text-align: center">
       <mat-divider></mat-divider>
-      <div ngClass="" ngClass.gt-md="group-members-container" >
-        <mat-accordion >
-          <mat-expansion-panel *ngFor="let group of adminGroupsFlat">
+      <div class="task-list">
+          <form class="width-100">
+            <mat-form-field class="width-100">
+              <input (keyup)="applyFilter($event.target.value)" matInput placeholder="Buscar usuario..." type="text">
+              <mat-icon matPrefix>search</mat-icon>
+            </mat-form-field>
+          </form>
+        
+          <div style="overflow-x: auto;">
+            <div>
+              <table [dataSource]="usersDisplay" class="mat-elevation-z8 width-100" mat-table matSort>
+        
+                <ng-container matColumnDef="username">
+                  <th *matHeaderCellDef mat-header-cell mat-sort-header>Nombre de usuario</th>
+                  <td *matCellDef="let user" mat-cell> {{user.username}}</td>
+                </ng-container>
+        
+                <ng-container matColumnDef="actions">
+                  <th *matHeaderCellDef mat-header-cell></th>
+                  <td *matCellDef="let user" mat-cell>
+                    <button (click)="openAssignTask(user.key,true)" color="primary" mat-icon-button>
+                      <mat-icon>assignment</mat-icon>
+                    </button>
+                    <button (click)="deleteTask()"  mat-icon-button>
+                      <mat-icon>launch</mat-icon>
+                    </button>
+                  </td>
+                </ng-container>
+        
+        
+                <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+                <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
+              </table>
+            </div>
+          </div>
+        
+        
+          <mat-paginator [pageSizeOptions]="[5, 10]"
+                         [pageSize]="5"
+                         [showFirstLastButtons]="true">
+        
+          </mat-paginator>
+        </div>
+      <div Class="groups" ngClass.gt-md="group-members-container">
+        <h4>Grupos</h4>
+        <mat-accordion>
+          <mat-expansion-panel *ngFor="let group of adminGroupsFlat; let index=index">
             <mat-expansion-panel-header>
               <mat-panel-title class="text-bold">
                 {{group.name}}
               </mat-panel-title>
             </mat-expansion-panel-header>
             <mat-accordion class="assigned-task-container">
-              <mat-expansion-panel class="assigned-task" *ngFor="let task of group.tasks | async">
+              <mat-expansion-panel
+                [ngClass]="{'assigned-task': !(themeService.isDarkTheme | async), 'assigned-task-dark': themeService.isDarkTheme | async}"
+                *ngFor="let task of group.tasks | async">
                 <mat-expansion-panel-header class="text-bold">
                   {{task.name}}
                 </mat-expansion-panel-header>
                 <div class="width-100" fxLayout="column" fxLayout.gt-md="row">
-                  <p fxFlex="33">Asignada en: {{task.creationDate}}</p>
-                  <p fxFlex="33">Fecha estimada: TODO</p>
+                  <p fxFlex="33">Asignada en: {{task.creationDate | date: 'dd/MM/yyyy'}}</p>
+                  <p fxFlex="33">Fecha estimada: {{task.deliveryDate | date: 'dd/MM/yyyy'}}</p>
+                  <p>Descripción:<br>{{task.description}}</p>
                   <p fxFlex="33">
                     progreso: {{task.progress}}%
                     <mat-progress-bar mode="determinate" value="{{task.progress}}"></mat-progress-bar>
@@ -28,7 +75,7 @@
             </mat-accordion>
 
             <div class="width-100" fxLayout="row" fxLayoutAlign="end center">
-              <button (click)="openAssignTask(group.id)" color="primary" mat-flat-button mat-icon-button>
+              <button (click)="openAssignTask(group.id,index)" color="primary" mat-flat-button mat-icon-button>
                 <mat-icon>add</mat-icon>
               </button>
             </div>
@@ -36,16 +83,43 @@
           </mat-expansion-panel>
         </mat-accordion>
       </div>
+      </div>
+    </mat-tab>
+    <mat-tab label="Mi trabajo">
+        <div Class="groups tab">
+
+            <h4>Grupos</h4>
+            <mat-accordion>
+              <mat-expansion-panel *ngFor="let group of membergroups; let index=index;">
+                <mat-expansion-panel-header *ngIf="(group.tasks | async)?.length>0">
+                  <mat-panel-title class="text-bold">
+                    {{group.name}}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-accordion class="assigned-task-container">
+                  <mat-expansion-panel class="assigned-task" *ngFor="let task of group.tasks | async">
+                    <mat-expansion-panel-header class="text-bold">
+                      {{task.name}}
+                    </mat-expansion-panel-header>
+                    <div class="width-100" fxLayout="column" fxLayout.gt-md="row">
+                      <p fxFlex="33">Asignada en: {{task.creationDate | date: 'dd/MM/yyyy'}}</p>
+                      <p fxFlex="33">Fecha estimada: {{task.deliveryDate | date: 'dd/MM/yyyy'}}</p>
+                      <p>Descripción:<br>{{task.description}}</p>
+                      <p fxFlex="33">
+                        progreso: {{task.progress}}%
+                        <mat-progress-bar mode="determinate" value="{{task.progress}}"></mat-progress-bar>
+                      </p>
+                    </div>
+                  </mat-expansion-panel>
+                </mat-accordion>
+    
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+    
+    </mat-tab>
 
 
-      <h4>Personas</h4>
-      <mat-divider></mat-divider>
-    </mat-tab>
-    <mat-tab label="Lista de trabajos">
-      <ng-template matTabContent>
-        <app-create-task></app-create-task>
-      </ng-template>
-    </mat-tab>
   </mat-tab-group>
 
 </div>

@@ -121,7 +121,7 @@ namespace MaxOrg.Controllers
         public async Task<IActionResult> Github([FromBody] GitHubLogin loginParameters)
         {
             // get an access token
-            var tokenResponse = await GetGitHubAccessToken(loginParameters.AccessToken);
+            var tokenResponse = await GetGitHubAccessToken(loginParameters.AccessToken, Configuration);
 
             var githubClient = new GitHubClient(new Octokit.ProductHeaderValue("MaxOrg"));
 
@@ -187,109 +187,6 @@ namespace MaxOrg.Controllers
             };
 
             return Ok(response);
-
-
-            /*
-            var userWithSameId = await (from u in db.Query<Models.Users.User>()
-                where u.GithubId == githubUser.Id
-                select u).FirstOrDefaultAsync();
-
-            // the account is linked
-            if (userWithSameId != null)
-            {
-                userToAuth = userWithSameId;
-                hasPassword = userToAuth.Password != null;
-            }
-            else
-            {
-                // we can't register accounts without public email :(
-                // but we can link those accounts with existing accounts :)
-                if (githubUser.Email == null)
-                {
-                    return Accepted(new
-                    {
-                        Username = githubUser.Login,
-                        Description = githubUser.Bio,
-                        RealName = githubUser.Name
-                    });
-                }
-
-                var userWithSameEmail = await (from u in db.Query<Models.Users.User>()
-                    where u.Email == githubUser.Email
-                    select u).FirstOrDefaultAsync();
-                if (userWithSameEmail != null)
-                {
-                    // Email is already registered
-
-                    // first github login
-                    if (userWithSameEmail.GithubId == null)
-                    {
-                        // well, user needs to link his account from account settings
-                        return
-                            BadRequest(new
-                                {message = "Email already exists, link your account from 'Account settings'"});
-                    }
-
-                    userToAuth = userWithSameEmail;
-                    hasPassword = false;
-                }
-                else
-                {
-                    userToAuth = new Models.Users.User
-                    {
-                        Description = githubUser.Bio,
-                        RealName = githubUser.Name,
-                        Email = githubUser.Email,
-                        GithubToken = tokenResponse.AccessToken,
-                        GithubId = githubUser.Id
-                    };
-
-                    var usernameExists = await (from u in db.Query<Models.Users.User>()
-                        where u.Username == githubUser.Login
-                        select u).FirstOrDefaultAsync();
-                    string username = githubUser.Login;
-
-                    // concat a random number to username if the username exists
-                    if (usernameExists != null)
-                    {
-                        return Accepted(new
-                        {
-                            Username = githubUser.Login,
-                            Description = githubUser.Bio,
-                            RealName = githubUser.Name,
-                            Email = githubUser.Email
-                        });
-                    }
-
-                    userToAuth.Username = username;
-
-                    // insert the user
-                    var insertedUser = await db.InsertAsync<Models.Users.User>(userToAuth);
-                    var image = await HttpClient.GetAsync(githubUser.AvatarUrl);
-                    var blob = Container.GetBlockBlobReference($"users/{insertedUser.Key}/profile.jpeg");
-                    await blob.UploadFromStreamAsync(await image.Content.ReadAsStreamAsync());
-                    userToAuth.Key = insertedUser.Key;
-                    hasPassword = false;
-                }
-            }
-
-
-            // generate a token :D
-            var (token, refreshToken) = await GenerateRefreshAndJwtToken(userToAuth);
-            var response = new LoginResponse
-            {
-                userId = userToAuth.Key,
-                userResourceLocation = "users/" + userToAuth.Key,
-                token = token,
-                refreshToken = refreshToken.Token
-            };
-            if (hasPassword)
-            {
-                HttpContext.Response.Headers.Add("HasPassword", "true");
-            }
-
-            return Ok(response);
-            */
         }
 
         [HttpPost("github/register")]
@@ -392,15 +289,15 @@ namespace MaxOrg.Controllers
         /// </summary>
         /// <param name="code">Código que servirá para generar el token (vease la documentación de GitHub respecto a OAuth)</param>
         /// <returns>Un response con el token de acceso, el tipo y el alcance</returns>
-        private async Task<GitHubTokenResponse> GetGitHubAccessToken(string code)
+        public static async Task<GitHubTokenResponse> GetGitHubAccessToken(string code, IConfiguration configuration)
         {
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var httpResult = await client.PostAsJsonAsync("https://github.com/login/oauth/access_token",
                 new
                 {
-                    client_id = Configuration["AppSettings:GitHub:ClientID"],
-                    client_secret = Configuration["AppSettings:GitHub:ClientSecret"],
+                    client_id = configuration["AppSettings:GitHub:ClientID"],
+                    client_secret = configuration["AppSettings:GitHub:ClientSecret"],
                     code
                 });
             var data = await httpResult.Content.ReadAsStringAsync();

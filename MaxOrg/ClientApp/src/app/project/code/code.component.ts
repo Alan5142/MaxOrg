@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {MatIconRegistry} from '@angular/material';
 import {MediaObserver} from '@angular/flex-layout';
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'app-code',

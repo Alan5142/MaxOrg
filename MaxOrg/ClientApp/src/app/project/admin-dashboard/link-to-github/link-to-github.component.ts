@@ -19,4 +19,8 @@ export class LinkToGithubComponent implements OnInit {
   ngOnInit() {
   }
 
+  returnGroupId(value: string) {
+    const repo = this.data.find(repo => repo.fullName === value);
+    this.dialogRef.close({id: repo.id});
+  }
 }

@@ -1,27 +1,43 @@
 <div class="height-100" style="overflow-y: auto">
   <h1>Historial de tests</h1>
-  <div ngClass="" ngClass.lt-md="tests-container-mobile" ngClass.gt-md="tests-container" fxLayout="column"
+  <div *ngIf="tests | async as $tests" ngClass="" ngClass.lt-md="tests-container-mobile" ngClass.gt-md="tests-container"
+       fxLayout="column"
        fxLayoutGap="16px">
-    <app-create-test></app-create-test>
+    <div fxLayout="row">
+      <button *ngIf="!$tests.isAdmin" mat-flat-button color="primary" (click)="queueTest()">ENCOLAR TEST</button>
+      <div fxFlex></div>
+    </div>
+
     <div fxLayout="column-reverse" fxLayoutGap="30px">
-      <mat-card *ngFor="let testData of data" class="mat-elevation-z6">
+      <mat-card *ngFor="let data of $tests?.tests" class="mat-elevation-z6">
         <mat-card-header>
-          <mat-card-title>#{{testData.number}}</mat-card-title>
+          <mat-card-title>{{data.name}}</mat-card-title>
         </mat-card-header>
         <mat-card-content fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap="10px">
           <mat-progress-spinner mode="determinate"
-                                [value]="testData.passed / testData.numberOfTests * 100"></mat-progress-spinner>
-          <h3 class="text-center">{{testData.numberOfTests}} tests, de los cuales</h3>
-          <h3 class="text-center" style="color: #41c300">{{testData.passed}} tests fueron completados con exito</h3>
-          <h3 class="text-center" style="color: #e53935">{{testData.failed}} tests fallaron en el proceso</h3>
-          <button (click)="openCreateReportDialog()" mat-flat-button color="primary"
-                  [disabled]="!testData.needReport">
-            {{testData.needReport ? 'CREAR REPORTE' : 'ESTE TEST YA CONTIENE UN REPORTE'}}
+                                *ngIf="data.failed !== null"
+                                [value]="data.succeeded / (data.succeeded + data.failed) * 100"></mat-progress-spinner>
+          <h3 *ngIf="data.failed === null">Ten paciencia, se esta ejecutando</h3>
+          <h3 *ngIf="data.failed !== null"
+              class="text-center">{{data.succeeded + data.failed}} {{(data.succeded + data.failed) > 2 ? 'tests, de los cuales' : 'test, del cual'}}</h3>
+          <h3 *ngIf="data.failed !== null" class="text-center" style="color: #41c300">
+            {{data.succeeded}} {{data.succeeded === 1 ? 'test fue completado con exito' : 'fueron completados con exito'}}
+          </h3>
+          <h3 *ngIf="data.failed !== null" class="text-center"
+              style="color: #e53935">{{data.failed}} {{data.failed === 1 ? 'test fallo en el proceso' : 'tests fallaron en el proceso'}}</h3>
+          <button *ngIf="!$tests.isAdmin && data.failed !== null" (click)="openCreateReportDialog(data.id)" mat-flat-button
+                  color="primary">
+            CREAR REPORTE
           </button>
-          <button mat-flat-button color="primary" *ngIf="!testData.needReport" routerLink="reports"
-                  [queryParams]="{number: testData.number}">VER REPORTE
+          <button mat-flat-button color="primary" *ngIf="$tests.isAdmin" [routerLink]="['reports', data.id]">VER REPORTE
           </button>
         </mat-card-content>
+      </mat-card>
+      <mat-card *ngIf="$tests?.tests.length === 0" class="mat-elevation-z8">
+        <mat-card-header>
+          <mat-card-title>Parece que no hay
+            tests, {{$tests.isAdmin ? 'espera a que un usuario haga uno para que veas su reporte' : 'pruba creando uno'}}</mat-card-title>
+        </mat-card-header>
       </mat-card>
     </div>
   </div>

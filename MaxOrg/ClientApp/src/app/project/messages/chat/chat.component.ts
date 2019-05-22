@@ -3,7 +3,7 @@ import {MediaObserver} from '@angular/flex-layout';
 import {Location} from '@angular/common';
 import {VirtualScrollerComponent} from 'ngx-virtual-scroller';
 import {ActivatedRoute, Router} from "@angular/router";
-import {merge, Observable, Subject} from "rxjs";
+import {merge, Observable, Subject, Subscription} from "rxjs";
 import {ChatService} from "../../services/chat.service";
 import {map, shareReplay} from "rxjs/operators";
 import {ChatModel, Message, MessageType} from "../../services/chat-model";
@@ -12,6 +12,7 @@ import {FabButton} from "../../../common-components/speed-dial-fab/fab-button.mo
 import {MatDialog, MatSnackBar} from "@angular/material";
 import {UploadFileComponent} from "./upload-file/upload-file.component";
 import {HttpEventType, HttpResponse} from "@angular/common/http";
+import {HideNavbarService} from "../../services/hide-navbar.service";
 
 @Component({
   selector: 'app-chat',
@@ -32,6 +33,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   chatId: string;
   currentUser: Observable<User> = null;
   chatMessages: Message[];
+  change: Subscription;
+
 
   speedDialFabButtons: FabButton[] = [
     new FabButton({
@@ -53,7 +56,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
               private chatService: ChatService,
               private router: Router,
               private dialog: MatDialog,
-              private snackbar: MatSnackBar) {
+              private snackbar: MatSnackBar,
+              private hideNavbar: HideNavbarService) {
     this.currentUser = this.userService.getCurrentUser().pipe(shareReplay(1));
     this.route.queryParamMap
       .subscribe(params => {
@@ -65,7 +69,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
           return model;
         }));
         this.chat.subscribe(c => {
-          this.chatMessages = c.messages;
+            this.chatMessages = c.messages;
             setTimeout(() => this.virtualScroll.scrollToIndex(c.messages.length - 1, true, 0, 0), 600)
           },
           error => this.router.navigate(['not-found'], {relativeTo: this.route.parent}));
@@ -83,6 +87,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chatService.onConnectedObservable.subscribe(() => {
       this.chatService.connect(this.chatId);
     });
+    this.change = this.mediaObserver.asObservable().subscribe(o => {
+      this.hideNavbar.setValue(this.mediaObserver.isActive('lt-md'));
+    });
 
   }
 
@@ -91,6 +98,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.chatService.disconnect(this.chatId);
+    this.hideNavbar.setValue(false);
+    this.change.unsubscribe();
   }
 
   sendMessage(message: string) {

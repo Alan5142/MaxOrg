@@ -1,6 +1,7 @@
-import {Component, OnInit, OnChanges} from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { ProjectsService } from 'src/app/services/projects.service';
+import {Component, OnChanges, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ProjectsService} from 'src/app/services/projects.service';
+import {UserService} from "../../services/user.service";
 
 @Component({
   selector: 'app-org-chart',
@@ -15,7 +16,12 @@ export class OrgChartComponent implements OnInit,OnChanges {
   myTree =[];
   userId;
   observable;
-  constructor(public route:ActivatedRoute, public projectService:ProjectsService) {
+  constructor(public route:ActivatedRoute,
+              public projectService:ProjectsService,
+              public userService: UserService) {
+    this.userService.getCurrentUser().subscribe(u => {
+      this.userId = u.key;
+    });
     this.userId=localStorage.getItem('userId');
     this.route.parent.params.subscribe(params => {
       this.observable = this.projectService.getProject(params['id']);
@@ -41,5 +47,13 @@ export class OrgChartComponent implements OnInit,OnChanges {
     });
   }
   ngOnChanges(): void {
+  }
+}
+@Component({
+  template:""
+})
+export class reloadChart{
+  constructor(router:Router,route:ActivatedRoute){
+    router.navigate(["../org-chart"],{relativeTo:route});
   }
 }

@@ -1,6 +1,6 @@
 <div class="height-100" fxLayout="column" fxLayoutAlign="end stretch" *ngIf="currentUser | async as user">
   <div>
-    <mat-toolbar>
+    <mat-toolbar [ngStyle.lt-md]="{'position': 'fixed', 'top': '0px'}" ngStyle="">
       <button (click)="location.back()" *ngIf="mediaObserver.isActive('lt-md')" fxFlexAlign="center" mat-icon-button>
         <mat-icon>arrow_back</mat-icon>
       </button>
@@ -21,28 +21,17 @@
                     [enableUnequalChildrenSizes]="true"
                     [items]="chatMessages"
                     class="height-100">
-      <app-chat-message *ngFor="let message of scroll?.viewPortItems; let i = index"
-                        class="chat-element chat-view"
-                        fxLayout="column"
-                        (refresh)="scrollToBottom(scroll?.viewPortItems.length - 1)"
-                        [lastMessage]="i === scroll.viewPortItems.length - 1"
-                        [message]="message.data"
-                        [sender]="message.remitent"
-                        [messageData]="message"
-                        [selfMessage]="user.username === message.remitent"></app-chat-message>
+    <app-chat-message *ngFor="let message of scroll?.viewPortItems; let i = index"
+                      class="chat-element chat-view"
+                      fxLayout="column"
+                      (refresh)="scrollToBottom(scroll?.viewPortItems.length - 1)"
+                      [lastMessage]="i === scroll.viewPortItems.length - 1"
+                      [message]="message.data"
+                      [sender]="message.remitent"
+                      [messageData]="message"
+                      [selfMessage]="user.username === message.remitent"></app-chat-message>
 
   </virtual-scroller>
-
-  <!--
-  <cdk-virtual-scroll-viewport #scrollViewPort itemSize="61" class="height-100">
-    <div class="chat-view">
-      <div fxLayout="column" *cdkVirtualFor="let item of items;
-                                             let odd = odd;" class="width-100">
-        <app-chat-message class="chat-element" [selfMessage]="odd" message="{{item}}"></app-chat-message>
-      </div>
-    </div>
-  </cdk-virtual-scroll-viewport>
--->
   <mat-form-field appearance="outline" class="width-100" fxFlexAlign="end">
     <textarea #message cdkTextareaAutosize matInput placeholder="mensaje"></textarea>
   </mat-form-field>

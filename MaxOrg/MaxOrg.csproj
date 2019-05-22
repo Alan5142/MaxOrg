@@ -16,6 +16,7 @@
   <ItemGroup>
     <PackageReference Include="ArangoDB.Client" Version="0.7.70" />
     <PackageReference Include="FluentFTP" Version="24.0.0" />
+    <PackageReference Include="M6T.Core.TupleModelBinder" Version="1.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.2.0" />
@@ -28,6 +29,9 @@
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
     <Content Remove="$(SpaRoot)**" />
+    <Content Include=".nuget\NuGet.Config">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
@@ -37,6 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\project\calendar\custom-date-formatter.provider.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\services\prism-include.ts" />
   </ItemGroup>
 

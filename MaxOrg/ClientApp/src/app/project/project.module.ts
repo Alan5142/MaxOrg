@@ -1,8 +1,9 @@
 import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {CommonModule, registerLocaleData} from '@angular/common';
 import {ProjectComponent} from './project.component';
 import {
   GestureConfig,
+  MAT_DATE_LOCALE,
   MatAutocompleteModule,
   MatBadgeModule,
   MatButtonModule,
@@ -10,6 +11,7 @@ import {
   MatCardModule,
   MatCheckboxModule,
   MatChipsModule,
+  MatDatepickerModule,
   MatDialogModule,
   MatDividerModule,
   MatExpansionModule,
@@ -19,6 +21,7 @@ import {
   MatInputModule,
   MatListModule,
   MatMenuModule,
+  MatNativeDateModule,
   MatPaginatorModule,
   MatProgressBarModule,
   MatProgressSpinnerModule,
@@ -48,10 +51,6 @@ import {ScrollingModule} from '@angular/cdk/scrolling';
 import {AssignedWorkComponent} from './assigned-work/assigned-work.component';
 import {HAMMER_GESTURE_CONFIG} from '@angular/platform-browser';
 import {AssignWorkComponent} from './assigned-work/assign-work/assign-work.component';
-import {CreateTaskComponent} from './assigned-work/create-task/create-task.component';
-import {CreateDialogComponent} from './assigned-work/create-task/create-dialog/create-dialog.component';
-import {DeleteTaskDialogComponent} from './assigned-work/create-task/delete-task-dialog/delete-task-dialog.component';
-import {EditTaskComponent} from './assigned-work/create-task/edit-task/edit-task.component';
 import {AdminDashboardComponent} from './admin-dashboard/admin-dashboard.component';
 import {LayoutModule} from '@angular/cdk/layout';
 import {Ng2GoogleChartsModule} from 'ng2-google-charts';
@@ -65,7 +64,7 @@ import {
   CommonComponentsModule,
   CommonComponentsModule as AppCommonComponentsModule
 } from '../common-components/common-components.module';
-import {OrgChartComponent} from './org-chart/org-chart.component';
+import {OrgChartComponent, reloadChart} from './org-chart/org-chart.component';
 import {TreeComponent} from './org-chart/tree/tree.component';
 import {GroupCardComponent} from './org-chart/group-card/group-card.component';
 import {RequirementsComponent} from './requirements/requirements.component';
@@ -95,14 +94,22 @@ import {ModifyMembersComponent} from './kanban-board/modify-members/modify-membe
 import {CreateChatGroupComponent} from './messages/create-chat-group/create-chat-group.component';
 import {UploadFileComponent} from './messages/chat/upload-file/upload-file.component';
 import {LinkToGithubComponent} from './admin-dashboard/link-to-github/link-to-github.component';
+import {EventComponent} from './calendar/event/event.component';
+import {DayEventsComponent} from './calendar/day-events/day-events.component';
+import {CalendarModule, DateAdapter} from "angular-calendar";
+import {adapterFactory} from "angular-calendar/date-adapters/date-fns";
+import localeEs from '@angular/common/locales/es-MX';
+import {MatMomentDateModule} from "@angular/material-moment-adapter";
+import {ShowCodeComponent} from './code/show-code/show-code.component';
+import {ShowIssuesComponent} from './code/show-issues/show-issues.component';
+import {ShowCommitsComponent} from './code/show-commits/show-commits.component';
+import {MarkdownEditorComponent} from './markdown-editor/markdown-editor.component';
 
+registerLocaleData(localeEs);
 @NgModule({
   entryComponents: [
     ProjectComponent,
     AssignWorkComponent,
-    CreateDialogComponent,
-    DeleteTaskDialogComponent,
-    EditTaskComponent,
     GroupCardComponent,
     NewSubgroupComponent,
     ChangeDescriptionComponent,
@@ -119,7 +126,10 @@ import {LinkToGithubComponent} from './admin-dashboard/link-to-github/link-to-gi
     ModifyMembersComponent,
     CreateChatGroupComponent,
     UploadFileComponent,
-    LinkToGithubComponent
+    LinkToGithubComponent,
+    EventComponent,
+    DayEventsComponent,
+    MarkdownEditorComponent
   ],
   imports: [
     CommonModule,
@@ -136,6 +146,7 @@ import {LinkToGithubComponent} from './admin-dashboard/link-to-github/link-to-gi
     FlexLayoutModule,
     MatCardModule,
     MatFormFieldModule,
+    MatNativeDateModule,
     DragDropModule,
     ServicesModule,
     FormsModule,
@@ -165,7 +176,13 @@ import {LinkToGithubComponent} from './admin-dashboard/link-to-github/link-to-gi
     MatBadgeModule,
     MatButtonToggleModule,
     MatRadioModule,
-    AppCommonComponentsModule
+    AppCommonComponentsModule,
+    CalendarModule.forRoot({
+      provide: DateAdapter,
+      useFactory: adapterFactory
+    }),
+    MatDatepickerModule,
+    MatMomentDateModule
   ],
   declarations: [
     ProjectComponent,
@@ -176,10 +193,6 @@ import {LinkToGithubComponent} from './admin-dashboard/link-to-github/link-to-gi
     ChatComponent,
     AssignedWorkComponent,
     AssignWorkComponent,
-    CreateTaskComponent,
-    CreateDialogComponent,
-    DeleteTaskDialogComponent,
-    EditTaskComponent,
     AdminDashboardComponent,
     KanbanToolbarComponent,
     BoardComponent,
@@ -214,14 +227,22 @@ import {LinkToGithubComponent} from './admin-dashboard/link-to-github/link-to-gi
     ModifyMembersComponent,
     CreateChatGroupComponent,
     UploadFileComponent,
-    LinkToGithubComponent
+    LinkToGithubComponent,
+    EventComponent,
+    DayEventsComponent,
+    ShowCodeComponent,
+    ShowIssuesComponent,
+    ShowCommitsComponent,
+    reloadChart,
+    MarkdownEditorComponent
   ],
   bootstrap: [
     ProjectComponent
   ],
   providers: [
     {provide: HAMMER_GESTURE_CONFIG, useClass: GestureConfig},
-    ChatService
+    ChatService,
+    {provide: MAT_DATE_LOCALE, useValue: 'es-MX'},
   ]
 })
 export class ProjectModule {
