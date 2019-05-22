@@ -12,15 +12,17 @@ import { Router, ActivatedRoute } from '@angular/router';
 export class AssignWorkComponent implements OnInit {
   references: boolean = false;
   task: CreateTaskRequest;
-  groupId: string;
+  id: string;
+  isUser:boolean;
   requirementId: string;
   url;
   date = (new FormControl(new Date())).value;
 
   constructor(public dialogRef: MatDialogRef<any>, private taskService: TasksService,
-    @Inject(MAT_DIALOG_DATA) groupId: string,
+    @Inject(MAT_DIALOG_DATA) params: any,
     private router: Router, private route: ActivatedRoute) {
-    this.groupId = groupId;
+    this.id = params.id;
+    this.isUser=params.isUser;
     this.requirementId = localStorage.getItem("taskRequirement");
     this.url = localStorage.getItem("url");
 
@@ -30,7 +32,7 @@ export class AssignWorkComponent implements OnInit {
     if (this.requirementId) {
       this.references = true;
     }
-    localStorage.removeItem("taskGroup");
+    localStorage.removeItem("taskTarget");
     localStorage.removeItem("url");
 
 
@@ -50,15 +52,16 @@ export class AssignWorkComponent implements OnInit {
         deliveryDate: this.date
       }
     console.log(this.task);
-
-    this.dialogRef.close(this.taskService.createGroupTask(this.groupId, this.task));
+    if(!this.isUser)
+      this.dialogRef.close(this.taskService.createGroupTask(this.id, this.task));
+    
   }
   unreference() {
     this.references = false;
     localStorage.removeItem("taskRequirement");
   }
   reference() {
-    localStorage.setItem("taskGroup", this.groupId);
+    localStorage.setItem("taskTarget", this.id);
     this.router.navigate([this.url]);
     this.dialogRef.close();
   }

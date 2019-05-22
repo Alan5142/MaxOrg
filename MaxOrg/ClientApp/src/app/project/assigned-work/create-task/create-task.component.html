@@ -11,39 +11,11 @@
 
   <div style="overflow-x: auto;">
     <div ngClass="" ngClass.lt-sm="table-content-mobile">
-      <table [dataSource]="tasks" class="mat-elevation-z8 width-100" mat-table matSort>
+      <table [dataSource]="users" class="mat-elevation-z8 width-100" mat-table matSort>
 
-        <ng-container matColumnDef="id">
-          <th *matHeaderCellDef mat-header-cell mat-sort-header>#</th>
-          <td *matCellDef="let element" mat-cell> {{element.id}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="name">
-          <th *matHeaderCellDef mat-header-cell mat-sort-header>Nombre</th>
-          <td *matCellDef="let element" mat-cell> {{element.name}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="description">
-          <th *matHeaderCellDef mat-header-cell>Descripción</th>
-          <td *matCellDef="let element" mat-cell> {{element.description}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="creationDate">
-          <th *matHeaderCellDef mat-header-cell mat-sort-header>Fecha de creación</th>
-          <td *matCellDef="let element" mat-cell> {{formatDate(element.creationDate)}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="assignedDate">
-          <th *matHeaderCellDef mat-header-cell mat-sort-header>Fecha de asignación</th>
-          <td *matCellDef="let element" mat-cell> {{formatDate(element.assignedDate)}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="progress">
-          <th *matHeaderCellDef mat-header-cell mat-sort-header>Progreso</th>
-          <td *matCellDef="let element" mat-cell>
-            <mat-progress-bar [value]="element.progress" mode="determinate"></mat-progress-bar>
-            <p class="text-center">{{element.progress}}%</p>
-          </td>
+        <ng-container matColumnDef="username">
+          <th *matHeaderCellDef mat-header-cell mat-sort-header>Nombre de usuario</th>
+          <td *matCellDef="let user" mat-cell> {{user.id}}</td>
         </ng-container>
 
         <ng-container matColumnDef="actions">

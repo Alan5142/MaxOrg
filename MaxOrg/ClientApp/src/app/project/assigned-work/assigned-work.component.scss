@@ -1,4 +1,4 @@
-.group-members-container {
+/* .group-members-container {
   margin: 0 20% 0 20%;
 }
 
@@ -9,7 +9,31 @@
 .assigned-task {
   background-color: #EEEEEE;
 }
+.task-list {
+  //margin: 0 20% 0 20%;
+  float: right;
+}
 
-.assigned-task-dark {
-  background-color: #2a2a2a;
+.task-list-mobile {
+  margin: 0 5% 0 5%;
+}
+
+.table-content-mobile {
+  width: 800px;
+}
+ */
+ .task-list {
+  //margin: 0 20% 0 20%;
+  display: inline-block;
+  margin:5%;
+  width: 350px;
+}
+.groups{
+  display: inline-block;
+  margin-top: 5%;
+  min-width: 350px;
+  width: 50%;
+}
+.tab{
+  text-align: center;
 }
