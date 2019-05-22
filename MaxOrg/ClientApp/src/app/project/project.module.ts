@@ -51,10 +51,6 @@ import {ScrollingModule} from '@angular/cdk/scrolling';
 import {AssignedWorkComponent} from './assigned-work/assigned-work.component';
 import {HAMMER_GESTURE_CONFIG} from '@angular/platform-browser';
 import {AssignWorkComponent} from './assigned-work/assign-work/assign-work.component';
-import {CreateTaskComponent} from './assigned-work/create-task/create-task.component';
-import {CreateDialogComponent} from './assigned-work/create-task/create-dialog/create-dialog.component';
-import {DeleteTaskDialogComponent} from './assigned-work/create-task/delete-task-dialog/delete-task-dialog.component';
-import {EditTaskComponent} from './assigned-work/create-task/edit-task/edit-task.component';
 import {AdminDashboardComponent} from './admin-dashboard/admin-dashboard.component';
 import {LayoutModule} from '@angular/cdk/layout';
 import {Ng2GoogleChartsModule} from 'ng2-google-charts';
@@ -114,9 +110,6 @@ registerLocaleData(localeEs);
   entryComponents: [
     ProjectComponent,
     AssignWorkComponent,
-    CreateDialogComponent,
-    DeleteTaskDialogComponent,
-    EditTaskComponent,
     GroupCardComponent,
     NewSubgroupComponent,
     ChangeDescriptionComponent,
