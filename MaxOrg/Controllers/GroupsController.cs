@@ -1758,7 +1758,7 @@ namespace MaxOrg.Controllers
                 if (result == null || result.Count <= 0) continue;
                 var testResult = result.Value[0];
                 test.Succeeded = testResult.PassedTests;
-                test.Failed = testResult.IncompleteTests;
+                test.Failed = testResult.TotalTests - test.Succeeded.Value;
                 await Database.UpdateByIdAsync<Test>(test.Id, test);
             }
 

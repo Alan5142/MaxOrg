@@ -1,13 +1,13 @@
-<div class="height-100" style="overflow-y: auto">
+<div class="height-100" style="overflow-y: hidden">
   <mat-toolbar fxLayout="row">
-    <button mat-icon-button routerLink="../">
+    <button mat-icon-button routerLink="../../">
       <mat-icon class="no-select">arrow_back</mat-icon>
     </button>
     <div fxFlex fxLayout="row" fxLayoutAlign="center center">
       <h1>Reportes</h1>
     </div>
   </mat-toolbar>
-  <div #descriptionContainer [innerHtml]="description" class="height-100">
+  <div #descriptionContainer [innerHtml]="description" class="height-100" style="overflow-y: auto">
   </div>
 
 </div>

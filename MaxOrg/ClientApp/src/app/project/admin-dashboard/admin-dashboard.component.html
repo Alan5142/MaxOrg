@@ -126,7 +126,8 @@
       </mat-card>
     </mat-grid-tile>
 
-    <mat-grid-tile *ngIf="!mediaObserver.isActive('lt-md')" [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
+    <mat-grid-tile *ngIf="!mediaObserver.isActive('lt-md')" [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1"
+                   [rowspan]="1">
       <mat-card class="dashboard-card mat-elevation-z3">
       </mat-card>
     </mat-grid-tile>
@@ -168,23 +169,27 @@
             <form class="options-container" fxFlex="50" fxLayout="column" *ngIf="(groupInfo | async) as $groupInfo">
               <div *ngIf="$groupInfo.isRoot" class="width-100">
                 <h2 class="width-100">Vincular con repositorio de GitHub</h2>
-                <button color="primary" mat-flat-button (click)="openLinkToGitHubDialog()" class="width-100">VINCULAR</button>
+                <button color="primary" mat-flat-button (click)="openLinkToGitHubDialog()" class="width-100">VINCULAR
+                </button>
               </div>
-              <div class="width-100">
+              <div class="width-100" *ngIf="!$groupInfo.isLinkedToDevOps">
                 <h2 class="width-100">Vincular con Azure DevOps</h2>
                 <button color="primary" mat-flat-button (click)="openVSDevOpsAuth()" class="width-100">VINCULAR</button>
               </div>
               <div *ngIf="$groupInfo.isRoot && $groupInfo.isLinkedToDevOps" class="width-100" fxLayout="column">
                 <h2>DevOps</h2>
                 <mat-form-field>
-                  <input matInput type="text">
+                  <input #devOpsOrgName matInput type="text">
                   <mat-label>Nombre de la organización</mat-label>
                 </mat-form-field>
                 <mat-form-field>
-                  <input matInput type="text">
+                  <input #devOpsProjectName matInput type="text">
                   <mat-label>Nombre del proyecto</mat-label>
                 </mat-form-field>
-                <button mat-flat-button color="accent">CAMBIAR INFORMACIÓN</button>
+                <button mat-flat-button color="accent"
+                        [disabled]="devOpsOrgName.value.trim() === '' || devOpsProjectName.value.trim() === ''"
+                        (click)="changeDevOpsInfo(devOpsOrgName.value, devOpsProjectName.value)">CAMBIAR INFORMACIÓN
+                </button>
               </div>
             </form>
           </div>

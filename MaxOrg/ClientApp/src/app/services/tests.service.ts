@@ -35,4 +35,11 @@ export class TestsService {
   getReportById(groupId: string, testId: string): Observable<any> {
     return this.http.get<any>(`/api/groups/${groupId}/tests/${testId}`);
   }
+
+  updateDevOpsInfo(groupdId: string, orgName: string, projectName: string) {
+    return this.http.put(`/api/groups/${groupdId}/devops`, {
+      orgName: orgName,
+      projectName: projectName
+    })
+  }
 }

@@ -11,6 +11,7 @@ import {GroupsService} from "../../services/groups.service";
 import {environment} from "../../../environments/environment";
 import {Observable} from "rxjs";
 import {shareReplay} from "rxjs/operators";
+import {TestsService} from "../../services/tests.service";
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -45,7 +46,8 @@ export class AdminDashboardComponent implements OnInit {
               private userService: UserService,
               private snackBar: MatSnackBar,
               private formBuilder: FormBuilder,
-              private groupService: GroupsService) {
+              private groupService: GroupsService,
+              private testsService: TestsService) {
     route.parent.params.subscribe(params => {
       this.groupId = params['id'];
       this.groupInfo = groupService.getAdminInfo(this.groupId).pipe(shareReplay(1));
@@ -106,5 +108,13 @@ export class AdminDashboardComponent implements OnInit {
   openVSDevOpsAuth() {
     const devops = environment.vsDevOps;
     window.location.href = `${devops.authUrl}?client_id=${devops.clientId}&response_type=Assertion&state=${this.groupId}&scope=${devops.scope}&redirect_uri=${devops.redirect}`;
+  }
+
+  changeDevOpsInfo(org: string, projectName: string) {
+    this.testsService.updateDevOpsInfo(this.groupId, org, projectName).subscribe(() => {
+      this.snackBar.open('Información editada con éxito', 'OK', {duration: 2000});
+    }, () => {
+      this.snackBar.open('No se pudo editar la información', 'OK', {duration: 2000});
+    });
   }
 }

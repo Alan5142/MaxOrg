@@ -5,7 +5,6 @@ namespace MaxOrg.Models.Tests
         public string Id { get; set; }
         public string Name { get; set; }
         public int TotalTests { get; set; }
-        public int IncompleteTests { get; set; }
         public int PassedTests { get; set; }
         public string WebAccessUrl { get; set; }
     }
