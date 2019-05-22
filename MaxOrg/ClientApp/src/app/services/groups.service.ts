@@ -104,4 +104,8 @@ export class GroupsService {
       headers: {'ngsw-bypass': ''}
     });
   }
+
+  getAdminInfo(groupId: string): Observable<any> {
+    return this.http.get(`/api/groups/${groupId}/admin-info`);
+  }
 }

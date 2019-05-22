@@ -105,7 +105,7 @@
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
           <div>
-            <h1>0/500MB</h1>
+            <h1>{{(groupInfo | async).size / 1048576 | number: '1.3-3'}}MiB/500MiB</h1>
           </div>
         </mat-card-content>
       </mat-card>
@@ -120,28 +120,18 @@
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
           <div>
-            <h1>5 miembros</h1>
+            <h1 *ngIf="(groupInfo | async).members as members">{{members}} miembro{{members > 1 ? 's' : ''}}</h1>
           </div>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>
 
-    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
+    <mat-grid-tile *ngIf="!mediaObserver.isActive('lt-md')" [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
       <mat-card class="dashboard-card mat-elevation-z3">
-        <mat-card-header>
-          <mat-card-title>
-            Numero de issues (en github)
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content class="dashboard-card-content">
-          <div>
-            <h1>35</h1>
-          </div>
-        </mat-card-content>
       </mat-card>
     </mat-grid-tile>
 
-    <mat-grid-tile [colspan]="3" [rowspan]="mediaObserver.isActive('lt-md') ? 4 : 3">
+    <mat-grid-tile [colspan]="3" [rowspan]="mediaObserver.isActive('lt-md') ? 7 : 3">
       <mat-card class="dashboard-card mat-elevation-z3">
         <mat-card-header>
           <mat-card-title>
@@ -152,11 +142,13 @@
           <div fxLayout="row" fxLayout.lt-md="column">
             <form class="options-container" fxFlex="50" fxLayout="column">
               <div fxFlexAlign="start">
-                <mat-slide-toggle #readOnly color="primary" style="width: min-content;" name="readOnly">Solo lectura</mat-slide-toggle>
+                <mat-slide-toggle #readOnly color="primary" style="width: min-content;" name="readOnly">Solo lectura
+                </mat-slide-toggle>
               </div>
               <p class="text-left">Cambiar nombre</p>
               <mat-form-field>
-                <input #projectName matInput maxlength="30" placeholder="Nombre del proyecto" type="text" name="name">
+                <input #projectName matInput maxlength="30" placeholder="Nombre del proyecto" type="text" name="name"
+                       [value]="(groupInfo | async).name">
                 <mat-hint>Longitud máxima de 30 caracteres</mat-hint>
               </mat-form-field>
               <p class="text-left">Agregar usuarios</p>
@@ -167,21 +159,34 @@
               <mat-form-field>
                 <textarea cdkTextareaAutosize matInput placeholder="Nombre de usuario"></textarea>
               </mat-form-field>
-              <button (click)="changeDescription()" color="accent" mat-flat-button>Cambiar descripción</button>
-              <button color="primary" type="submit" mat-flat-button (click)="editInfo(readOnly.checked, projectName.value)">Guardar cambios</button>
+              <button (click)="changeDescription()" color="accent" mat-flat-button>CAMBIAR DESCRIPCIÓN</button>
+              <button color="primary" type="submit" mat-flat-button
+                      (click)="editInfo(readOnly.checked, projectName.value)">GUARDAR CAMBIOS
+              </button>
             </form>
 
-            <form class="options-container" fxFlex="50" fxLayout="column">
-              <h2>Vincular con repositorio de GitHub</h2>
-              <button color="primary" mat-flat-button (click)="openLinkToGitHubDialog()">Vincular</button>
-              <h2>Ceder administración a otro usuario</h2>
-              <mat-form-field>
-                <input matInput placeholder="Nombre de usuario del nuevo administrador" type="text">
-              </mat-form-field>
-              <button color="warn" mat-flat-button>Ceder administración</button>
+            <form class="options-container" fxFlex="50" fxLayout="column" *ngIf="(groupInfo | async) as $groupInfo">
+              <div *ngIf="$groupInfo.isRoot" class="width-100">
+                <h2 class="width-100">Vincular con repositorio de GitHub</h2>
+                <button color="primary" mat-flat-button (click)="openLinkToGitHubDialog()" class="width-100">VINCULAR</button>
+              </div>
+              <div class="width-100">
+                <h2 class="width-100">Vincular con Azure DevOps</h2>
+                <button color="primary" mat-flat-button (click)="openVSDevOpsAuth()" class="width-100">VINCULAR</button>
+              </div>
+              <div *ngIf="$groupInfo.isRoot && $groupInfo.isLinkedToDevOps" class="width-100" fxLayout="column">
+                <h2>DevOps</h2>
+                <mat-form-field>
+                  <input matInput type="text">
+                  <mat-label>Nombre de la organización</mat-label>
+                </mat-form-field>
+                <mat-form-field>
+                  <input matInput type="text">
+                  <mat-label>Nombre del proyecto</mat-label>
+                </mat-form-field>
+                <button mat-flat-button color="accent">CAMBIAR INFORMACIÓN</button>
+              </div>
             </form>
-
-
           </div>
         </mat-card-content>
       </mat-card>

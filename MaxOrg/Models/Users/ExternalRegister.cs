@@ -10,8 +10,8 @@ namespace MaxOrg.Models.Users
         public string Password { get; set; }
         [Required]
         public string Email { get; set; }
-        [Required]
-        public string Description { get; set; }
+
+        public string Description { get; set; } = "";
         [Required]
         public string ProfileUrl { get; set; }
         [Required]

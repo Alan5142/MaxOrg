@@ -51,6 +51,17 @@ namespace MaxOrg.Models.Group
         public long? LinkedRepositoryName { get; set; } = null;
 
         /// <summary>
+        /// Token utilizado para generar nuevos tokens en la plataforma de Azure DevOps
+        /// </summary>
+        public string DevOpsRefreshToken { get; set; } = null;
+
+        public string DevOpsToken { get; set; } = null;
+        public DateTime? DevOpsExpirationTime { get; set; } = null;
+
+        public string DevOpsOrgName { get; set; } = null;
+        public string DevOpsProjectName { get; set; } = null;
+
+        /// <summary>
         /// Fecha de creación del proyecto/grupo
         /// </summary>
         public DateTime CreationDate { get; set; }

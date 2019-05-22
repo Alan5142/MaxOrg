@@ -8,6 +8,9 @@ import {LinkToGithubComponent} from "./link-to-github/link-to-github.component";
 import {UserService} from "../../services/user.service";
 import {FormBuilder} from "@angular/forms";
 import {GroupsService} from "../../services/groups.service";
+import {environment} from "../../../environments/environment";
+import {Observable} from "rxjs";
+import {shareReplay} from "rxjs/operators";
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -34,6 +37,8 @@ export class AdminDashboardComponent implements OnInit {
     options: {explorer: {axis: 'horizontal', keepInBounds: true}, hAxis: {format: ' dd/MM/yyyy'}, height: '1900px'}
   };
 
+  groupInfo: Observable<any>;
+
   constructor(public mediaObserver: MediaObserver,
               public dialog: MatDialog,
               public route: ActivatedRoute,
@@ -43,6 +48,7 @@ export class AdminDashboardComponent implements OnInit {
               private groupService: GroupsService) {
     route.parent.params.subscribe(params => {
       this.groupId = params['id'];
+      this.groupInfo = groupService.getAdminInfo(this.groupId).pipe(shareReplay(1));
     });
   }
 
@@ -95,5 +101,10 @@ export class AdminDashboardComponent implements OnInit {
     }, error => {
       this.snackBar.open('No se pudo editar la información', 'OK', {duration: 2000});
     });
+  }
+
+  openVSDevOpsAuth() {
+    const devops = environment.vsDevOps;
+    window.location.href = `${devops.authUrl}?client_id=${devops.clientId}&response_type=Assertion&state=${this.groupId}&scope=${devops.scope}&redirect_uri=${devops.redirect}`;
   }
 }

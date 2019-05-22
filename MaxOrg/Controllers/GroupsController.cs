@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using ArangoDB.Client;
 using MaxOrg.Hubs;
@@ -10,6 +12,7 @@ using MaxOrg.Models.Calendar;
 using MaxOrg.Models.Group;
 using MaxOrg.Models.Kanban;
 using MaxOrg.Models.Tasks;
+using MaxOrg.Models.Tests;
 using MaxOrg.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,11 +20,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Protocols;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Newtonsoft.Json;
 using Octokit;
 using shortid;
 using Notification = MaxOrg.Models.Notification;
+using ProductHeaderValue = Octokit.ProductHeaderValue;
 using User = MaxOrg.Models.Users.User;
 
 namespace MaxOrg.Controllers
@@ -58,6 +64,8 @@ namespace MaxOrg.Controllers
 
         private CloudBlobContainer BlobContainer { get; }
 
+        private HttpClient HttpClient { get; }
+
         /// <summary>
         /// Constructor de la clase, es invocado por ASP.NET Core al momento de tener que manejar una petición, al mismo tiempo
         /// le inyecta la base de datos, el "Hub" para el tablero, el "Hub" para las notificaciones y los parametros de
@@ -72,8 +80,10 @@ namespace MaxOrg.Controllers
             IHubContext<KanbanHub, IKanbanClient> kanbanHub,
             IHubContext<NotificationHub> notificationHub,
             IConfiguration configuration,
-            CloudBlobContainer container)
+            CloudBlobContainer container,
+            HttpClient client)
         {
+            HttpClient = client;
             BlobContainer = container;
             Configuration = configuration;
             KanbanHub = kanbanHub;
@@ -154,6 +164,8 @@ namespace MaxOrg.Controllers
 
                 usersToAdd = usersToAdd.Where(u => u.Key != subgroupAdmin.Key).Select(u => u);
 
+                var root = await Database.GetRootGroup(createdGroup.Key);
+
                 foreach (var user in usersToAdd)
                 {
                     var userToAdd = new UsersInGroup
@@ -165,6 +177,22 @@ namespace MaxOrg.Controllers
                         AddedBy = subgroupAdmin.Key
                     };
                     await groupGraph.InsertEdgeAsync<UsersInGroup>(userToAdd);
+                    userToAdd = new UsersInGroup
+                    {
+                        IsAdmin = false,
+                        JoinDate = currentDate,
+                        Group = root.Id,
+                        User = user.Id,
+                        AddedBy = subgroupAdmin.Key
+                    };
+                    try
+                    {
+                        await groupGraph.InsertEdgeAsync<UsersInGroup>(userToAdd);
+                    }
+                    catch (Exception e)
+                    {
+                        // ignored
+                    }
                 }
 
                 return Created("api/groups/" + createdGroup.Key, null);
@@ -1091,6 +1119,43 @@ namespace MaxOrg.Controllers
             return Ok();
         }
 
+        [HttpGet("{groupId}/admin-info")]
+        public async Task<IActionResult> AdminDashboardInfo(string groupId)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            var root = await Database.GetRootGroup(groupId);
+
+            if (!await Database.IsAdmin(HttpContext.User.Identity.Name, groupId))
+            {
+                return Unauthorized();
+            }
+
+            var members = Database.CreateStatement<int>($@"return LENGTH(FOR c in 1..1 INBOUND 'Group/{groupId}'
+ GRAPH 'GroupUsersGraph'
+ return c)").ToList().FirstOr(0);
+
+            var blobList = await BlobContainer.ListBlobsSegmentedAsync($"project/{root.Key}/attachments", true,
+                BlobListingDetails.All,
+                int.MaxValue, null, new BlobRequestOptions(), new OperationContext());
+
+            var size = blobList.Results.OfType<CloudBlockBlob>().Sum(blob => blob.Properties.Length);
+
+            return Ok(new
+            {
+                Members = members,
+                group.IsRoot,
+                IsLinkedToDevOps = group.DevOpsRefreshToken != null,
+                group.Finished,
+                group.Name,
+                size
+            });
+        }
+
         #endregion
 
         #region Requirements
@@ -1491,8 +1556,9 @@ namespace MaxOrg.Controllers
             {
                 return NotFound();
             }
-            
-            var blobList = await BlobContainer.ListBlobsSegmentedAsync($"project/{root.Key}/attachments", true, BlobListingDetails.All,
+
+            var blobList = await BlobContainer.ListBlobsSegmentedAsync($"project/{root.Key}/attachments", true,
+                BlobListingDetails.All,
                 int.MaxValue, null, new BlobRequestOptions(), new OperationContext());
 
             var size = blobList.Results.OfType<CloudBlockBlob>().Sum(blob => blob.Properties.Length);
@@ -1500,7 +1566,7 @@ namespace MaxOrg.Controllers
             {
                 return BadRequest(new {message = "Size exceded"});
             }
-            
+
             var extension = System.IO.Path.GetExtension(file.FileName);
             var attachmentName = $"{ShortId.Generate(true, false, 20)}" +
                                  $"{extension}";
@@ -1516,7 +1582,7 @@ namespace MaxOrg.Controllers
                 file.FileName
             });
         }
-        
+
         [HttpGet("{groupId}/attachments/{attachmentName}")]
         public async Task<IActionResult> GetAttachment(string groupId, string attachmentName)
         {
@@ -1542,6 +1608,158 @@ namespace MaxOrg.Controllers
 
             var sasBlobToken = attachment.GetSharedAccessSignature(sasConstraints);
             return Redirect(attachment.Uri + sasBlobToken);
+        }
+
+        #endregion
+
+        #region DevOps integration
+
+        [HttpPost("{groupId}/devops")]
+        public async Task<IActionResult> LinkToDevOps(string groupId, [FromQuery] string code)
+        {
+            var root = await Database.GetRootGroup(groupId);
+            if (code == null || root == null)
+            {
+                return BadRequest();
+            }
+
+            var token = await DevOpsHelper.GetAccessToken(Configuration, code, HttpClient);
+            if (token == null) return BadRequest();
+            root.DevOpsRefreshToken = token.RefreshToken;
+            root.DevOpsToken = token.AccessToken;
+            root.DevOpsExpirationTime = DateTime.UtcNow.AddSeconds(3000);
+            await Database.UpdateByIdAsync<Group>(root.Id, root);
+            return Ok();
+        }
+
+        [HttpPut("{groupId}/devops")]
+        public async Task<IActionResult> SetProjectDevOpsInfo(string groupId,
+            [FromBody] (string orgName, string projectName) info)
+        {
+            var root = await Database.GetRootGroup(groupId);
+            if (root == null) return NotFound();
+            if (!await Database.IsAdmin(HttpContext.User.Identity.Name, root.Key)) return Unauthorized();
+            var (orgName, projectName) = info;
+            root.DevOpsOrgName = orgName;
+            root.DevOpsProjectName = projectName;
+            await Database.UpdateByIdAsync<Group>(root.Id, root);
+            return Ok();
+        }
+
+
+        [HttpPost("{groupId}/tests")]
+        public async Task<IActionResult> QueueBuild(string groupId, [FromBody] (int definitionId, string name) data)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            var root = await Database.GetRootGroup(groupId);
+            if (group == null || root?.DevOpsRefreshToken == null ||
+                !await Database.IsGroupMember(HttpContext.User.Identity.Name, groupId))
+            {
+                return NotFound();
+            }
+
+            var token = await DevOpsHelper.GetAccessToken(Configuration, root, HttpClient, Database);
+            if (token == null) return BadRequest();
+            var id = await DevOpsHelper.CreateBuild(token, root.DevOpsOrgName, root.DevOpsProjectName,
+                HttpClient, data.definitionId);
+            if (id == -1) return BadRequest();
+
+            var test = new Test
+            {
+                BuildId = id,
+                Name = data.name
+            };
+            await Database.InsertAsync<Test>(test);
+            var createdTestInGroup = new CreatedTest
+            {
+                Group = group.Id,
+                Test = test.Id,
+                CreatorId = HttpContext.User.Identity.Name
+            };
+            await Database.InsertAsync<CreatedTest>(createdTestInGroup);
+
+            return Ok(new {testId = test.Key});
+        }
+
+        [HttpGet("{groupId}/tests")]
+        public async Task<IActionResult> GetTests(string groupId)
+        {
+            var rootGroup = await Database.GetRootGroup(groupId);
+            if (rootGroup == null) return NotFound();
+            var userId = HttpContext.User.Identity.Name;
+            if (await Database.IsGroupMember(userId, groupId) && !await Database.IsAdmin(userId, groupId))
+            {
+                return await GetUserTest(groupId);
+            }
+
+            if (await Database.IsAdmin(userId, groupId))
+            {
+                return await GetAdminTestReports(groupId);
+            }
+
+            return BadRequest();
+        }
+
+        private async Task<IActionResult> GetUserTest(string groupId)
+        {
+            var rootGroup = await Database.GetRootGroup(groupId);
+            if (rootGroup == null) return NotFound();
+            var tests = await Database.CreateStatement<Test>($@"FOR c, e in 1..1 OUTBOUND 'Group/{groupId}'
+ GRAPH 'TestBuilds'
+ FILTER e.creatorId == '{HttpContext.User.Identity.Name}'
+ return c").ToListAsync();
+            
+            var token = await DevOpsHelper.GetAccessToken(Configuration, rootGroup, HttpClient, Database);
+            if (token == null) return BadRequest();
+
+            foreach (var test in tests)
+            {
+                if (test.Failed.HasValue) continue;
+                var result = await DevOpsHelper.GetBuildResult(token, rootGroup.DevOpsOrgName,
+                    rootGroup.DevOpsProjectName, test.BuildId, HttpClient);
+                if (result == null || result.Count <= 0) continue;
+                var testResult = result.Value[0];
+                test.Succeeded = testResult.PassedTests;
+                test.Failed = testResult.IncompleteTests;
+                await Database.UpdateByIdAsync<Test>(test.Id, test);
+            }
+            
+            return Ok(tests);
+        }
+
+        private async Task<IActionResult> GetAdminTestReports(string groupId)
+        {
+            var tests = await Database.CreateStatement<Test>($@"FOR c in 1..1 OUTBOUND 'Group/{groupId}'
+ GRAPH 'TestBuilds'
+ FILTER c.description != null
+ return c").ToListAsync();
+            return Ok(tests.Select(t => new
+            {
+                t.Failed,
+                Id = t.Key,
+                t.Succeeded,
+                t.Name,
+                t.CreationDate,
+                t.BuildId
+            }));
+        }
+        
+        [HttpGet("{groupId}/tests/build-definitions")]
+        public async Task<IActionResult> GetBuildDefinitions(string groupId)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            var root = await Database.GetRootGroup(groupId);
+            if (group == null || root?.DevOpsRefreshToken == null ||
+                !await Database.IsGroupMember(HttpContext.User.Identity.Name, groupId))
+            {
+                return NotFound();
+            }
+
+            var token = await DevOpsHelper.GetAccessToken(Configuration, root, HttpClient, Database);
+            if (token == null) return BadRequest();
+            var buildDefinitions =
+                await DevOpsHelper.GetBuildDefinitions(token, root.DevOpsOrgName, root.DevOpsProjectName, HttpClient);
+            return Ok(buildDefinitions);
         }
 
         #endregion

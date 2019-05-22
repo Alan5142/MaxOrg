@@ -10,6 +10,7 @@ import {
   MatDialogModule,
   MatFormFieldModule,
   MatInputModule,
+  MatProgressSpinnerModule,
   MatSnackBarModule,
   MatToolbarModule,
   MatTooltipModule
@@ -22,11 +23,13 @@ import {ServiceWorkerModule} from '@angular/service-worker';
 import {environment} from '../environments/environment';
 import {TokenInterceptor} from "./utility/token-interceptor";
 import {AuthServiceConfig, GoogleLoginProvider, SocialLoginModule} from "angularx-social-login";
+import {DevopsAuthComponent} from './devops-auth/devops-auth.component';
 
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    DevopsAuthComponent
   ],
   imports: [
     BrowserModule,
@@ -45,7 +48,8 @@ import {AuthServiceConfig, GoogleLoginProvider, SocialLoginModule} from "angular
     SocialLoginModule,
     MatTooltipModule,
     MatSnackBarModule,
-    ServiceWorkerModule.register('service-worker.js', {enabled: environment.production})
+    ServiceWorkerModule.register('service-worker.js', {enabled: environment.production}),
+    MatProgressSpinnerModule
   ],
   providers: [
     {provide: HAMMER_GESTURE_CONFIG, useClass: GestureConfig},
