@@ -57,7 +57,6 @@
             </mat-expansion-panel-header>
             <mat-accordion class="assigned-task-container">
               <mat-expansion-panel
-                [ngClass]="{'assigned-task': !(themeService.isDarkTheme | async), 'assigned-task-dark': themeService.isDarkTheme | async}"
                 *ngFor="let task of group.tasks | async">
                 <mat-expansion-panel-header class="text-bold">
                   {{task.name}}
@@ -75,7 +74,7 @@
             </mat-accordion>
 
             <div class="width-100" fxLayout="row" fxLayoutAlign="end center">
-              <button (click)="openAssignTask(group.id,index)" color="primary" mat-flat-button mat-icon-button>
+              <button (click)="openAssignTask(group.id,false,index)" color="primary" mat-flat-button mat-icon-button>
                 <mat-icon>add</mat-icon>
               </button>
             </div>

@@ -144,8 +144,9 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(r => {
       if (r) {
         if(!isUser)
+          r.subscribe(r=>
           this.adminGroupsFlat[index].tasks =
-          this.adminGroupsFlat[index].tasks.pipe(map<Task[], any>(tasks => { return tasks; }))
+          this.adminGroupsFlat[index].tasks.pipe(map<Task[], any>(tasks => { return tasks; })));
         this.snackBar.open("Tarea agregada", "cerrar");
       }
     });

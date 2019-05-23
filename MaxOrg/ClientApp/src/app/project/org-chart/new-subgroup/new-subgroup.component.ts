@@ -35,8 +35,8 @@ export class NewSubgroupComponent {
     this.userService.getUsersByName(this.selectedAdmin,1).subscribe(admin=>{
       const itf = {currentGroupId:((this.parentGroupId as any).parentId as string),name:this.groupName,description:this.groupDescription,members:this.selectedUsers,subgroupAdminId:admin[0].key};
       const returnPromise = this.groupService.createGroup(itf);
-      returnPromise.subscribe(r=>console.log(r));
-      this.dialogRef.close(returnPromise);
+      returnPromise.subscribe(r=>this.dialogRef.close(returnPromise));
+      
     })
 
 

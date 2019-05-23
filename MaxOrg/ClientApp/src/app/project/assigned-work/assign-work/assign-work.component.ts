@@ -52,8 +52,10 @@ export class AssignWorkComponent implements OnInit {
         deliveryDate: this.date
       }
     console.log(this.task);
-    if(!this.isUser)
-      this.dialogRef.close(this.taskService.createGroupTask(this.id, this.task));
+    if(!this.isUser){
+      console.log(this.id);
+      this.dialogRef.close(this.taskService.createGroupTask(this.id,this.task));
+    }
     
   }
   unreference() {
