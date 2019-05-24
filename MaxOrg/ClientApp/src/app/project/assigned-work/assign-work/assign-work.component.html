@@ -9,7 +9,7 @@
 <div mat-dialog-content>
   <form><p>
       <mat-form-field *ngIf="references">
-          <input matInput type="number" min="1" max="100" placeholder="Porcentaje">
+          <input matInput type="number" min="1" max="100" placeholder="Porcentaje"  [(ngModel)]="percent" name="percent">
           <mat-hint>Este campo puede estar vacio
           </mat-hint>
         </mat-form-field></p>

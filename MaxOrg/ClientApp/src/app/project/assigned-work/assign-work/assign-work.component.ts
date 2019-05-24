@@ -15,6 +15,7 @@ export class AssignWorkComponent implements OnInit {
   id: string;
   isUser:boolean;
   requirementId: string;
+  percent;
   url;
   date = (new FormControl(new Date())).value;
 
@@ -38,13 +39,25 @@ export class AssignWorkComponent implements OnInit {
 
   }
   createTask(taskName: HTMLInputElement, taskDescription: HTMLInputElement) {
-    if (this.references)
-      this.task = {
-        name: taskName.value,
-        description: taskDescription.value,
-        deliveryDate: this.date,
-        referenceRequirement: this.requirementId
-      }
+    console.log(this.percent);
+    this.task=null;
+    if (this.references){
+    if(Number.isInteger(this.percent)&&this.percent>0&&this.percent<=100)      
+    this.task = {
+      name: taskName.value,
+      description: taskDescription.value,
+      deliveryDate: this.date,
+      referenceRequirement: this.requirementId,
+      contributionPercentage: this.percent.toString()
+    }
+    else if(this.percent===null)
+    this.task = {
+      name: taskName.value,
+      description: taskDescription.value,
+      deliveryDate: this.date,
+      referenceRequirement: this.requirementId
+    }
+  }
     else
       this.task = {
         name: taskName.value,

@@ -1187,7 +1187,7 @@ namespace MaxOrg.Controllers
                 if (!Database.CreateStatement<bool>(
                     $"LET rootGroup = (FOR v in 0..100 INBOUND 'Group/{groupId}' GRAPH 'SubgroupGraph' PRUNE v.isRoot == true FILTER v.isRoot == true return v)" +
                     $"LET requirements = (FOR v in 1 INBOUND rootGroup[0]._id GRAPH 'GroupRequirementsGraph' FILTER v._key == '{request.ReferenceRequirement}' return v)" +
-                    $"return requirements == []").ToList().FirstOr(false))
+                    $"return requirements != []").ToList().FirstOr(false))
                 {
                     return Created($"api/groups/{groupId}/tasks/{task.Key}", new
                     {
@@ -1210,7 +1210,7 @@ namespace MaxOrg.Controllers
                 };
 
                 // Insertamos y listo
-                var graph = Database.Graph("TasksReferencingRequirementGraph");
+                var graph = Database.Graph("TasksReferencingRequirementsGraph");
                 await graph.InsertEdgeAsync<TaskReferencingRequirement>(referenceToRequirement);
             }
             else if (request.ReferenceRequirement == null && request.ReferenceTask != null)

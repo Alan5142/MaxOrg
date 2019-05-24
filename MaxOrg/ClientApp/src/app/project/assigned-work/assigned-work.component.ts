@@ -144,12 +144,14 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(r => {
       if (r) {
         if(!isUser)
-          r.subscribe(r=>
+        console.log(r);
+          r.subscribe(r=>{
+            console.log(r);
           this.adminGroupsFlat[index].tasks =
-          this.adminGroupsFlat[index].tasks.pipe(map<Task[], any>(tasks => { return tasks; })));
+          this.adminGroupsFlat[index].tasks.pipe(map<Task[], any>(tasks => { return tasks; }))});
         this.snackBar.open("Tarea agregada", "cerrar");
       }
-    });
+    },error=>this.snackBar.open("La tarea no se pudo agregar","cerrar"));
   }
   applyFilter(filterValue: string) {
     this.usersDisplay.filter = filterValue.trim().toLowerCase();
@@ -157,5 +159,8 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
       this.usersDisplay.paginator.firstPage();
     }
   }
-
+  openEditTask(task){
+    console.log(task);
+    
+  }
 }
