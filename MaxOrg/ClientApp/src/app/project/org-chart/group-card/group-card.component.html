@@ -1,6 +1,8 @@
 <h1 class="center" mat-dialog-title>{{data.group.name}}</h1>
 <mat-dialog-content>
-  <h2>Descripción</h2>
+  <h2>Descripción <button mat-icon-button *ngIf="data.isAdmin">
+    <mat-icon (click)="changeDescription()">edit</mat-icon>
+  </button></h2>
   <div [innerHTML]="description"></div>
   <mat-divider></mat-divider>
 

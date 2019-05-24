@@ -82,7 +82,7 @@ import {CreateReportDialogComponent} from './tests/record/create-report-dialog/c
 import {ReportsComponent} from './tests/reports/reports.component';
 import {ChatService} from "./services/chat.service";
 import {NodeComponent} from './org-chart/tree/node/node.component';
-import {NewSubgroupComponent} from './org-chart/new-subgroup/new-subgroup.component';
+import {NewSubgroupComponent, addDescription} from './org-chart/new-subgroup/new-subgroup.component';
 import {EditRequirementComponent} from './requirements/edit-requirement/edit-requirement.component';
 import {RemoveRequirementComponent} from './requirements/remove-requirement/remove-requirement.component';
 import {EditSectionComponent} from './kanban-board/board/edit-section/edit-section.component';
@@ -111,6 +111,7 @@ registerLocaleData(localeEs);
     ProjectComponent,
     AssignWorkComponent,
     GroupCardComponent,
+    addDescription,
     NewSubgroupComponent,
     ChangeDescriptionComponent,
     CreateCardComponent,
@@ -234,7 +235,8 @@ registerLocaleData(localeEs);
     ShowIssuesComponent,
     ShowCommitsComponent,
     reloadChart,
-    MarkdownEditorComponent
+    MarkdownEditorComponent,
+    addDescription
   ],
   bootstrap: [
     ProjectComponent

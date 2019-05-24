@@ -4,7 +4,7 @@
       <button mat-fab (click)="openDialog(parentId)">+</button>
     </li>
     <li *ngFor="let node of treeData">
-      <app-node [userId]="userId" [nodeData]="node"></app-node>
+      <app-node [userId]="userId" [nodeData]="node" [isAdmin]="isAdmin"></app-node>
       <app-tree [isAdmin]="isAdmin" [adminId]="node.groupOwner" [treeData]="node.subgroups" [userId]="userId" [parentId]="node.id"></app-tree>
     </li>
   </ul>

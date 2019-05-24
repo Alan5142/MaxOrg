@@ -128,7 +128,8 @@ namespace MaxOrg.Controllers
                     CreationDate = currentDate,
                     Name = createGroup.Name,
                     GroupOwner = createGroup.SubgroupAdminId,
-                    IsRoot = false
+                    IsRoot = false,
+                    Description = createGroup.Description
                 };
 
                 var createdGroup = await db.InsertAsync<Group>(newGroup);

@@ -27,6 +27,6 @@ export class ChangeDescriptionComponent implements OnInit {
 
   updateDescription(newDescription: string) {
     this.groups.changeGroupDescription(this.groupId, newDescription);
-    this.dialogRef.close();
+    this.dialogRef.close(newDescription);
   }
 }

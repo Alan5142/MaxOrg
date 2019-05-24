@@ -1,6 +1,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {MAT_DIALOG_DATA, MatDialogRef, MatDialog} from '@angular/material';
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
+import { ChangeDescriptionComponent } from '../../admin-dashboard/change-description/change-description.component';
 
 declare var require: any;
 
@@ -17,6 +18,7 @@ export class GroupCardComponent implements OnInit {
   description: SafeHtml = null;
 
   constructor(
+    private dialog:MatDialog,
     public dialogRef: MatDialogRef<GroupCardComponent>,
     private sanitizer: DomSanitizer,
     @Inject(MAT_DIALOG_DATA) public data: any) {
@@ -103,6 +105,17 @@ export class GroupCardComponent implements OnInit {
 
   onNoClick(): void {
     this.dialogRef.close();
+  }
+  changeDescription(){
+    console.log(this.data);
+    let dialogRef=this.dialog.open(ChangeDescriptionComponent,{
+      data:{groupId:this.data.group.id}
+    });
+    dialogRef.afterClosed().subscribe(newDescription=>{
+      if(newDescription){
+        this.description
+      }
+    });
   }
 
   ngOnInit() {
