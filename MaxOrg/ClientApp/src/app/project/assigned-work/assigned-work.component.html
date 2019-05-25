@@ -109,8 +109,8 @@
                         <mat-progress-bar mode="determinate" value="{{task.progress}}"></mat-progress-bar>
                       </p>
                     </div>
-                    <button mat-icon-button>
-                      <mat-icon (click)="editTask()">edit</mat-icon>%
+                    <button mat-icon-button *ngIf="task.progress<100">
+                      <mat-icon (click)="openEditTask(task,group.id)">edit</mat-icon>%
                     </button>
                   </mat-expansion-panel>
                 </mat-accordion>

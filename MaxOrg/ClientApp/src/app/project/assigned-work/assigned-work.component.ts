@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TasksService, Task } from 'src/app/services/tasks.service';
 import { map } from 'rxjs/operators';
 import { UserService } from 'src/app/services/user.service';
+import { EditTaskComponent } from './edit-task/edit-task.component';
 
 @Component({
   selector: 'app-assigned-work',
@@ -159,8 +160,17 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
       this.usersDisplay.paginator.firstPage();
     }
   }
-  openEditTask(task){
+  openEditTask(task,groupId){
     console.log(task);
-    
+    const dialogRef=this.dialog.open(EditTaskComponent,{
+      data:{task:task,groupId:groupId},
+      width:"350px"
+    });
+    dialogRef.afterClosed().subscribe(progress=>{
+      if(progress){
+        task.progress=progress;
+        this.snackBar.open("progreso añadido","cerrar");
+      }
+    },error=>this.snackBar.open("no se pudo añadir progreso","cerrar"));
   }
 }

@@ -39,14 +39,19 @@ export class TasksService {
       return response;
     }));
   }
-
+  modifyGroupTask(groupId,newTask){
+    const url = environment.apiUrl + 'groups/' + groupId + '/tasks/'+newTask.id;
+    console.log(url);
+    console.log(newTask);
+    return this.http.put(url,newTask).subscribe(r=>console.log(r));
+  }
   getGroupTasks(groupId: string){
     const url= environment.apiUrl + 'groups/' + groupId + '/tasks';
     
-    return this.http.get(url);
-    
+    return this.http.get(url);  
   
   }
+
   formatDate(dateToFormat:any){
     let date=new Date(Date.parse(dateToFormat));
     return (date.getDate()>9?"":"0")+date.getDate()+"/"+(date.getMonth()>8?"":"0")+(date.getMonth()+1)+"/"+date.getFullYear();

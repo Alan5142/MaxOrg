@@ -104,11 +104,13 @@ import {ShowCodeComponent} from './code/show-code/show-code.component';
 import {ShowIssuesComponent} from './code/show-issues/show-issues.component';
 import {ShowCommitsComponent} from './code/show-commits/show-commits.component';
 import {MarkdownEditorComponent} from './markdown-editor/markdown-editor.component';
+import { EditTaskComponent } from './assigned-work/edit-task/edit-task.component';
 
 registerLocaleData(localeEs);
 @NgModule({
   entryComponents: [
     ProjectComponent,
+    EditTaskComponent,
     AssignWorkComponent,
     GroupCardComponent,
     addDescription,
@@ -236,7 +238,8 @@ registerLocaleData(localeEs);
     ShowCommitsComponent,
     reloadChart,
     MarkdownEditorComponent,
-    addDescription
+    addDescription,
+    EditTaskComponent
   ],
   bootstrap: [
     ProjectComponent

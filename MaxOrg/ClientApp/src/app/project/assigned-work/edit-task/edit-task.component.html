@@ -1,0 +1,9 @@
+<p mat-dialog-title> {{data.task.name}}</p>
+<div mat-dialog-content >
+  añadir progreso
+  <div>
+  <input matInput onkeydown="return false" type="number" min="{{data.task.progress}}" max="100" placeholder="Porcentaje"  [(ngModel)]="newProgress" name="percent">
+  <button mat-flat-button (click)="newProgress=100">marcar como completa</button>
+</div>
+  <button mat-flat-button (click)="editTask()" color="primary" cdkFocusInitial>Guardar</button>
+</div>
