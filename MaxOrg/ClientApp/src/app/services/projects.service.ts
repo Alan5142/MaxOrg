@@ -104,8 +104,8 @@ export class ProjectsService {
   }
   getRequirementProgress(projectId,requirementId){
     const url=environment.apiUrl+'projects/'+projectId+'/requirements/'+requirementId+'/progress';
-    //return this.http.get(url);
-    return of(80);
+    return this.http.get(url);
+    //return of(80);
   }
   modifyProjectRequirement(projectId: string, requirementId: string, newDescription: string): Observable<void> {
     const headers = new HttpHeaders({
