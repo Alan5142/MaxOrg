@@ -41,10 +41,5 @@ namespace MaxOrg.Models.Chats
         /// Nombre del grupo, en caso de que este chat no sea un grupo su valor será "null" y se mostrará el nombre del otro usuario
         /// </summary>
         public string Name { get; set; }
-
-        /// <summary>
-        /// Descripción del grupo
-        /// </summary>
-        public string Description { get; set; }
     }
 }

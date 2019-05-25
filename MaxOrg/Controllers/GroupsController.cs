@@ -1266,6 +1266,25 @@ namespace MaxOrg.Controllers
             }));
         }
 
+        [HttpGet("{groupId}/tasks/statistics")]
+        public async Task<IActionResult> GetLastWeekFinishedTasks(string groupId)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            if (group == null) return NotFound();
+            if (!await Database.IsAdmin(HttpContext.User.Identity.Name, groupId)) return Unauthorized();
+            var tasks = await Database.CreateStatement<dynamic>(
+                $@"LET thisDateMinusSeven = DATE_SUBTRACT(DATE_ISO8601(DATE_NOW()), 1, 'w')
+FOR v in 1 INBOUND 'Group/{groupId}'
+    GRAPH 'GroupTasksGraph'
+    FILTER v.finishedDate != null and DATE_TIMESTAMP(thisDateMinusSeven) < DATE_TIMESTAMP(v.finishedDate)
+    COLLECT date = v.finishedDate INTO tasksByDate
+    return {{
+                    date,
+                tasks: LENGTH(tasksByDate)
+    }}").ToListAsync();
+            return Ok(tasks);
+        }
+        
         [HttpGet("{groupId}/tasks/{taskId}")]
         public async Task<IActionResult> GetTaskInfo(string groupId, string taskId)
         {
@@ -1310,6 +1329,10 @@ namespace MaxOrg.Controllers
             }
 
             task.Progress = request.NewProgress ?? task.Progress;
+            if (task.Progress == 100)
+            {
+                task.FinishedDate = DateTime.UtcNow.Date;
+            }
 
             await Database.UpdateByIdAsync<ToDoTask>(task.Id, task);
 
@@ -1339,7 +1362,7 @@ namespace MaxOrg.Controllers
         }
 
         [HttpPost("{groupId}/tasks/{taskId}")]
-        public async Task<IActionResult> AssignTaskToSubGroup(string groupId, string taskId,
+        public async Task<IActionResult> AssignTask(string groupId, string taskId,
             [FromBody] AssignTaskRequest request)
         {
             if (!await IsGroupAdmin(groupId, HttpContext.User.Identity.Name))
@@ -1401,6 +1424,16 @@ namespace MaxOrg.Controllers
             return Ok();
         }
 
+        /*
+        [HttpPost("{groupId}/tasks/my-tasks")]
+        public async Task<IActionResult> GetMyAssignedTasks(string groupId)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            if (group == null) return NotFound();
+            if (!await Database.IsGroupMember(HttpContext.User.Identity.Name, groupId)) return NotFound();
+            
+        }*/
+        
         #endregion
 
         #region GitHub repo

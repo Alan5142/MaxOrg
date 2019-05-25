@@ -232,7 +232,7 @@ namespace MaxOrg.Controllers
                                 return MERGE(m, {sender: u.username})
                             )
                     return MERGE(c, {messages: messages})"
-                ).ToListAsync()).Select(c => new {c.Key, c.Name, c.Messages, c.IsGroup, c.Description, c.ProjectId});
+                ).ToListAsync()).Select(c => new {c.Key, c.Name, c.Messages, c.IsGroup, c.ProjectId});
 
                 var traversalResult = await db.TraverseAsync<User, Chat>(new TraversalConfig
                 {
