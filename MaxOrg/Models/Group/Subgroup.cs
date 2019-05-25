@@ -1,7 +1,6 @@
 ﻿using ArangoDB.Client;
-using System;
 
-namespace MaxOrg.Models
+namespace MaxOrg.Models.Group
 {
     [CollectionProperty(Naming = NamingConvention.ToCamelCase)]
     public class Subgroup

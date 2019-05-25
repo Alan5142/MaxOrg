@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using ArangoDB.Client;
 using MaxOrg.Hubs;
 using MaxOrg.Hubs.Clients;
-using MaxOrg.Models;
 using MaxOrg.Models.Calendar;
 using MaxOrg.Models.Group;
 using MaxOrg.Models.Kanban;
+using MaxOrg.Models.Notifications;
 using MaxOrg.Models.Tasks;
 using MaxOrg.Models.Tests;
 using MaxOrg.Utility;
@@ -23,7 +23,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Octokit;
 using shortid;
-using Notification = MaxOrg.Models.Notification;
+using Notification = MaxOrg.Models.Notifications.Notification;
 using User = MaxOrg.Models.Users.User;
 
 namespace MaxOrg.Controllers

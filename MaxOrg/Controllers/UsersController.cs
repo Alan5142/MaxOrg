@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Octokit;
-using Notification = MaxOrg.Models.Notification;
+using Notification = MaxOrg.Models.Notifications.Notification;
 using User = MaxOrg.Models.Users.User;
 
 namespace MaxOrg.Controllers

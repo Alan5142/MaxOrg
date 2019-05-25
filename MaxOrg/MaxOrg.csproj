@@ -38,7 +38,6 @@
 
   <ItemGroup>
     <Folder Include="Database\" />
-    <Folder Include="Models\Login" />
   </ItemGroup>
 
   <ItemGroup>
