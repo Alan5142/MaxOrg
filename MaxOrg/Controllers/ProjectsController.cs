@@ -358,7 +358,8 @@ namespace MaxOrg.Controllers
                 r.RequirementType
             }));
         }
-
+        
+        
         /// <summary>
         /// Método que se encarga de manejar el método POST en la ruta "api/projects/{projectId}/requirements", es invocado por ASP.NET Core
         /// cuando recibe una petición en la ruta mencionada anteriormente, recibe como parametros el id del proyecto y un objeto de tipo
@@ -470,6 +471,65 @@ namespace MaxOrg.Controllers
             });
         }
 
+        [Authorize]
+        [HttpGet("{projectId}/requirements/{requirementId}/progress")]
+        public async Task<IActionResult> GetRequirementProgresss(string projectId, string requirementId)
+        {
+            var userIsInProject = (await Database.CreateStatement<dynamic>(
+                                      $"FOR vertex IN 1..1 INBOUND 'Group/{projectId}' " +
+                                      $"GRAPH 'GroupUsersGraph' FILTER vertex._key == '{HttpContext.User.Identity.Name}'" +
+                                      " return vertex._key").ToListAsync()).Count == 1;
+            if (!userIsInProject)
+            {
+                return Unauthorized();
+            }
+
+            var isProject = await Database
+                .CreateStatement<bool>($"FOR group in Group FILTER group._key == '{projectId}' RETURN group.isRoot")
+                .ToListAsync();
+
+            if (isProject.Count == 0 || isProject[0] == false)
+            {
+                return NotFound();
+            }
+
+            var requirementQuery = $"FOR vertex, edge, p IN 1..1 INBOUND 'Group/{projectId}'" +
+                                   $" GRAPH 'GroupRequirementsGraph' FILTER p.vertices[0].isRoot == true" +
+                                   $" FILTER vertex._key == '{requirementId}'" +
+                                   $" return vertex";
+            var requirement = (await Database.CreateStatement<Requirement>(requirementQuery).ToListAsync())
+                .FirstOrDefault();
+            if (requirement == null)
+            {
+                return NotFound();
+            }
+
+            var requirementProgress = Database.CreateStatement<int>(
+                $@"LET tasksWithContributionPercentage = (FOR c, v in 1..1 INBOUND 'Requirements/{requirementId}'
+ GRAPH 'TasksReferencingRequirementsGraph'
+  FILTER v.contributionPercentage != null
+ return {{c: c, v: v}})
+
+LET tasksWithoutContributionPercentage = (FOR c, v in 1..1 INBOUND 'Requirements/{requirementId}'
+ GRAPH 'TasksReferencingRequirementsGraph'
+  FILTER v.contributionPercentage == null
+ return {{c: c, v: v}})
+
+LET tasksWithPercentage = SUM(FOR t in tasksWithContributionPercentage
+  FILTER t.v.contributionPercentage != null
+ return (t.c.progress * t.v.contributionPercentage) / 100)
+
+LET totalContributionPercentage = SUM(FOR t in tasksWithContributionPercentage return t.v.contributionPercentage)
+
+
+LET tasksWithoutPercentage = SUM(FOR t in tasksWithoutContributionPercentage
+ return (t.c.progress * ((100 - totalContributionPercentage) / LENGTH(tasksWithoutContributionPercentage))) / 100)
+
+
+return tasksWithoutPercentage + tasksWithPercentage").ToList().FirstOr(0);
+            return Ok(requirementProgress);
+        }
+        
         /// <summary>
         /// Método que se encarga de manejar el método DELETE en la ruta "api/projects/{projectId}/requirements/{requirementId}", es invocado por ASP.NET Core
         /// cuando recibe una petición en la ruta mencionada anteriormente, recibe dos parametros a través de la ruta, "projectId"

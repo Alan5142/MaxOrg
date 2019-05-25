@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using ArangoDB.Client;
 using MaxOrg.Models.Users;
+using MaxOrg.Services.Email;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -24,9 +25,11 @@ namespace MaxOrg.Controllers
         private IConfiguration Configuration { get; }
         private CloudBlobContainer Container { get; }
         private IArangoDatabase Database { get; }
+        private IEmailSender EmailSender { get; }
         
-        public UsersController(IConfiguration configuration, CloudBlobContainer container, IArangoDatabase database)
+        public UsersController(IConfiguration configuration, CloudBlobContainer container, IArangoDatabase database, IEmailSender sender)
         {
+            EmailSender = sender;
             Database = database;
             Container = container;
             Configuration = configuration;
@@ -158,6 +161,12 @@ namespace MaxOrg.Controllers
             var userToInsert = new User(user);
             userToInsert.Password = PasswordHasher.HashPassword(userToInsert, saltAsString + user.Password);
             userToInsert.Salt = saltAsString;
+            if (!await EmailSender.SendEmailAsync(user.Email, "Bienvenido a MaxOrg", $@"MaxOrg es una plataforma
+ que agilizará tus proyectos de sofware<br>Tu cuenta es: {user.Username}, podrás acceder a la plataforma desde 
+https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de utilidad :)</h2>"))
+            {
+                return NotFound($"Email doesn't exist");
+            }
 
             var createdUser = await db.InsertAsync<User>(userToInsert);
             return Created("api/users/" + createdUser.Key, new

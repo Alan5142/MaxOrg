@@ -43,7 +43,7 @@ namespace MaxOrg.Models.Chats
         public string Name { get; set; }
 
         /// <summary>
-        /// Descripción del grupo, null en caso de que no sea un grupo
+        /// Descripción del grupo
         /// </summary>
         public string Description { get; set; }
     }

@@ -1,9 +1,10 @@
-using System;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
 namespace MaxOrg.Models.Tests
 {
+    /// <summary>
+    /// Tomado de internet
+    /// </summary>
     public class TokenResponse
     {
         [JsonProperty("access_token")]

@@ -228,8 +228,8 @@ namespace MaxOrg.Controllers
                             LET messages = (
                                 FOR m in c.messages
                                 FOR u in User
-                                FILTER m.remitent == u._key
-                                return MERGE(m, {remitent: u.username})
+                                FILTER m.sender == u._key
+                                return MERGE(m, {sender: u.username})
                             )
                     return MERGE(c, {messages: messages})"
                 ).ToListAsync()).Select(c => new {c.Key, c.Name, c.Messages, c.IsGroup, c.Description, c.ProjectId});
@@ -262,7 +262,7 @@ namespace MaxOrg.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("{chatId}/messages")]
-        [RequestSizeLimit(52428800)]
+        [RequestSizeLimit(10485760)]
         public async Task<IActionResult> SendMessage(string chatId, [FromForm, FromBody] SendMessageRequest request)
         {
             var chat = await Database.Query<Chat>()
@@ -281,7 +281,7 @@ namespace MaxOrg.Controllers
                 {
                     Type = MessageType.Text,
                     Data = request.Message,
-                    Remitent = HttpContext.User.Identity.Name,
+                    Sender = HttpContext.User.Identity.Name,
                     Date = DateTime.UtcNow
                 };
             }
@@ -316,7 +316,7 @@ namespace MaxOrg.Controllers
                     {
                         Type = messageType,
                         Data = $"/api/chats/{chatId}/messages/attachment/{id}",
-                        Remitent = HttpContext.User.Identity.Name,
+                        Sender = HttpContext.User.Identity.Name,
                         Date = DateTime.UtcNow,
                         AttachmentId = id
                     };
@@ -343,7 +343,7 @@ namespace MaxOrg.Controllers
                 message.Type,
                 message.AttachmentId,
                 message.AttachmentName,
-                Remitent = (await Database.Collection("User").DocumentAsync<User>(message.Remitent)).Username
+                Sender = (await Database.Collection("User").DocumentAsync<User>(message.Sender)).Username
             });
 
             await Database.UpdateByIdAsync<Chat>(chat.Id, chat);
