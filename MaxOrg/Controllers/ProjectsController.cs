@@ -473,7 +473,7 @@ namespace MaxOrg.Controllers
 
         [Authorize]
         [HttpGet("{projectId}/requirements/{requirementId}/progress")]
-        public async Task<IActionResult> GetRequirementProgresss(string projectId, string requirementId)
+        public async Task<IActionResult> GetRequirementProgress(string projectId, string requirementId)
         {
             var userIsInProject = (await Database.CreateStatement<dynamic>(
                                       $"FOR vertex IN 1..1 INBOUND 'Group/{projectId}' " +
