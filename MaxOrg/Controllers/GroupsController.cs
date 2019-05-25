@@ -371,10 +371,7 @@ namespace MaxOrg.Controllers
                 e.Title,
                 e.Color,
                 e.End,
-                e.Meta,
-                e.Resizable,
                 e.Start,
-                e.AllDay,
                 CanEdit = isAdmin || e.Creator == userId
             }));
         }
@@ -395,15 +392,11 @@ namespace MaxOrg.Controllers
 
             rootGroup.Events.Add(new CalendarEvent
             {
-                Description = eventRequest.Description,
                 Title = eventRequest.Title,
                 Color = eventRequest.Color,
                 Creator = HttpContext.User.Identity.Name,
-                End = eventRequest.End,
-                Meta = eventRequest.Meta,
-                Resizable = eventRequest.Resizable,
-                Start = eventRequest.Start,
-                AllDay = eventRequest.AllDay
+                End = eventRequest.End.Date,
+                Start = eventRequest.Start.Date,
             });
 
             await Database.UpdateByIdAsync<Group>(rootGroup.Id, rootGroup);
@@ -433,13 +426,9 @@ namespace MaxOrg.Controllers
             }
 
             ev.Color = eventRequest.Color ?? ev.Color;
-            ev.Description = eventRequest.Description ?? ev.Description;
             ev.Title = eventRequest.Title ?? ev.Title;
             ev.End = eventRequest.End;
-            ev.Meta = eventRequest.Meta;
-            ev.Resizable = eventRequest.Resizable;
             ev.Start = eventRequest.Start;
-            ev.AllDay = eventRequest.AllDay;
             await Database.UpdateByIdAsync<Group>(rootGroup.Id, rootGroup);
             return Ok();
         }
@@ -1157,6 +1146,7 @@ namespace MaxOrg.Controllers
 
         #region Requirements
 
+
         #endregion
 
         #region To do tasks
@@ -1546,6 +1536,7 @@ namespace MaxOrg.Controllers
         #region Upload options
 
         [HttpPost("{groupId}/attachments")]
+        [RequestSizeLimit(10485760)]
         public async Task<IActionResult> UploadFile(string groupId, IFormFile file)
         {
             var root = await Database.GetRootGroup(groupId);

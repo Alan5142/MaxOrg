@@ -1,7 +1,7 @@
 namespace MaxOrg.Models.Chats
 {
     /// <summary>
-    /// Indica si un mensaje fue de texto, imágen, video o cualquier otro tipo de archivo
+    /// Indica si un mensaje es de texto, imágen, video o cualquier otro tipo de archivo
     /// </summary>
     public enum MessageType
     {

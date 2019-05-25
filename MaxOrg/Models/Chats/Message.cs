@@ -12,7 +12,7 @@ namespace MaxOrg.Models.Chats
         /// <summary>
         /// Remitente del mensaje
         /// </summary>
-        public string Remitent { get; set; }
+        public string Sender { get; set; }
 
         /// <summary>
         /// Fecha de emisión del mensaje
