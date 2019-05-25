@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {map} from 'rxjs/operators';
 
@@ -31,6 +31,7 @@ export interface Requirement {
   description: string;
   creationDate: Date;
   requirementType: RequirementType;
+  progress?:number;
 }
 
 export interface CreateRequirementRequest {
@@ -101,7 +102,11 @@ export class ProjectsService {
     return this.http.delete<void>(`${environment.apiUrl}projects/${projectId}/requirements/${requirementId}`,
       {headers: headers});
   }
-
+  getRequirementProgress(projectId,requirementId){
+    const url=environment.apiUrl+'projects/'+projectId+'/requirements/'+requirementId+'/progress';
+    //return this.http.get(url);
+    return of(80);
+  }
   modifyProjectRequirement(projectId: string, requirementId: string, newDescription: string): Observable<void> {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${localStorage.getItem('token')}`,

@@ -32,7 +32,7 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
   taskTarget;
   url;
   users = [];
-  admin=false;
+  admin=true;
   constructor(public snackBar: MatSnackBar, public mediaObserver: MediaObserver, public dialog: MatDialog,
     public route: ActivatedRoute, public projectService: ProjectsService, private taskService: TasksService) {
     this.userId = localStorage.getItem('userId');
@@ -55,8 +55,8 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
         console.log(this.membergroups);
         console.log(this.adminGroupsFlat);
         console.log(this.users);
-        if(this.adminGroupsFlat.length>0)
-          this.admin=true;
+        if(this.adminGroupsFlat.length==0)
+          this.admin=false;
         this.usersDisplay.sort = this.sort;
         this.usersDisplay.paginator = this.paginator;
       })

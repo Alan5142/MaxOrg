@@ -12,6 +12,8 @@ import {environment} from "../../../environments/environment";
 import {Observable} from "rxjs";
 import {shareReplay} from "rxjs/operators";
 import {TestsService} from "../../services/tests.service";
+import { ProjectsService } from 'src/app/services/projects.service';
+import { TasksService, Task } from 'src/app/services/tasks.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -47,14 +49,44 @@ export class AdminDashboardComponent implements OnInit {
               private snackBar: MatSnackBar,
               private formBuilder: FormBuilder,
               private groupService: GroupsService,
-              private testsService: TestsService) {
+              private testsService: TestsService,
+              private projectService: ProjectsService,
+              private taskService: TasksService) {
     route.parent.params.subscribe(params => {
       this.groupId = params['id'];
       this.groupInfo = groupService.getAdminInfo(this.groupId).pipe(shareReplay(1));
     });
   }
+  tasksInfo={
+    finished:0,
+    halfProgress:0,
+    noProgress:0,
+    total:0
+  };
+  getTasksInfo(groups){
+    groups.forEach(group => {
+      this.taskService.getGroupTasks(group.id).subscribe((tasks:[])=>{
+        tasks.forEach((task:Task) => {
+          if(task.progress==100)
+            this.tasksInfo.finished++;
+          else if(task.progress>0)
+            this.tasksInfo.halfProgress++;
+          else 
+            this.tasksInfo.noProgress++;
+          this.tasksInfo.total++;
+        });
+        console.log(this.tasksInfo);
+      });
+      this.getTasksInfo(group.subgroups);
+    });
+  }
 
   ngOnInit() {
+    this.projectService.getProject(this.groupId).subscribe(project=>{
+      let groups=[];
+      groups.push(project);
+      this.getTasksInfo(groups);
+    });
   }
 
   changeDescription() {

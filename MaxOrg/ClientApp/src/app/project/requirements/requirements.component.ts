@@ -14,22 +14,9 @@ import { Route } from '@angular/compiler/src/core';
   styleUrls: ['./requirements.component.scss']
 })
 export class RequirementsComponent implements OnInit {
-  displayedColumns: string[] = ['description', 'creationDate', 'actions'];
+  displayedColumns: string[] = ['description', 'progress', 'creationDate', 'actions'];
 
   projectId = '';
-
-  dataSource = [
-    {description: 'Requerimiento 1', creationDate: new Date()},
-    {description: 'Requerimiento 2', creationDate: new Date()},
-    {description: 'Requerimiento 3', creationDate: new Date()},
-    {description: 'Requerimiento 4', creationDate: new Date()},
-    {description: 'Requerimiento 5', creationDate: new Date()},
-    {description: 'Requerimiento 6', creationDate: new Date()},
-    {description: 'Requerimiento 7', creationDate: new Date()},
-    {description: 'Requerimiento 8', creationDate: new Date()},
-    {description: 'Requerimiento 9', creationDate: new Date()},
-    {description: 'Requerimiento 10', creationDate: new Date()},
-  ];
 
   requirements: Observable<Requirement[]>;
   functionalRequirements: Observable<Requirement[]>;
@@ -45,7 +32,15 @@ export class RequirementsComponent implements OnInit {
       this.requirements = this.projectService.getProjectRequirements(this.projectId).pipe(shareReplay(1));
 
       this.functionalRequirements = this.requirements.pipe(map<Requirement[], Requirement[]>(values => {
-        return values.filter(value => value.requirementType == RequirementType.Functional);
+        let functValues=values.filter(value => value.requirementType == RequirementType.Functional);
+        functValues.forEach(requirement=>{
+          projectService.getRequirementProgress(this.projectId,requirement.id).subscribe((progress:number)=>{
+            requirement.progress=progress;
+            console.log(requirement.id);
+            console.log(requirement.progress);
+          })
+        });
+        return functValues;
       }));
 
       this.nonFunctionalRequirements = this.requirements.pipe(map<Requirement[], Requirement[]>(values => {

@@ -50,7 +50,7 @@ export class AssignWorkComponent implements OnInit {
       referenceRequirement: this.requirementId,
       contributionPercentage: this.percent.toString()
     }
-    else if(this.percent===null)
+    else if(this.percent==null)
     this.task = {
       name: taskName.value,
       description: taskDescription.value,

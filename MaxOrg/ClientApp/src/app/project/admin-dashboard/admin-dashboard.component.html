@@ -57,10 +57,10 @@
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
           <div class="height-100 width-100" fxLayout="column" fxLayoutAlign="center center">
-            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50" [value]="50"
+            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50" [value]="250"
                                   mode="determinate"></mat-progress-spinner>
-            <h2 *ngIf="!mediaObserver.isActive('lt-md')">50%</h2>
-            <h1 *ngIf="mediaObserver.isActive('lt-md')">50%</h1>
+            <h2 *ngIf="!mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h2>
+            <h1 *ngIf="mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h1>
           </div>
         </mat-card-content>
       </mat-card>
@@ -75,7 +75,7 @@
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
           <div>
-            <h1>57</h1>
+            <h1>{{tasksInfo.finished}}</h1>
           </div>
         </mat-card-content>
       </mat-card>
@@ -85,12 +85,12 @@
       <mat-card class="dashboard-card mat-elevation-z3">
         <mat-card-header>
           <mat-card-title>
-            Tareas restantes
+            Tareas faltantes
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
           <div>
-            <h1>57</h1>
+            <h1>{{tasksInfo.halfProgress+tasksInfo.noProgress}}</h1>
           </div>
         </mat-card-content>
       </mat-card>
