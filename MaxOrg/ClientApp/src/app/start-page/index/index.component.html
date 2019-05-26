@@ -1,23 +1,45 @@
-<div fxLayout="column">
-  <h1 fxFlexAlign="center">MaxOrg</h1>
+<div fxLayout="column" class="width-100 height-100">
+  <!-- style="background-image: url('/images/logos/people-admin.png')"-->
+  <ngx-hm-carousel
+    [(ngModel)]="index"
+    [autoplay-speed]="speed"
+    [autoplay]="autoplay"
+    [autoplay-direction]="direction"
+    [infinite]="infinite"
+    [between-delay]="2000"
+    [data]="avatars"
+    [aniTime]="600"
+    class="carousel">
 
-  <!-- Aquí va el carrusel-->
+    <section ngx-hm-carousel-container class="content">
+      <article class="item cursor-pointer visible_important"
+               ngx-hm-carousel-item
+               *ngFor="let avatar of avatars; let i = index">
+        <div class="img"
+             [style.backgroundImage]="'url('+avatar.url+')'" style="width: 100%; height: 100%">
+          <div fxLayout="column" style="opacity: 1">
+            <h1 style="font-size: 2.5em; opacity: 1; text-align: center; color: white">MaxOrg</h1>
+            <div fxFlex></div>
+            <h1 style="font-size:2em; text-align: center; opacity: 1; color: white">{{avatar.title}}</h1>
+          </div>
+        </div>
+      </article>
+      <ng-template #infiniteContainer></ng-template>
+    </section>
 
-  <h2 fxFlexAlign="center" i18n>¿Qué es MaxOrg?</h2>
-  <div fxLayout="row" fxLayout.xs="column">
-    <div fxFlex="1 1 50%" fxLayout="column" fxLayoutAlign="center center">
-      <h2 i18n>Caracteristicas</h2>
-      <ul>
-        <li>Item 1</li>
-        <li>Item 2</li>
-        <li>Item 3</li>
-        <li>Item 4</li>
-      </ul>
-    </div>
+    <ng-template #carouselContent let-avatar let-i="index">
+      <article class="item cursor-pointer visible_important">
+        <div class="img"
+             [style.backgroundImage]="'url('+avatar.url+')'">
+        </div>
+      </article>
+    </ng-template>
 
-    <div fxFlex="1 1 50%" fxLayout="row" fxLayoutAlign="center center">
-      <img fxFlex="40%" fxFlex.lt-md="100%"
-           src="https://i.pinimg.com/originals/20/2e/5a/202e5a6a68eb1b2d32847f41148e6127.jpg">
-    </div>
-  </div>
+    <ng-template #carouselDot let-model>
+      <div class="ball bg-accent"
+           [class.visible]="model.index === model.currentIndex"></div>
+    </ng-template>
+
+  </ngx-hm-carousel>
+
 </div>

@@ -27,9 +27,9 @@
                       (refresh)="scrollToBottom(scroll?.viewPortItems.length - 1)"
                       [lastMessage]="i === scroll.viewPortItems.length - 1"
                       [message]="message.data"
-                      [sender]="message.remitent"
+                      [sender]="message.sender"
                       [messageData]="message"
-                      [selfMessage]="user.username === message.remitent"></app-chat-message>
+                      [selfMessage]="user.username === message.sender"></app-chat-message>
 
   </virtual-scroller>
   <mat-form-field appearance="outline" class="width-100" fxFlexAlign="end">

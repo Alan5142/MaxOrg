@@ -43,6 +43,7 @@
     "moment": "^2.24.0",
     "ng2-charts": "^2.2.3",
     "ng2-google-charts": "^3.5.0",
+    "ngx-hm-carousel": "^1.6.5-bata.1",
     "ngx-img-cropper": "^7.0.5",
     "ngx-virtual-scroller": "^2.1.0",
     "prismjs": "^1.16.0",
