@@ -1150,6 +1150,7 @@ namespace MaxOrg.Controllers
         [HttpPost("{groupId}/tasks")]
         public async Task<IActionResult> CreateTask(string groupId, [FromBody] CreateTaskRequest request)
         {
+            if(request.UserAssignId==null)
             // si no es administrador en ese grupo no puede crear tareas
             if (!await IsGroupAdmin(groupId, HttpContext.User.Identity.Name))
             {
@@ -1161,7 +1162,8 @@ namespace MaxOrg.Controllers
             {
                 Name = request.Name,
                 Description = request.Description,
-                DeliveryDate = request.DeliveryDate
+                DeliveryDate = request.DeliveryDate,
+                UserAssignId = request.UserAssignId
             };
             await Database.InsertAsync<ToDoTask>(task);
 
@@ -1259,7 +1261,8 @@ namespace MaxOrg.Controllers
                 t.Description,
                 t.CreationDate,
                 t.DeliveryDate,
-                t.Progress
+                t.Progress,
+                t.UserAssignId
             }));
         }
 

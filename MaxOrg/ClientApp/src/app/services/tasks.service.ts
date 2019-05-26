@@ -10,6 +10,7 @@ export interface CreateTaskRequest{
   referenceRequirement?:string;
   referenceTask?:string;
   contributionPercentage?:string;
+  userAssignId?:string;
 }
 export interface Task{
   key:string;
@@ -35,9 +36,7 @@ export class TasksService {
     headers = headers.append('Content-Type', 'application/json');
     headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
     const url = environment.apiUrl + 'groups/' + groupId + '/tasks';
-    return this.http.post(url, task, {headers: headers}).pipe(map<any, boolean>(response => {
-      return response;
-    }));
+    return this.http.post(url, task, {headers: headers});
   }
   modifyGroupTask(groupId,newTask){
     const url = environment.apiUrl + 'groups/' + groupId + '/tasks/'+newTask.id;

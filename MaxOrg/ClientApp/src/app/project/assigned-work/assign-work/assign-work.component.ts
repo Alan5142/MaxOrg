@@ -16,7 +16,7 @@ export class AssignWorkComponent implements OnInit {
   isUser:boolean;
   requirementId: string;
   percent;
-  url;
+  projectId;
   date = (new FormControl(new Date())).value;
 
   constructor(public dialogRef: MatDialogRef<any>, private taskService: TasksService,
@@ -25,7 +25,7 @@ export class AssignWorkComponent implements OnInit {
     this.id = params.id;
     this.isUser=params.isUser;
     this.requirementId = localStorage.getItem("taskRequirement");
-    this.url = localStorage.getItem("url");
+    this.projectId = localStorage.getItem("projectId");
 
   }
 
@@ -34,7 +34,7 @@ export class AssignWorkComponent implements OnInit {
       this.references = true;
     }
     localStorage.removeItem("taskTarget");
-    localStorage.removeItem("url");
+    localStorage.removeItem("projectId");
 
 
   }
@@ -68,6 +68,9 @@ export class AssignWorkComponent implements OnInit {
     if(!this.isUser){
       console.log(this.id);
       this.dialogRef.close(this.taskService.createGroupTask(this.id,this.task));
+    }else{
+      this.task.userAssignId=this.id;
+      this.dialogRef.close(this.taskService.createGroupTask(this.projectId,this.task));
     }
     
   }
@@ -77,7 +80,7 @@ export class AssignWorkComponent implements OnInit {
   }
   reference() {
     localStorage.setItem("taskTarget", this.id);
-    this.router.navigate([this.url]);
+    this.router.navigate(['/project/'+this.projectId+'requirements']);
     this.dialogRef.close();
   }
 }
