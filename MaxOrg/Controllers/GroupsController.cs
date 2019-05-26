@@ -10,6 +10,7 @@ using MaxOrg.Models.Calendar;
 using MaxOrg.Models.Group;
 using MaxOrg.Models.Kanban;
 using MaxOrg.Models.Notifications;
+using MaxOrg.Models.Posts;
 using MaxOrg.Models.Tasks;
 using MaxOrg.Models.Tests;
 using MaxOrg.Utility;
@@ -1144,11 +1145,6 @@ namespace MaxOrg.Controllers
 
         #endregion
 
-        #region Requirements
-
-
-        #endregion
-
         #region To do tasks
 
         [HttpPost("{groupId}/tasks")]
@@ -1844,6 +1840,73 @@ FOR v in 1 INBOUND 'Group/{groupId}'
 
         #endregion
 
+        #region Group posts
+
+        [HttpPost("{groupId}/posts")]
+        public async Task<IActionResult> CreatePost(string groupId, (string content, object dummy) creationData)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            if (group == null || !await Database.IsGroupMember(HttpContext.User.Identity.Name, groupId)) return NotFound();
+            group.Posts.Add(new Post
+            {
+                CreatorId = HttpContext.User.Identity.Name,
+                Content = creationData.content
+            });
+            await Database.UpdateByIdAsync<Group>(group.Id, group);
+            return Ok();
+        }
+        
+        [HttpGet("{groupId}/posts")]
+        public async Task<IActionResult> GetPosts(string groupId)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            if (group == null || !await Database.IsGroupMember(HttpContext.User.Identity.Name, groupId)) return NotFound();
+
+            var posts = await Database.CreateStatement<dynamic>($@"LET group = DOCUMENT('Group/{groupId}')
+FOR p in group.posts
+LET user = DOCUMENT(CONCAT('User/', p.creatorId))
+SORT p.creationDate DESC
+return {{
+        id: p.id, 
+        creator: user.username, 
+        creatorId: p.creatorId, 
+        content: p.content,
+        comments: (
+            FOR c in p.comments
+            LET usr = DOCUMENT(CONCAT('User/', c.creatorId))
+            return {{
+                id: c.id, 
+                creatorId: c.creatorId,
+                content: c.content,
+                creatorName: usr.username,
+                profilePicture: CONCAT('/api/users/', c.creatorId, '/profile.jpeg'),
+                creationDate: c.creationDate
+            }}
+        ), 
+        creationDate: p.creationDate,
+        profilePicture: CONCAT('/api/users/', p.creatorId, '/profile.jpeg')
+}}").ToListAsync();
+            return Ok(posts);
+        }
+
+        [HttpPost("{groupId}/posts/{postId}/comment")]
+        public async Task<IActionResult> CreateComment(string groupId, string postId, (string content, object dummy) content)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            if (group == null || !await Database.IsGroupMember(HttpContext.User.Identity.Name, groupId)) return NotFound();
+            var post = group.Posts.Find(p => p.Id == postId);
+            if (post == null) return NotFound();
+            post.Comments.Add(new Commentary
+            {
+                Content = content.content,
+                CreatorId = HttpContext.User.Identity.Name
+            });
+            await Database.UpdateByIdAsync<Group>(group.Id, group);
+            return Ok();
+        }
+        
+        #endregion
+        
         /// <summary>
         /// Obtiene un valor de verdadero o falso si un usuario en cuestión es administrador de un grupo definido por un
         /// identificador
