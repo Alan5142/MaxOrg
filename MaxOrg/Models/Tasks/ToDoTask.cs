@@ -23,5 +23,6 @@ namespace MaxOrg.Models.Tasks
         public short Progress { get; set; } = 0;
         
         public DateTime? FinishedDate { get; set; }
+        public string UserAssignId { get; set; } = string.Empty;
     }
 }

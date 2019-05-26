@@ -89,8 +89,37 @@
 
             <h4>Grupos</h4>
             <mat-accordion>
+              
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title class="text-bold">
+                    Tareas Asignadas Personalmente
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-accordion class="assigned-task-container">
+                  <mat-expansion-panel class="assigned-task" *ngFor="let task of membergroups[0]?.tasks | async">
+                    <mat-expansion-panel-header class="text-bold" *ngIf="task.userAssignId==userId">
+                      {{task.name}}
+                    </mat-expansion-panel-header>
+                    <div class="width-100" fxLayout="column" fxLayout.gt-md="row">
+                      <p fxFlex="33">Asignada en: {{task.creationDate | date: 'dd/MM/yyyy'}}</p>
+                      <p fxFlex="33">Fecha estimada: {{task.deliveryDate | date: 'dd/MM/yyyy'}}</p>
+                      <p>Descripción:<br>{{task.description}}</p>
+                      <p fxFlex="33">
+                        progreso: {{task.progress}}%
+                        <mat-progress-bar mode="determinate" value="{{task.progress}}"></mat-progress-bar>
+                      </p>
+                    </div>
+                    <button mat-icon-button *ngIf="task.progress<100">
+                      <mat-icon (click)="openEditTask(task,membergroups[0].id)">edit</mat-icon>%
+                    </button>
+                  </mat-expansion-panel>
+                </mat-accordion>
+    
+              </mat-expansion-panel>
+              
               <mat-expansion-panel *ngFor="let group of membergroups; let index=index;">
-                <mat-expansion-panel-header *ngIf="(group.tasks | async)?.length>0">
+                <mat-expansion-panel-header *ngIf="((group.tasks | async)?.length>0&&index>0)">
                   <mat-panel-title class="text-bold">
                     {{group.name}}
                   </mat-panel-title>
