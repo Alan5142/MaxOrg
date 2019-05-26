@@ -20,7 +20,7 @@
           <div fxLayout="column" style="opacity: 1">
             <h1 style="font-size: 2.5em; opacity: 1; text-align: center; color: white">MaxOrg</h1>
             <div fxFlex></div>
-            <h1 style="font-size:2em; text-align: center; opacity: 1; color: white">{{avatar.title}}</h1>
+            <h1 [ngStyle]="{'margin-top': '15%'}" [ngStyle.lt-sm]="{'margin-top': '50%'}" style="font-size:2em; text-align: center; opacity: 1; color: white">{{avatar.title}}</h1>
           </div>
         </div>
       </article>
