@@ -1,6 +1,5 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MediaObserver} from '@angular/flex-layout';
-import {GoogleChartComponent} from 'ng2-google-charts';
 import {MatDialog, MatSnackBar} from '@angular/material';
 import {ChangeDescriptionComponent} from './change-description/change-description.component';
 import {ActivatedRoute} from '@angular/router';
@@ -10,10 +9,12 @@ import {FormBuilder} from "@angular/forms";
 import {GroupsService} from "../../services/groups.service";
 import {environment} from "../../../environments/environment";
 import {Observable} from "rxjs";
-import {shareReplay, map} from "rxjs/operators";
+import {shareReplay} from "rxjs/operators";
 import {TestsService} from "../../services/tests.service";
-import { ProjectsService, Requirement, RequirementType } from 'src/app/services/projects.service';
-import { TasksService, Task } from 'src/app/services/tasks.service';
+import {ProjectsService, Requirement, RequirementType} from 'src/app/services/projects.service';
+import {Task, TasksService} from 'src/app/services/tasks.service';
+import {ChartDataSets, ChartOptions} from "chart.js";
+import {Color, Label} from "ng2-charts";
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -22,20 +23,85 @@ import { TasksService, Task } from 'src/app/services/tasks.service';
 })
 export class AdminDashboardComponent implements OnInit {
 
-  @ViewChild('tasksChart') tasksChart: GoogleChartComponent;
+  public lineChartData: ChartDataSets[] = [
+    {data: [], label: 'Tareas completadas'}
+  ];
+  public lineChartLabels: Label[] = [];
+  public lineChartOptions: (ChartOptions & { annotation: any }) = {
+    responsive: true,
+    scales: {
+      // We use this empty structure as a placeholder for dynamic theming.
+      xAxes: [{}],
+      yAxes: [
+        {
+          id: 'y-axis-0',
+          position: 'left',
+        },
+        {
+          id: 'y-axis-1',
+          position: 'right',
+          gridLines: {
+            color: 'rgba(255,0,0,0.3)',
+          },
+          ticks: {
+            fontColor: 'red',
+          }
+        }
+      ]
+    },
+    annotation: {
+      annotations: [
+        {
+          type: 'line',
+          mode: 'vertical',
+          scaleID: 'x-axis-0',
+          value: 'March',
+          borderColor: 'orange',
+          borderWidth: 2,
+          label: {
+            enabled: true,
+            fontColor: 'orange',
+            content: 'LineAnno'
+          }
+        },
+      ],
+    },
+  };
+  public lineChartColors: Color[] = [
+    { // grey
+      backgroundColor: 'rgba(148,159,177,0.2)',
+      borderColor: 'rgba(148,159,177,1)',
+      pointBackgroundColor: 'rgba(148,159,177,1)',
+      pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: 'rgba(148,159,177,0.8)'
+    },
+    { // dark grey
+      backgroundColor: 'rgba(77,83,96,0.2)',
+      borderColor: 'rgba(77,83,96,1)',
+      pointBackgroundColor: 'rgba(77,83,96,1)',
+      pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: 'rgba(77,83,96,1)'
+    },
+    { // red
+      backgroundColor: 'rgba(255,0,0,0.3)',
+      borderColor: 'red',
+      pointBackgroundColor: 'rgba(148,159,177,1)',
+      pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: 'rgba(148,159,177,0.8)'
+    }
+  ];
+  public lineChartLegend = true;
+  public lineChartType = 'line';
+
+
   groupId: string;
-  percent_ratio={
-    tasks:false,
-    functionalRequirements:false,
-    nonFunctionalRequirements:false
-  }
-  
-  pieChartData = {
-    chartType: 'LineChart',
-    dataTable: [
-      ['Intervalo', 'Tareas']
-    ],
-    options: {explorer: {axis: 'horizontal', keepInBounds: true}, hAxis: {format: ' dd/MM/yyyy'}, height: '1900px'}
+  percent_ratio = {
+    tasks: false,
+    functionalRequirements: false,
+    nonFunctionalRequirements: false
   };
 
   groupInfo: Observable<any>;
@@ -55,21 +121,23 @@ export class AdminDashboardComponent implements OnInit {
       this.groupInfo = groupService.getAdminInfo(this.groupId).pipe(shareReplay(1));
     });
   }
-  tasksInfo={
-    finished:0,
-    halfProgress:0,
-    noProgress:0,
-    total:0
+
+  tasksInfo = {
+    finished: 0,
+    halfProgress: 0,
+    noProgress: 0,
+    total: 0
   };
-  getTasksInfo(groups){
+
+  getTasksInfo(groups) {
     groups.forEach(group => {
-      this.taskService.getGroupTasks(group.id).subscribe((tasks:[])=>{
-        tasks.forEach((task:Task) => {
-          if(task.progress==100)
+      this.taskService.getGroupTasks(group.id).subscribe((tasks: []) => {
+        tasks.forEach((task: Task) => {
+          if (task.progress == 100)
             this.tasksInfo.finished++;
-          else if(task.progress>0)
+          else if (task.progress > 0)
             this.tasksInfo.halfProgress++;
-          else 
+          else
             this.tasksInfo.noProgress++;
           this.tasksInfo.total++;
         });
@@ -78,53 +146,72 @@ export class AdminDashboardComponent implements OnInit {
       this.getTasksInfo(group.subgroups);
     });
   }
-  reqsInfo={
-    fReqTotal:0,
-    fReqFinished:0,
-    nfReqTotal:0,
-    nfReqFinished:0
+
+  reqsInfo = {
+    fReqTotal: 0,
+    fReqFinished: 0,
+    nfReqTotal: 0,
+    nfReqFinished: 0
   };
-  getReqsInfo(){
-    this.projectService.getProjectRequirements(this.groupId).subscribe((reqs:Requirement[])=>{
-      reqs.filter(req=>req.requirementType==RequirementType.Functional).forEach(req=>{
-        this.projectService.getRequirementProgress(this.groupId,req.id).subscribe((progress:number)=>{
-          if(progress>=100)
+
+  getReqsInfo() {
+    this.projectService.getProjectRequirements(this.groupId).subscribe((reqs: Requirement[]) => {
+      reqs.filter(req => req.requirementType == RequirementType.Functional).forEach(req => {
+        this.projectService.getRequirementProgress(this.groupId, req.id).subscribe((progress: number) => {
+          if (progress >= 100)
             this.reqsInfo.fReqFinished++;
           this.reqsInfo.fReqTotal++;
         });
       });
-      reqs.filter(req=>req.requirementType==RequirementType.NonFunctional).forEach(req=>{
-        this.projectService.getRequirementProgress(this.groupId,req.id).subscribe((progress:number)=>{
-          if(progress>=100)
+      reqs.filter(req => req.requirementType == RequirementType.NonFunctional).forEach(req => {
+        this.projectService.getRequirementProgress(this.groupId, req.id).subscribe((progress: number) => {
+          if (progress >= 100)
             this.reqsInfo.nfReqFinished++;
           this.reqsInfo.nfReqTotal++;
         });
       });
     });
   }
-  
-  getTaskStats(groups){
+
+  getTaskStats(groups) {
     groups.forEach(group => {
-      this.taskService.getTasksStats(group.id).subscribe((dates:[])=>{
-        dates.forEach((date:any)=>{
-          let repeat=false;
-            this.pieChartData.dataTable.forEach(tDate=>{
-              if(tDate[0]==date.date){
-                tDate[1]=tDate[1] as unknown as number+1;
-                repeat=true;
-              }
-            });
-            if(!repeat)
-              this.pieChartData.dataTable.push([date.date,date.tasks]);
-            console.log(this.pieChartData.dataTable);
+      this.taskService.getTasksStats(group.id).subscribe((dates: []) => {
+        dates.forEach((date: any) => {
+          const num = date.tasks;
+          const asDate = new Date(date.date);
+          const stringFormat = `${asDate.getDate()}/${asDate.getMonth() + 1}/${asDate.getFullYear()}`;
+          const indexOfDay = this.lineChartLabels.indexOf(stringFormat);
+          const data = this.lineChartData[0].data as number[];
+          if (indexOfDay === -1) {
+            data.push(num);
+            this.lineChartLabels.push(stringFormat);
+          } else {
+            data[indexOfDay] += num;
+          }
+          /*
+                    let repeat=false;
+                      this.pieChartData.dataTable.forEach(tDate=>{
+                        console.log(tDate);
+                        console.log(date);
+                        if(tDate[0] == date.date){
+                          tDate[1]= (tDate[1] as unknown as number + 1).toString();
+                          repeat=true;
+                        }
+                      });
+                      if(!repeat)
+                        this.pieChartData.dataTable.push([new Date(date.date).toISOString(), date.tasks]);
+                      console.log(this.pieChartData.dataTable);
+                      */
+
         });
       });
       this.getTaskStats(group.subgroups);
     });
   }
+
   ngOnInit() {
-    this.projectService.getProject(this.groupId).subscribe(project=>{
-      let groups=[];
+    this.projectService.getProject(this.groupId).subscribe(project => {
+      let groups = [];
       groups.push(project);
       this.getTasksInfo(groups);
       this.getTaskStats(groups);

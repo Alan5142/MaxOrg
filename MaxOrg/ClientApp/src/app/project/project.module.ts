@@ -82,7 +82,7 @@ import {CreateReportDialogComponent} from './tests/record/create-report-dialog/c
 import {ReportsComponent} from './tests/reports/reports.component';
 import {ChatService} from "./services/chat.service";
 import {NodeComponent} from './org-chart/tree/node/node.component';
-import {NewSubgroupComponent, addDescription} from './org-chart/new-subgroup/new-subgroup.component';
+import {addDescription, NewSubgroupComponent} from './org-chart/new-subgroup/new-subgroup.component';
 import {EditRequirementComponent} from './requirements/edit-requirement/edit-requirement.component';
 import {RemoveRequirementComponent} from './requirements/remove-requirement/remove-requirement.component';
 import {EditSectionComponent} from './kanban-board/board/edit-section/edit-section.component';
@@ -104,7 +104,8 @@ import {ShowCodeComponent} from './code/show-code/show-code.component';
 import {ShowIssuesComponent} from './code/show-issues/show-issues.component';
 import {ShowCommitsComponent} from './code/show-commits/show-commits.component';
 import {MarkdownEditorComponent} from './markdown-editor/markdown-editor.component';
-import { EditTaskComponent } from './assigned-work/edit-task/edit-task.component';
+import {EditTaskComponent} from './assigned-work/edit-task/edit-task.component';
+import {ChartsModule} from "ng2-charts";
 
 registerLocaleData(localeEs);
 @NgModule({
@@ -185,7 +186,8 @@ registerLocaleData(localeEs);
       useFactory: adapterFactory
     }),
     MatDatepickerModule,
-    MatMomentDateModule
+    MatMomentDateModule,
+    ChartsModule
   ],
   declarations: [
     ProjectComponent,

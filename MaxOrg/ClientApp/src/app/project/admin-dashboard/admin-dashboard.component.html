@@ -8,40 +8,15 @@
             Tareas terminadas
           </mat-card-title>
         </mat-card-header>
-        <mat-card-content class="dashboard-card-content">
-          <div class="height-100" fxLayout="column" style="overflow-x: auto; overflow-y: hidden">
-            <google-chart #tasksChart
-                          [data]="pieChartData"
-                          class="chart-style"></google-chart>
-          </div>
-          <div>
-            <div fxLayout="row">
-              <mat-form-field style="width: 40%">
-                <mat-select placeholder="Filtrar" value="days">
-                  <mat-option value="days">
-                    Por días
-                  </mat-option>
-                  <mat-option value="weeks">
-                    Por semanas
-                  </mat-option>
-                  <mat-option value="months">
-                    Por meses
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-              <button mat-icon-button>
-                <mat-icon>first_page</mat-icon>
-              </button>
-              <button mat-icon-button>
-                <mat-icon>chevron_left</mat-icon>
-              </button>
-              <button mat-icon-button>
-                <mat-icon>chevron_right</mat-icon>
-              </button>
-              <button mat-icon-button>
-                <mat-icon>last_page</mat-icon>
-              </button>
-            </div>
+        <mat-card-content class="dashboard-card-content height-100 width-100">
+          <div class="chart-container" fxLayout="column" style="overflow-x: auto; overflow-y: hidden">
+            <canvas baseChart
+                    [datasets]="lineChartData"
+                    [labels]="lineChartLabels"
+                    [options]="lineChartOptions"
+                    [colors]="lineChartColors"
+                    [legend]="lineChartLegend"
+                    [chartType]="lineChartType"></canvas>
           </div>
         </mat-card-content>
       </mat-card>
@@ -57,11 +32,12 @@
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
           <div class="height-100 width-100" fxLayout="column" fxLayoutAlign="center center">
-            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50" [value]="tasksInfo.finished*100/tasksInfo.total"
+            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50"
+                                  [value]="tasksInfo.finished*100/tasksInfo.total"
                                   mode="determinate"></mat-progress-spinner>
             <!-- <h2 *ngIf="!mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h2> -->
             <button mat-button (click)="percent_ratio.tasks=!percent_ratio.tasks"><h4>
-              {{percent_ratio.tasks? (tasksInfo.finished+'/'+tasksInfo.total):((tasksInfo.finished*100/tasksInfo.total | number:'1.0-0')+'%')}}
+              {{percent_ratio.tasks ? (tasksInfo.finished + '/' + tasksInfo.total) : ((tasksInfo.finished * 100 / tasksInfo.total | number:'1.0-0') + '%')}}
             </h4></button>
             <!-- <h1 *ngIf="mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h1> -->
           </div>
@@ -78,11 +54,12 @@
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
           <div class="height-100 width-100" fxLayout="column" fxLayoutAlign="center center">
-            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50" [value]="reqsInfo.fReqFinished*100/reqsInfo.fReqTotal"
+            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50"
+                                  [value]="reqsInfo.fReqFinished*100/reqsInfo.fReqTotal"
                                   mode="determinate"></mat-progress-spinner>
             <!-- <h2 *ngIf="!mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h2> -->
             <button mat-button (click)="percent_ratio.functionalRequirements=!percent_ratio.functionalRequirements"><h4>
-              {{percent_ratio.functionalRequirements? (reqsInfo.fReqFinished+'/'+reqsInfo.fReqTotal):((reqsInfo.fReqFinished*100/reqsInfo.fReqTotal | number:'1.0-0')+'%')}}
+              {{percent_ratio.functionalRequirements ? (reqsInfo.fReqFinished + '/' + reqsInfo.fReqTotal) : ((reqsInfo.fReqFinished * 100 / reqsInfo.fReqTotal | number:'1.0-0') + '%')}}
             </h4></button>
             <!-- <h1 *ngIf="mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h1> -->
           </div>
@@ -99,48 +76,50 @@
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
           <div class="height-100 width-100" fxLayout="column" fxLayoutAlign="center center">
-            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50" [value]="reqsInfo.nfReqFinished*100/reqsInfo.nfReqTotal"
+            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50"
+                                  [value]="reqsInfo.nfReqFinished*100/reqsInfo.nfReqTotal"
                                   mode="determinate"></mat-progress-spinner>
             <!-- <h2 *ngIf="!mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h2> -->
-            <button mat-button (click)="percent_ratio.nonFunctionalRequirements=!percent_ratio.nonFunctionalRequirements"><h4>
-              {{percent_ratio.nonFunctionalRequirements? (reqsInfo.nfReqFinished+'/'+reqsInfo.nfReqTotal):((reqsInfo.nfReqFinished*100/reqsInfo.nfReqTotal | number:'1.0-0')+'%')}}
+            <button mat-button
+                    (click)="percent_ratio.nonFunctionalRequirements=!percent_ratio.nonFunctionalRequirements"><h4>
+              {{percent_ratio.nonFunctionalRequirements ? (reqsInfo.nfReqFinished + '/' + reqsInfo.nfReqTotal) : ((reqsInfo.nfReqFinished * 100 / reqsInfo.nfReqTotal | number:'1.0-0') + '%')}}
             </h4></button>
             <!-- <h1 *ngIf="mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h1> -->
           </div>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>
-<!-- 
-    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
-      <mat-card class="dashboard-card mat-elevation-z3">
-        <mat-card-header>
-          <mat-card-title>
-            Tareas completadas
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content class="dashboard-card-content">
-          <div>
-            <h1>{{tasksInfo.finished}}</h1>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
+    <!--
+        <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
+          <mat-card class="dashboard-card mat-elevation-z3">
+            <mat-card-header>
+              <mat-card-title>
+                Tareas completadas
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="dashboard-card-content">
+              <div>
+                <h1>{{tasksInfo.finished}}</h1>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </mat-grid-tile>
 
-    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
-      <mat-card class="dashboard-card mat-elevation-z3">
-        <mat-card-header>
-          <mat-card-title>
-            Tareas faltantes
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content class="dashboard-card-content">
-          <div>
-            <h1>{{tasksInfo.halfProgress+tasksInfo.noProgress}}</h1>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
- -->
+        <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
+          <mat-card class="dashboard-card mat-elevation-z3">
+            <mat-card-header>
+              <mat-card-title>
+                Tareas faltantes
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="dashboard-card-content">
+              <div>
+                <h1>{{tasksInfo.halfProgress+tasksInfo.noProgress}}</h1>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </mat-grid-tile>
+     -->
     <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
       <mat-card class="dashboard-card mat-elevation-z3">
         <mat-card-header>
@@ -150,7 +129,7 @@
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
           <div>
-            <h1>{{(groupInfo | async).size / 1048576 | number: '1.3-3'}}MiB/500MiB</h1>
+            <h1>{{(groupInfo | async)?.size / 1048576 | number: '1.3-3'}}MiB/500MiB</h1>
           </div>
         </mat-card-content>
       </mat-card>
@@ -165,7 +144,7 @@
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
           <div>
-            <h1 *ngIf="(groupInfo | async).members as members">{{members}} miembro{{members > 1 ? 's' : ''}}</h1>
+            <h1 *ngIf="(groupInfo | async)?.members as members">{{members}} miembro{{members > 1 ? 's' : ''}}</h1>
           </div>
         </mat-card-content>
       </mat-card>
@@ -194,7 +173,7 @@
               <p class="text-left">Cambiar nombre</p>
               <mat-form-field>
                 <input #projectName matInput maxlength="30" placeholder="Nombre del proyecto" type="text" name="name"
-                       [value]="(groupInfo | async).name">
+                       [value]="(groupInfo | async)?.name">
                 <mat-hint>Longitud máxima de 30 caracteres</mat-hint>
               </mat-form-field>
               <p class="text-left">Agregar usuarios</p>
