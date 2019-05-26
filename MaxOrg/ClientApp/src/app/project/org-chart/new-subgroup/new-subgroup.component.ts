@@ -1,9 +1,8 @@
-import { Component, Inject, ViewChild } from '@angular/core';
-import { MAT_DIALOG_DATA, MatAutocompleteSelectedEvent, MatDialogRef, MatDialog } from '@angular/material';
-import { User, UserService } from 'src/app/services/user.service';
-import { GroupsService } from 'src/app/services/groups.service';
-import { componentFactoryName } from '@angular/compiler';
-import { Observable, of } from 'rxjs';
+import {Component, Inject, ViewChild} from '@angular/core';
+import {MAT_DIALOG_DATA, MatAutocompleteSelectedEvent, MatDialog, MatDialogRef} from '@angular/material';
+import {User, UserService} from 'src/app/services/user.service';
+import {GroupsService} from 'src/app/services/groups.service';
+import {Observable, of} from 'rxjs';
 
 @Component({
   selector: 'app-new-subgroup',
@@ -113,7 +112,7 @@ export class NewSubgroupComponent {
 export class addDescription {
   description:Observable<string>;
   groupId:string;
-  constructor(private dialogRef: MatDialogRef<addDescription>,
+  constructor(public dialogRef: MatDialogRef<addDescription>,
       @Inject(MAT_DIALOG_DATA) data:any) {
         console.log(data);
         this.description= of(data.description);
