@@ -51,6 +51,10 @@ export class TasksService {
     return this.http.get(url);  
   
   }
+  getTasksStats(groupId){
+    const url= environment.apiUrl + 'groups/' + groupId + '/tasks/statistics';
+    return this.http.get(url);
+  }
 
   formatDate(dateToFormat:any){
     let date=new Date(Date.parse(dateToFormat));

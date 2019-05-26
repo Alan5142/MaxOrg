@@ -33,14 +33,7 @@ export class AdminDashboardComponent implements OnInit {
   pieChartData = {
     chartType: 'LineChart',
     dataTable: [
-      ['Intervalo', 'Tareas'],
-      [new Date(2019, 0, 5), 0],
-      [new Date(2019, 0, 6), 2],
-      [new Date(2019, 0, 7), 5],
-      [new Date(2019, 0, 8), 0],
-      [new Date(2019, 0, 9), 3],
-      [new Date(2019, 0, 10), 2],
-      [new Date(2019, 0, 11), 0]
+      ['Intervalo', 'Tareas']
     ],
     options: {explorer: {axis: 'horizontal', keepInBounds: true}, hAxis: {format: ' dd/MM/yyyy'}, height: '1900px'}
   };
@@ -91,12 +84,7 @@ export class AdminDashboardComponent implements OnInit {
     nfReqTotal:0,
     nfReqFinished:0
   };
-  ngOnInit() {
-    this.projectService.getProject(this.groupId).subscribe(project=>{
-      let groups=[];
-      groups.push(project);
-      this.getTasksInfo(groups);
-    });
+  getReqsInfo(){
     this.projectService.getProjectRequirements(this.groupId).subscribe((reqs:Requirement[])=>{
       reqs.filter(req=>req.requirementType==RequirementType.Functional).forEach(req=>{
         this.projectService.getRequirementProgress(this.groupId,req.id).subscribe((progress:number)=>{
@@ -113,6 +101,35 @@ export class AdminDashboardComponent implements OnInit {
         });
       });
     });
+  }
+  
+  getTaskStats(groups){
+    groups.forEach(group => {
+      this.taskService.getTasksStats(group.id).subscribe((dates:[])=>{
+        dates.forEach((date:any)=>{
+          let repeat=false;
+            this.pieChartData.dataTable.forEach(tDate=>{
+              if(tDate[0]==date.date){
+                tDate[1]=tDate[1] as unknown as number+1;
+                repeat=true;
+              }
+            });
+            if(!repeat)
+              this.pieChartData.dataTable.push([date.date,date.tasks]);
+            console.log(this.pieChartData.dataTable);
+        });
+      });
+      this.getTaskStats(group.subgroups);
+    });
+  }
+  ngOnInit() {
+    this.projectService.getProject(this.groupId).subscribe(project=>{
+      let groups=[];
+      groups.push(project);
+      this.getTasksInfo(groups);
+      this.getTaskStats(groups);
+    });
+    this.getReqsInfo();
   }
 
   changeDescription() {
