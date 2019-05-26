@@ -1,10 +1,10 @@
-﻿using MaxOrg.Services.Cron;
-using MaxOrg.Services.Tasks;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MaxOrg.Services.Cron;
+using MaxOrg.Services.Tasks;
 
 namespace MaxOrg.Services
 {
@@ -74,7 +74,7 @@ namespace MaxOrg.Services
             }
         }
 
-        private class SchedulerTaskWrapper
+        private class SchedulerTaskWrapper : object
         {
             public CrontabSchedule Schedule { get; set; }
             public IScheduledTask Task { get; set; }

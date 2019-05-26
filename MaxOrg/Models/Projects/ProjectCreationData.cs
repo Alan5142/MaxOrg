@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace MaxOrg.Models
+namespace MaxOrg.Models.Projects
 {
     public class ProjectCreationData
     {

@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using ArangoDB.Client;
-using MaxOrg.Models;
+using MaxOrg.Models.Login;
 using MaxOrg.Models.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -47,20 +47,20 @@ namespace MaxOrg.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> Login([FromBody] Login userLoginData)
         {
-            if (userLoginData.password == null || userLoginData.username == null)
+            if (userLoginData.Password == null || userLoginData.Username == null)
             {
                 return BadRequest(new {message = "No password or username was given"});
             }
 
             var db = Database;
             var user = await (from u in db.Query<Models.Users.User>()
-                where u.Username == userLoginData.username
+                where u.Username == userLoginData.Username
                 select u).FirstOrDefaultAsync();
 
             if (user == null) return NotFound(new {message = "Incorrect username or password"});
 
             if (m_passwordHasher.VerifyHashedPassword(user, user.Password,
-                    user.Salt + userLoginData.password) != PasswordVerificationResult.Success)
+                    user.Salt + userLoginData.Password) != PasswordVerificationResult.Success)
             {
                 return BadRequest(new {message = "Username or password are incorrect"});
             }
@@ -68,10 +68,10 @@ namespace MaxOrg.Controllers
             var (token, refreshToken) = await GenerateRefreshAndJwtToken(user);
             var response = new LoginResponse
             {
-                userId = user.Key,
-                userResourceLocation = "users/" + user.Key,
-                token = token,
-                refreshToken = refreshToken.Token
+                UserId = user.Key,
+                UserResourceLocation = "users/" + user.Key,
+                Token = token,
+                RefreshToken = refreshToken.Token
             };
             return Ok(response);
         }
@@ -180,10 +180,10 @@ namespace MaxOrg.Controllers
             var (token, refreshToken) = await GenerateRefreshAndJwtToken(userToAuth);
             var response = new LoginResponse
             {
-                userId = userToAuth.Key,
-                userResourceLocation = "users/" + userToAuth.Key,
-                token = token,
-                refreshToken = refreshToken.Token
+                UserId = userToAuth.Key,
+                UserResourceLocation = "users/" + userToAuth.Key,
+                Token = token,
+                RefreshToken = refreshToken.Token
             };
 
             return Ok(response);
@@ -212,10 +212,10 @@ namespace MaxOrg.Controllers
             var (token, refreshToken) = await GenerateRefreshAndJwtToken(user);
             var response = new LoginResponse
             {
-                userId = user.Key,
-                userResourceLocation = "users/" + user.Key,
-                token = token,
-                refreshToken = refreshToken.Token
+                UserId = user.Key,
+                UserResourceLocation = "users/" + user.Key,
+                Token = token,
+                RefreshToken = refreshToken.Token
             };
 
             return Ok(response);
@@ -236,10 +236,10 @@ namespace MaxOrg.Controllers
             var (token, refreshToken) = await GenerateRefreshAndJwtToken(user);
             var response = new LoginResponse
             {
-                userId = user.Key,
-                userResourceLocation = "users/" + user.Key,
-                token = token,
-                refreshToken = refreshToken.Token
+                UserId = user.Key,
+                UserResourceLocation = "users/" + user.Key,
+                Token = token,
+                RefreshToken = refreshToken.Token
             };
 
             return Ok(response);
@@ -264,10 +264,10 @@ namespace MaxOrg.Controllers
             var (token, refreshToken) = await GenerateRefreshAndJwtToken(user);
             var response = new LoginResponse
             {
-                userId = user.Key,
-                userResourceLocation = "users/" + user.Key,
-                token = token,
-                refreshToken = refreshToken.Token
+                UserId = user.Key,
+                UserResourceLocation = "users/" + user.Key,
+                Token = token,
+                RefreshToken = refreshToken.Token
             };
 
             try

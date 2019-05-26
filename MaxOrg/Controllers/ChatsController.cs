@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using ArangoDB.Client;
 using MaxOrg.Graphs;
 using MaxOrg.Hubs;
-using MaxOrg.Models;
 using MaxOrg.Models.Chats;
 using MaxOrg.Models.Group;
+using MaxOrg.Models.Notifications;
 using MaxOrg.Models.Users;
 using MaxOrg.Requests.Chat;
 using MaxOrg.Utility;
@@ -232,7 +232,7 @@ namespace MaxOrg.Controllers
                                 return MERGE(m, {sender: u.username})
                             )
                     return MERGE(c, {messages: messages})"
-                ).ToListAsync()).Select(c => new {c.Key, c.Name, c.Messages, c.IsGroup, c.Description, c.ProjectId});
+                ).ToListAsync()).Select(c => new {c.Key, c.Name, c.Messages, c.IsGroup, c.ProjectId});
 
                 var traversalResult = await db.TraverseAsync<User, Chat>(new TraversalConfig
                 {

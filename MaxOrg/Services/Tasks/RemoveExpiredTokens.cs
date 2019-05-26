@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ArangoDB.Client;
-using MaxOrg.Models;
+using MaxOrg.Models.Login;
 
 namespace MaxOrg.Services.Tasks
 {

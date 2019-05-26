@@ -1,10 +1,7 @@
-﻿using ArangoDB.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
+using ArangoDB.Client;
 
-namespace MaxOrg.Models
+namespace MaxOrg.Models.Group
 {
     [CollectionProperty(Naming = NamingConvention.ToCamelCase)]
     public class UsersInGroup

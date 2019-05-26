@@ -3,16 +3,8 @@ using shortid;
 
 namespace MaxOrg.Models.Calendar
 {
-    /*
-     * Representa a un evento en el calendario, están definidos por una fecha de inicio y una fecha de termino, tienen
-     * una prioridad definida y un identificador, el identificador consiste en una cadena de texto alfanúmerica de 15
-     * digitos, este modelo es utilizado por el método "CreateEvent" para insertar un evento dentro de un grupo de trabajo
-     * 
-     */
     /// <summary>
-    /// Representa a un evento en el calendario, están definidos por una fecha de inicio y una fecha de termino, tienen
-    /// una prioridad definida y un identificador, el identificador consiste en una cadena de texto alfanúmerica de 15
-    /// digitos, este modelo es utilizado por el método "CreateEvent" para insertar un evento dentro de un grupo de trabajo
+    /// Representa a un evento en el calendario
     /// </summary>
     public class CalendarEvent
     {

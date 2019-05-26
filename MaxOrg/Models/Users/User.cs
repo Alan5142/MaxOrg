@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ArangoDB.Client;
+using MaxOrg.Models.Notifications;
 
 namespace MaxOrg.Models.Users
 {

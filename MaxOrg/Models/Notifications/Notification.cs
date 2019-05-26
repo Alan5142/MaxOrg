@@ -1,36 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using System.Threading.Tasks;
+using System;
 using ArangoDB.Client;
 using shortid;
 
-namespace MaxOrg.Models
+namespace MaxOrg.Models.Notifications
 {
-    /// <summary>
-    /// Prioridad de la notificación, es útil para considerar el color con el que se representará la notificación
-    /// y para efecto de silenciar notificaciones de prioridades bajas
-    /// </summary>
-    public enum NotificationPriority
-    {
-        /// <summary>
-        /// Notificación de prioridad baja
-        /// </summary>
-        Low,
-
-        /// <summary>
-        /// Notificación de prioridad media 
-        /// </summary>
-        Medium,
-
-        /// <summary>
-        /// Notificación de prioridad alta
-        /// </summary>
-        High
-    }
-
-
     /// <summary>
     /// Representa una notificación en la base de datos, es utilizado por cualquier método que se encargue
     /// de crear notificaciones y también es utilizado por los métodos que se encargan de mandar la lista de notificaciones
@@ -76,20 +49,5 @@ namespace MaxOrg.Models
         /// Representa si la notificación fue leida
         /// </summary>
         public bool Read { get; set; }
-    }
-
-    public enum NotificationType
-    {
-        ProjectCreation,
-        Message,
-        
-    }
-    
-    public class NotificationPush
-    {
-        public string Message { get; set; }
-        
-        public string Context { get; set; }
-        
     }
 }
