@@ -10,9 +10,9 @@ import {FormBuilder} from "@angular/forms";
 import {GroupsService} from "../../services/groups.service";
 import {environment} from "../../../environments/environment";
 import {Observable} from "rxjs";
-import {shareReplay} from "rxjs/operators";
+import {shareReplay, map} from "rxjs/operators";
 import {TestsService} from "../../services/tests.service";
-import { ProjectsService } from 'src/app/services/projects.service';
+import { ProjectsService, Requirement, RequirementType } from 'src/app/services/projects.service';
 import { TasksService, Task } from 'src/app/services/tasks.service';
 
 @Component({
@@ -24,7 +24,12 @@ export class AdminDashboardComponent implements OnInit {
 
   @ViewChild('tasksChart') tasksChart: GoogleChartComponent;
   groupId: string;
-
+  percent_ratio={
+    tasks:false,
+    functionalRequirements:false,
+    nonFunctionalRequirements:false
+  }
+  
   pieChartData = {
     chartType: 'LineChart',
     dataTable: [
@@ -80,12 +85,33 @@ export class AdminDashboardComponent implements OnInit {
       this.getTasksInfo(group.subgroups);
     });
   }
-
+  reqsInfo={
+    fReqTotal:0,
+    fReqFinished:0,
+    nfReqTotal:0,
+    nfReqFinished:0
+  };
   ngOnInit() {
     this.projectService.getProject(this.groupId).subscribe(project=>{
       let groups=[];
       groups.push(project);
       this.getTasksInfo(groups);
+    });
+    this.projectService.getProjectRequirements(this.groupId).subscribe((reqs:Requirement[])=>{
+      reqs.filter(req=>req.requirementType==RequirementType.Functional).forEach(req=>{
+        this.projectService.getRequirementProgress(this.groupId,req.id).subscribe((progress:number)=>{
+          if(progress>=100)
+            this.reqsInfo.fReqFinished++;
+          this.reqsInfo.fReqTotal++;
+        });
+      });
+      reqs.filter(req=>req.requirementType==RequirementType.NonFunctional).forEach(req=>{
+        this.projectService.getRequirementProgress(this.groupId,req.id).subscribe((progress:number)=>{
+          if(progress>=100)
+            this.reqsInfo.nfReqFinished++;
+          this.reqsInfo.nfReqTotal++;
+        });
+      });
     });
   }
 

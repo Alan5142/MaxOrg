@@ -52,20 +52,65 @@
       <mat-card class="dashboard-card mat-elevation-z3">
         <mat-card-header>
           <mat-card-title>
-            % de tareas terminadas
+            tareas terminadas
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
           <div class="height-100 width-100" fxLayout="column" fxLayoutAlign="center center">
-            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50" [value]="250"
+            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50" [value]="tasksInfo.finished*100/tasksInfo.total"
                                   mode="determinate"></mat-progress-spinner>
-            <h2 *ngIf="!mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h2>
-            <h1 *ngIf="mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h1>
+            <!-- <h2 *ngIf="!mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h2> -->
+            <button mat-button (click)="percent_ratio.tasks=!percent_ratio.tasks"><h4>
+              {{percent_ratio.tasks? (tasksInfo.finished+'/'+tasksInfo.total):((tasksInfo.finished*100/tasksInfo.total | number:'1.0-0')+'%')}}
+            </h4></button>
+            <!-- <h1 *ngIf="mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h1> -->
           </div>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>
-
+    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1"
+                   [rowspan]="mediaObserver.isActive('lt-md') ? 2 : 1">
+      <mat-card class="dashboard-card mat-elevation-z3">
+        <mat-card-header>
+          <mat-card-title>
+            requerimientos funcionales terminados
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+          <div class="height-100 width-100" fxLayout="column" fxLayoutAlign="center center">
+            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50" [value]="reqsInfo.fReqFinished*100/reqsInfo.fReqTotal"
+                                  mode="determinate"></mat-progress-spinner>
+            <!-- <h2 *ngIf="!mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h2> -->
+            <button mat-button (click)="percent_ratio.functionalRequirements=!percent_ratio.functionalRequirements"><h4>
+              {{percent_ratio.functionalRequirements? (reqsInfo.fReqFinished+'/'+reqsInfo.fReqTotal):((reqsInfo.fReqFinished*100/reqsInfo.fReqTotal | number:'1.0-0')+'%')}}
+            </h4></button>
+            <!-- <h1 *ngIf="mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h1> -->
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1"
+                   [rowspan]="mediaObserver.isActive('lt-md') ? 2 : 1">
+      <mat-card class="dashboard-card mat-elevation-z3">
+        <mat-card-header>
+          <mat-card-title>
+            requerimientos no funcionales terminados
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+          <div class="height-100 width-100" fxLayout="column" fxLayoutAlign="center center">
+            <mat-progress-spinner [diameter]="mediaObserver.isActive('lt-md') ? 100 : 50" [value]="reqsInfo.nfReqFinished*100/reqsInfo.nfReqTotal"
+                                  mode="determinate"></mat-progress-spinner>
+            <!-- <h2 *ngIf="!mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h2> -->
+            <button mat-button (click)="percent_ratio.nonFunctionalRequirements=!percent_ratio.nonFunctionalRequirements"><h4>
+              {{percent_ratio.nonFunctionalRequirements? (reqsInfo.nfReqFinished+'/'+reqsInfo.nfReqTotal):((reqsInfo.nfReqFinished*100/reqsInfo.nfReqTotal | number:'1.0-0')+'%')}}
+            </h4></button>
+            <!-- <h1 *ngIf="mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h1> -->
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+<!-- 
     <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
       <mat-card class="dashboard-card mat-elevation-z3">
         <mat-card-header>
@@ -95,7 +140,7 @@
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>
-
+ -->
     <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
       <mat-card class="dashboard-card mat-elevation-z3">
         <mat-card-header>
