@@ -1272,8 +1272,8 @@ namespace MaxOrg.Controllers
             var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
             if (group == null) return NotFound();
             if (!await Database.IsAdmin(HttpContext.User.Identity.Name, groupId)) return Unauthorized();
-            var tasks = await Database.CreateStatement<dynamic>(
-                $@"LET thisDateMinusSeven = DATE_SUBTRACT(DATE_ISO8601(DATE_NOW()), 1, 'w')
+            var tasks = await Database.CreateStatement<Statistic>(
+                $@"LET thisDateMinusSeven = DATE_SUBTRACT(DATE_ISO8601(DATE_NOW()), 6, 'd')
 FOR v in 1 INBOUND 'Group/{groupId}'
     GRAPH 'GroupTasksGraph'
     FILTER v.finishedDate != null and DATE_TIMESTAMP(thisDateMinusSeven) < DATE_TIMESTAMP(v.finishedDate)
@@ -1282,7 +1282,25 @@ FOR v in 1 INBOUND 'Group/{groupId}'
                     date,
                 tasks: LENGTH(tasksByDate)
     }}").ToListAsync();
-            return Ok(tasks);
+            tasks = tasks.OrderBy(task => task.Date).ToList();
+            var resultingTasks = new List<Statistic>(tasks);
+            var i = 0;
+            for (var date = DateTime.UtcNow.Date.AddDays(-6); date <= DateTime.UtcNow.Date; date = date.AddDays(1))
+            {
+                if (tasks.Count == 0 || tasks[i].Date > date || date > tasks[i].Date)
+                {
+                    resultingTasks.Add(new Statistic
+                    {
+                        Date = date,
+                        Tasks = 0
+                    });
+                }
+                else if (date == tasks[i].Date)
+                {
+                    i++;
+                }
+            }
+            return Ok(resultingTasks.OrderBy(task => task.Date));
         }
         
         [HttpGet("{groupId}/tasks/{taskId}")]

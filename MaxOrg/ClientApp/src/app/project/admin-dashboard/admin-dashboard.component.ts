@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {MediaObserver} from '@angular/flex-layout';
 import {MatDialog, MatSnackBar} from '@angular/material';
 import {ChangeDescriptionComponent} from './change-description/change-description.component';
@@ -14,7 +14,7 @@ import {TestsService} from "../../services/tests.service";
 import {ProjectsService, Requirement, RequirementType} from 'src/app/services/projects.service';
 import {Task, TasksService} from 'src/app/services/tasks.service';
 import {ChartDataSets, ChartOptions} from "chart.js";
-import {Color, Label} from "ng2-charts";
+import {BaseChartDirective, Color, Label} from "ng2-charts";
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -22,6 +22,9 @@ import {Color, Label} from "ng2-charts";
   styleUrls: ['./admin-dashboard.component.scss'],
 })
 export class AdminDashboardComponent implements OnInit {
+
+  @ViewChild(BaseChartDirective)
+  public chart: BaseChartDirective;
 
   public lineChartData: ChartDataSets[] = [
     {data: [], label: 'Tareas completadas'}
@@ -188,24 +191,11 @@ export class AdminDashboardComponent implements OnInit {
           } else {
             data[indexOfDay] += num;
           }
-          /*
-                    let repeat=false;
-                      this.pieChartData.dataTable.forEach(tDate=>{
-                        console.log(tDate);
-                        console.log(date);
-                        if(tDate[0] == date.date){
-                          tDate[1]= (tDate[1] as unknown as number + 1).toString();
-                          repeat=true;
-                        }
-                      });
-                      if(!repeat)
-                        this.pieChartData.dataTable.push([new Date(date.date).toISOString(), date.tasks]);
-                      console.log(this.pieChartData.dataTable);
-                      */
-
         });
+        this.chart.update()
       });
       this.getTaskStats(group.subgroups);
+      setTimeout(() => this.chart.update(), 100);
     });
   }
 

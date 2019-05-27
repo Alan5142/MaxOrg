@@ -14,7 +14,7 @@ namespace MaxOrg.Services.Tasks
 {
     public class CheckCalendar : IScheduledTask
     {
-        public string Schedule => "0 * * * *";
+        public string Schedule => "0 0 * * *";
 
         private IArangoDatabase Database { get; }
         private IHubContext<NotificationHub> NotificationHub { get; }
