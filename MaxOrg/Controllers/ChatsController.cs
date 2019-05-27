@@ -167,7 +167,7 @@ namespace MaxOrg.Controllers
 
                 await usersInChatGraph.InsertEdgeAsync<ChatMembers>(userToAdd);
                 var notificationMessage =
-                    $"${user.Username} te ha agregado al chat ${chat.Name} en el proyecto ${group.Name}";
+                    $"{user.Username} te ha agregado al chat {chat.Name} en el proyecto {group.Name}";
 
                 foreach (var userId in request.Members)
                 {
