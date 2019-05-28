@@ -43,7 +43,7 @@
                [mode]="mediaObserver.isActive('lt-md') ? 'over' : 'side'"
                [opened]="!mediaObserver.isActive('lt-md')" #sidenav>
     <mat-nav-list class="no-select" (click)="sidenav.toggle(!mediaObserver.isActive('lt-md'))">
-      <h3>{{(projectInfo | async)?.name}}</h3>
+      <h3 style="padding-left: 20px">{{(projectInfo | async)?.name}}</h3>
 
       <mat-form-field class="width-100">
         <mat-label>Grupo</mat-label>
