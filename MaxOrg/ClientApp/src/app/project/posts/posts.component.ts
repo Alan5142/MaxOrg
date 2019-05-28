@@ -10,6 +10,7 @@ import * as marked from 'marked/marked.min';
 import * as sanitizeHtml from 'sanitize-html/dist/sanitize-html';
 import {HttpEventType, HttpResponse} from "@angular/common/http";
 import {GroupsService} from "../../services/groups.service";
+import { ProjectsService } from 'src/app/services/projects.service';
 
 @Component({
   selector: 'app-project-index',
@@ -21,7 +22,7 @@ export class PostsComponent implements OnInit {
   private groupId: string;
   public posts;
   public value = 0;
-
+  userId;
   @ViewChild('fileInput') file: ElementRef<HTMLInputElement>;
   @ViewChild('newPost') newPost: ElementRef<HTMLInputElement>;
 
@@ -32,17 +33,47 @@ export class PostsComponent implements OnInit {
               private highlighter: HighlightService,
               private sanitizer: DomSanitizer,
               private groupsService: GroupsService,
+              private projectService: ProjectsService,
               public cdr: ChangeDetectorRef) {
     this.cdr.detach();
+    this.userId=localStorage.getItem("userId");
     this.route.parent.params.subscribe(params => {
       this.groupId = params['id'];
-      this.postsService.getPosts(this.groupId).pipe(shareReplay(1)).subscribe(posts => {
-        this.posts = posts;
-        this.cdr.detectChanges();
+      this.projectService.getProject(this.groupId).subscribe(project=>{
+        this.getUserGroups(project);
+        console.log(this.groupsList);
+        this.getPosts(this.groupId);
       });
     });
   }
-
+  getPosts(groupId){
+    console.log(groupId);
+    this.groupId=groupId;
+    this.postsService.getPosts(this.groupId).pipe(shareReplay(1)).subscribe(posts => {
+      this.posts = posts;
+      this.cdr.detectChanges();
+    });
+  }
+  selectValue;
+  groupsList=[];
+  getUserGroups(group,isAdmin=false){
+    let isMember=isAdmin;
+    if(!isAdmin){
+      group.members.forEach(member=>{
+        if(member.key==this.userId)
+          isMember=true;
+      });
+    }
+    if(isMember){
+      this.groupsList.push({
+        id:group.id,
+        name:group.name
+      });
+    }
+    group.subgroups.forEach(subgroup => {
+      this.getUserGroups(subgroup,(isAdmin||group.groupOwner==this.userId));
+    });
+  }
   ngOnInit() {
   }
 
