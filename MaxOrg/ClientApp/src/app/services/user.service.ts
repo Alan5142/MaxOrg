@@ -218,4 +218,8 @@ export class UserService {
   linkToGitHub(accessToken: string) {
     return this.http.put(`/api/users/github-link?accessToken=${accessToken}`, {});
   }
+
+  get pendingTasks(): Observable<any> {
+    return this.http.get('/api/users/pending-tasks');
+  }
 }

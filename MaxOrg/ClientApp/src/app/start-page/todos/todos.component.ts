@@ -1,4 +1,7 @@
 import {Component, OnInit} from '@angular/core';
+import {UserService} from "../../services/user.service";
+import {Observable} from "rxjs";
+import {shareReplay} from "rxjs/operators";
 
 @Component({
   selector: 'app-todos',
@@ -13,7 +16,10 @@ export class TodosComponent implements OnInit {
     'user/proyecto3',
   ];
 
-  constructor() {
+  myTasks: Observable<any>;
+
+  constructor(private userService: UserService) {
+    this.myTasks = userService.pendingTasks.pipe(shareReplay(1));
   }
 
   ngOnInit() {

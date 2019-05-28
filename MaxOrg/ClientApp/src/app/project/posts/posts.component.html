@@ -3,7 +3,10 @@
     <form fxLayout="column">
       <mat-progress-bar *ngIf="value !== 0" mode="determinate" [value]="value"></mat-progress-bar>
       <mat-form-field appearance="outline" fxFlex>
-        <textarea (focusin)="cdr.detectChanges()" (focusout)="cdr.detectChanges()" #newPost cdkAutosizeMaxRows="5"
+        <textarea (focusin)="cdr.detectChanges()"
+                  (focusout)="cdr.detectChanges()"
+                  (keyup)="cdr.detectChanges()"
+                  #newPost cdkAutosizeMaxRows="5"
                   cdkTextareaAutosize matInput></textarea>
         <mat-label>Post</mat-label>
         <mat-hint>Puedes utilizar markdown y HTML</mat-hint>
@@ -20,7 +23,7 @@
   </div>
 
   <mat-card *ngFor="let post of posts">
-    <mat-card-header>
+    <mat-card-header [routerLink]="['../user', post.creatorId]">
       <div class="example-header-image" mat-card-avatar matRipple
            [ngStyle]="{'background-image': 'url(' + post.profilePicture + ')'}"></div>
       <mat-card-title class="no-select" matRipple>{{post?.creator}}</mat-card-title>
@@ -45,10 +48,11 @@
           </button>
           <div fxLayout="column">
             <div *ngFor="let comment of post.comments" style="margin-bottom: 16px; margin-top: 16px">
-              <div fxLayout="row">
+              <div fxLayout="row" class="no-select" [routerLink]="['../user', post.creatorId]">
                 <img [src]="comment.profilePicture"
+                     matRipple
                      style="max-width: 3em; max-height: 3em; border-radius: 50%">
-                <h4 style="margin-top: 5px">{{comment.creatorName}}</h4>
+                <h4 matRipple style="margin-top: 5px">{{comment.creatorName}}</h4>
               </div>
               <div style="margin-left: 46px; margin-right: 32px; margin-top: -16px">
                 {{comment.content}}

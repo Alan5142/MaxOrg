@@ -214,7 +214,7 @@ export class PostsComponent implements OnInit {
 
     const observable = this.groupsService.uploadAttachment(this.groupId, $event.target.files[0]).subscribe(result => {
       if (result.type === HttpEventType.UploadProgress) {
-        console.log('Progress');
+        this.cdr.detectChanges();
         this.value = Math.round(100 * result.loaded / result.total);
       } else if (result instanceof HttpResponse) {
         const file = $event.target.files[0] as File;
@@ -226,6 +226,7 @@ export class PostsComponent implements OnInit {
           this.newPost.nativeElement.value += `<br><br><a target="_blank" href="${result.body.url}" style="text-decoration: none; color: inherit; font-size: 2em"><i class="material-icons">file_copy</i>${file.name}</a>`
         }
         this.value = 0;
+        this.cdr.detectChanges();
       }
     }, error => {
       this.snackbar.open('No se pudo subir', 'OK', {duration: 2000});

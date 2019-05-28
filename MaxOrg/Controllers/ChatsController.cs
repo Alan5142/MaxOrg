@@ -229,7 +229,7 @@ namespace MaxOrg.Controllers
                                 FOR m in c.messages
                                 FOR u in User
                                 FILTER m.sender == u._key
-                                return MERGE(m, {sender: u.username})
+                                return MERGE(m, {sender: u.username, senderId: m.sender})
                             )
                     return MERGE(c, {messages: messages})"
                 ).ToListAsync()).Select(c => new {c.Key, c.Name, c.Messages, c.IsGroup, c.ProjectId});

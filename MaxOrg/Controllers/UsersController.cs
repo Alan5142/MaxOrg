@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using ArangoDB.Client;
+using MaxOrg.Models.Tasks;
 using MaxOrg.Models.Users;
 using MaxOrg.Services.Email;
 using Microsoft.AspNetCore.Authorization;
@@ -26,8 +27,9 @@ namespace MaxOrg.Controllers
         private CloudBlobContainer Container { get; }
         private IArangoDatabase Database { get; }
         private IEmailSender EmailSender { get; }
-        
-        public UsersController(IConfiguration configuration, CloudBlobContainer container, IArangoDatabase database, IEmailSender sender)
+
+        public UsersController(IConfiguration configuration, CloudBlobContainer container, IArangoDatabase database,
+            IEmailSender sender)
         {
             EmailSender = sender;
             Database = database;
@@ -108,7 +110,7 @@ namespace MaxOrg.Controllers
                 .Where(u => u.Key == HttpContext.User.Identity.Name)
                 .Select(u => u)
                 .FirstOrDefaultAsync();
-                
+
             return Ok(new
             {
                 user.Username,
@@ -122,7 +124,7 @@ namespace MaxOrg.Controllers
                 ProfilePicture = $"{Configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
             });
         }
-        
+
         /// <summary>
         /// Crea un nuevo usuario
         /// </summary>
@@ -187,7 +189,7 @@ https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de ut
                         where u.Key == userId
                         select new
                         {
-                            u.Username, 
+                            u.Username,
                             u.RealName,
                             u.Email,
                             u.Description,
@@ -223,7 +225,7 @@ https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de ut
             {
                 return NotFound();
             }
-            
+
             var sasConstraints = new SharedAccessBlobPolicy
             {
                 SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5),
@@ -299,8 +301,22 @@ https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de ut
             }
         }
 
-        #region Notifications
+        [Authorize]
+        [HttpGet("pending-tasks")]
+        public async Task<IActionResult> GetLoggedUserPendingTasks()
+        {
+            var pendingTasks = await Database.CreateStatement<PendingTask>($@"FOR at in ToDoTasks
+FILTER at.userAssignId == '{HttpContext.User.Identity.Name}' AND at.progress != 100
+LET unfinishedTaskInfo = (FOR g in 1..1 OUTBOUND at._id
+ GRAPH 'GroupTasksGraph'
+ return {{groupName: g.name, groupId: g._key, task: at, owner: DOCUMENT(CONCAT('User/', g.groupOwner)).username}})
+return unfinishedTaskInfo[0]").ToListAsync();
+            return Ok(pendingTasks);
+        }
         
+
+        #region Notifications
+
         [Authorize]
         [HttpGet("notifications")]
         public async Task<IActionResult> GetUserNotifications([FromQuery] NotificationQueryOptions queryOptions)
@@ -339,8 +355,8 @@ https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de ut
                 {
                     return NotFound();
                 }
-                
-                return Ok(new{Preferences = user.NotificationPreference});
+
+                return Ok(new {Preferences = user.NotificationPreference});
             }
         }
 
@@ -363,7 +379,7 @@ https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de ut
                 return Ok();
             }
         }
-        
+
         [Authorize]
         [HttpPut("notifications/{notificationId}/mark-as-read")]
         public async Task<IActionResult> MarkNotificationAsRead(string notificationId)
@@ -374,7 +390,7 @@ https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de ut
                 return NotFound();
             }
 
-            var notification =  user.Notifications.Find(n => n.Id == notificationId);
+            var notification = user.Notifications.Find(n => n.Id == notificationId);
             if (notification == null)
             {
                 return NotFound();
@@ -385,6 +401,7 @@ https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de ut
             await UpdateUser(user);
             return Ok();
         }
+
         #endregion
 
         #region Common
@@ -407,7 +424,7 @@ https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de ut
                 await db.UpdateByIdAsync<User>(userToUpdate.Id, userToUpdate);
             }
         }
-        
+
         #endregion
 
         #region GitHub user stuff
@@ -420,6 +437,7 @@ https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de ut
             {
                 return BadRequest();
             }
+
             var tokenResponse = await LoginController.GetGitHubAccessToken(accessToken, Configuration);
             var githubClient = new GitHubClient(new Octokit.ProductHeaderValue("MaxOrg"));
 
@@ -432,6 +450,7 @@ https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de ut
             {
                 return StatusCode(500);
             }
+
             githubClient.Credentials = tokenAuth;
             var githubUser = await githubClient.User.Current();
 
@@ -443,15 +462,16 @@ https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de ut
             {
                 return BadRequest();
             }
+
             var user = await Database.Collection("User").DocumentAsync<User>(HttpContext.User.Identity.Name);
             user.GithubToken = tokenResponse.AccessToken;
             user.GithubId = githubUser.Id;
 
             await Database.UpdateByIdAsync<User>(user.Id, user);
-            
+
             return Ok();
         }
-        
+
         [Authorize]
         [HttpGet("repos")]
         public async Task<IActionResult> GetUserRepos()
@@ -461,9 +481,9 @@ https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de ut
             {
                 return NotFound();
             }
-            
+
             var client = new GitHubClient(new ProductHeaderValue("maxorg"));
-            
+
             var tokenAuth = new Credentials(user.GithubToken);
             client.Credentials = tokenAuth;
 

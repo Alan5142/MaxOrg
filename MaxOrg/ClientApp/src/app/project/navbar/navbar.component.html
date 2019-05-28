@@ -18,8 +18,7 @@
     </mat-menu>
 
     <button [matMenuTriggerFor]="notMenu" mat-icon-button>
-      <mat-icon *ngIf="notificationsComponent.getNumberOfUnreadNotifications() | async as notCount"
-                [matBadge]="notCount > 99 ? '99+' : notCount" matBadgeColor="warn"
+      <mat-icon [matBadge]="(notificationsComponent.getNumberOfUnreadNotifications() | async) > 99 ? '99+' : (notificationsComponent.getNumberOfUnreadNotifications() | async)" matBadgeColor="warn"
                 matBadgePosition="above after">notifications
       </mat-icon>
     </button>

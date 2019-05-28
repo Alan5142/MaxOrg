@@ -19,7 +19,7 @@
 
     <div fxFlex></div>
     <button [matMenuTriggerFor]="notificationMenu" mat-icon-button>
-      <mat-icon [matBadge]="notificationComponent.getNumberOfUnreadNotifications() | async" matBadgeColor="warn"
+      <mat-icon [matBadge]="(notificationComponent.getNumberOfUnreadNotifications() | async) > 99 ? '99+' : (notificationComponent.getNumberOfUnreadNotifications() | async)" matBadgeColor="warn"
                 matBadgePosition="above after">notifications
       </mat-icon>
     </button>

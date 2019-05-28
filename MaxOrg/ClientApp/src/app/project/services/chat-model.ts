@@ -12,6 +12,7 @@ export interface Message {
   type: MessageType;
   data: string;
   attachmentName?: string;
+  senderId: string;
 }
 
 export interface ChatModel {

@@ -40,5 +40,7 @@ namespace MaxOrg.Models.Chats
         /// Nombre del archivo que se subió al chat, es utilizado para mostrar el nombre del archivo de una manera amigable dentro del chat
         /// </summary>
         public string AttachmentName { get; set; }
+        
+        public string SenderId { get; set; }
     }
 }

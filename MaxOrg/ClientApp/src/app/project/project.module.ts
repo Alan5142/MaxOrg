@@ -106,6 +106,7 @@ import {ShowCommitsComponent} from './code/show-commits/show-commits.component';
 import {MarkdownEditorComponent} from './markdown-editor/markdown-editor.component';
 import {EditTaskComponent} from './assigned-work/edit-task/edit-task.component';
 import {ChartsModule} from "ng2-charts";
+import {UserViewComponent} from './user-view/user-view.component';
 
 registerLocaleData(localeEs);
 @NgModule({
@@ -241,7 +242,8 @@ registerLocaleData(localeEs);
     reloadChart,
     MarkdownEditorComponent,
     addDescription,
-    EditTaskComponent
+    EditTaskComponent,
+    UserViewComponent
   ],
   bootstrap: [
     ProjectComponent
