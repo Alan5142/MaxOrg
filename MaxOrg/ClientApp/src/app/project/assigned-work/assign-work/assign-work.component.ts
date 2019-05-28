@@ -1,8 +1,8 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { TasksService, Task, CreateTaskRequest } from 'src/app/services/tasks.service';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-import { FormControl } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import {Component, Inject, OnInit} from '@angular/core';
+import {CreateTaskRequest, TasksService} from 'src/app/services/tasks.service';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {FormControl} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'app-assign-work',
@@ -42,7 +42,7 @@ export class AssignWorkComponent implements OnInit {
     console.log(this.percent);
     this.task=null;
     if (this.references){
-    if(Number.isInteger(this.percent)&&this.percent>0&&this.percent<=100)      
+    if(Number.isInteger(this.percent)&&this.percent>0&&this.percent<=100)
     this.task = {
       name: taskName.value,
       description: taskDescription.value,
@@ -72,7 +72,7 @@ export class AssignWorkComponent implements OnInit {
       this.task.userAssignId=this.id;
       this.dialogRef.close(this.taskService.createGroupTask(this.projectId,this.task));
     }
-    
+
   }
   unreference() {
     this.references = false;
@@ -80,7 +80,7 @@ export class AssignWorkComponent implements OnInit {
   }
   reference() {
     localStorage.setItem("taskTarget", this.id);
-    this.router.navigate(['/project/'+this.projectId+'requirements']);
+    this.router.navigate(['/project/'+this.projectId+'/requirements']);
     this.dialogRef.close();
   }
 }
