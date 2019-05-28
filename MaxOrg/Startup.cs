@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using ArangoDB.Client;
 using M6T.Core.TupleModelBinder;
 using MaxOrg.Hubs;
+using MaxOrg.Models.Email;
+using MaxOrg.Services.Email;
 using MaxOrg.Services.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -158,8 +160,7 @@ namespace MaxOrg
                 settings.ClusterMode = true;
                 settings.Serialization.SerializeEnumAsInteger = false;
             });
-
-            // init all :) 
+            
             using (var db = ArangoDatabase.CreateWithSetting())
             {
                 CreateCollection(db, "Group");
@@ -168,8 +169,11 @@ namespace MaxOrg
                 CreateCollection(db, "Subgroup", CollectionType.Edge);
                 CreateCollection(db, "UsersInGroup", CollectionType.Edge);
             }
+            services.AddOptions();
+            services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
             
             services.AddTransient(provider => ArangoDatabase.CreateWithSetting());
+            services.AddTransient<IEmailSender, RegistrationSender>();
             services.AddSingleton(new HttpClient());
 
             services.AddSingleton<IScheduledTask, RemoveExpiredTokens>();

@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using ArangoDB.Client;
 using MaxOrg.Hubs;
 using MaxOrg.Hubs.Clients;
-using MaxOrg.Models;
 using MaxOrg.Models.Calendar;
 using MaxOrg.Models.Group;
 using MaxOrg.Models.Kanban;
+using MaxOrg.Models.Notifications;
+using MaxOrg.Models.Posts;
 using MaxOrg.Models.Tasks;
 using MaxOrg.Models.Tests;
 using MaxOrg.Utility;
@@ -23,7 +24,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Octokit;
 using shortid;
-using Notification = MaxOrg.Models.Notification;
+using Notification = MaxOrg.Models.Notifications.Notification;
 using User = MaxOrg.Models.Users.User;
 
 namespace MaxOrg.Controllers
@@ -128,7 +129,8 @@ namespace MaxOrg.Controllers
                     CreationDate = currentDate,
                     Name = createGroup.Name,
                     GroupOwner = createGroup.SubgroupAdminId,
-                    IsRoot = false
+                    IsRoot = false,
+                    Description = createGroup.Description
                 };
 
                 var createdGroup = await db.InsertAsync<Group>(newGroup);
@@ -370,10 +372,7 @@ namespace MaxOrg.Controllers
                 e.Title,
                 e.Color,
                 e.End,
-                e.Meta,
-                e.Resizable,
                 e.Start,
-                e.AllDay,
                 CanEdit = isAdmin || e.Creator == userId
             }));
         }
@@ -394,15 +393,11 @@ namespace MaxOrg.Controllers
 
             rootGroup.Events.Add(new CalendarEvent
             {
-                Description = eventRequest.Description,
                 Title = eventRequest.Title,
                 Color = eventRequest.Color,
                 Creator = HttpContext.User.Identity.Name,
-                End = eventRequest.End,
-                Meta = eventRequest.Meta,
-                Resizable = eventRequest.Resizable,
-                Start = eventRequest.Start,
-                AllDay = eventRequest.AllDay
+                End = eventRequest.End.Date,
+                Start = eventRequest.Start.Date,
             });
 
             await Database.UpdateByIdAsync<Group>(rootGroup.Id, rootGroup);
@@ -432,13 +427,9 @@ namespace MaxOrg.Controllers
             }
 
             ev.Color = eventRequest.Color ?? ev.Color;
-            ev.Description = eventRequest.Description ?? ev.Description;
             ev.Title = eventRequest.Title ?? ev.Title;
             ev.End = eventRequest.End;
-            ev.Meta = eventRequest.Meta;
-            ev.Resizable = eventRequest.Resizable;
             ev.Start = eventRequest.Start;
-            ev.AllDay = eventRequest.AllDay;
             await Database.UpdateByIdAsync<Group>(rootGroup.Id, rootGroup);
             return Ok();
         }
@@ -1154,15 +1145,12 @@ namespace MaxOrg.Controllers
 
         #endregion
 
-        #region Requirements
-
-        #endregion
-
         #region To do tasks
 
         [HttpPost("{groupId}/tasks")]
         public async Task<IActionResult> CreateTask(string groupId, [FromBody] CreateTaskRequest request)
         {
+            if(request.UserAssignId==null)
             // si no es administrador en ese grupo no puede crear tareas
             if (!await IsGroupAdmin(groupId, HttpContext.User.Identity.Name))
             {
@@ -1174,7 +1162,8 @@ namespace MaxOrg.Controllers
             {
                 Name = request.Name,
                 Description = request.Description,
-                DeliveryDate = request.DeliveryDate
+                DeliveryDate = request.DeliveryDate,
+                UserAssignId = request.UserAssignId
             };
             await Database.InsertAsync<ToDoTask>(task);
 
@@ -1186,7 +1175,7 @@ namespace MaxOrg.Controllers
                 if (!Database.CreateStatement<bool>(
                     $"LET rootGroup = (FOR v in 0..100 INBOUND 'Group/{groupId}' GRAPH 'SubgroupGraph' PRUNE v.isRoot == true FILTER v.isRoot == true return v)" +
                     $"LET requirements = (FOR v in 1 INBOUND rootGroup[0]._id GRAPH 'GroupRequirementsGraph' FILTER v._key == '{request.ReferenceRequirement}' return v)" +
-                    $"return requirements == []").ToList().FirstOr(false))
+                    $"return requirements != []").ToList().FirstOr(false))
                 {
                     return Created($"api/groups/{groupId}/tasks/{task.Key}", new
                     {
@@ -1209,7 +1198,7 @@ namespace MaxOrg.Controllers
                 };
 
                 // Insertamos y listo
-                var graph = Database.Graph("TasksReferencingRequirementGraph");
+                var graph = Database.Graph("TasksReferencingRequirementsGraph");
                 await graph.InsertEdgeAsync<TaskReferencingRequirement>(referenceToRequirement);
             }
             else if (request.ReferenceRequirement == null && request.ReferenceTask != null)
@@ -1272,10 +1261,48 @@ namespace MaxOrg.Controllers
                 t.Description,
                 t.CreationDate,
                 t.DeliveryDate,
-                t.Progress
+                t.Progress,
+                t.UserAssignId
             }));
         }
 
+        [HttpGet("{groupId}/tasks/statistics")]
+        public async Task<IActionResult> GetLastWeekFinishedTasks(string groupId)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            if (group == null) return NotFound();
+            if (!await Database.IsAdmin(HttpContext.User.Identity.Name, groupId)) return Unauthorized();
+            var tasks = await Database.CreateStatement<Statistic>(
+                $@"LET thisDateMinusSeven = DATE_SUBTRACT(DATE_ISO8601(DATE_NOW()), 6, 'd')
+FOR v in 1 INBOUND 'Group/{groupId}'
+    GRAPH 'GroupTasksGraph'
+    FILTER v.finishedDate != null and DATE_TIMESTAMP(thisDateMinusSeven) < DATE_TIMESTAMP(v.finishedDate)
+    COLLECT date = v.finishedDate INTO tasksByDate
+    return {{
+                    date,
+                tasks: LENGTH(tasksByDate)
+    }}").ToListAsync();
+            tasks = tasks.OrderBy(task => task.Date).ToList();
+            var resultingTasks = new List<Statistic>(tasks);
+            var i = 0;
+            for (var date = DateTime.UtcNow.Date.AddDays(-6); date <= DateTime.UtcNow.Date; date = date.AddDays(1))
+            {
+                if (tasks.Count == 0 || tasks[i].Date > date || date > tasks[i].Date)
+                {
+                    resultingTasks.Add(new Statistic
+                    {
+                        Date = date,
+                        Tasks = 0
+                    });
+                }
+                else if (date == tasks[i].Date)
+                {
+                    i++;
+                }
+            }
+            return Ok(resultingTasks.OrderBy(task => task.Date));
+        }
+        
         [HttpGet("{groupId}/tasks/{taskId}")]
         public async Task<IActionResult> GetTaskInfo(string groupId, string taskId)
         {
@@ -1320,6 +1347,10 @@ namespace MaxOrg.Controllers
             }
 
             task.Progress = request.NewProgress ?? task.Progress;
+            if (task.Progress == 100)
+            {
+                task.FinishedDate = DateTime.UtcNow.Date;
+            }
 
             await Database.UpdateByIdAsync<ToDoTask>(task.Id, task);
 
@@ -1349,7 +1380,7 @@ namespace MaxOrg.Controllers
         }
 
         [HttpPost("{groupId}/tasks/{taskId}")]
-        public async Task<IActionResult> AssignTaskToSubGroup(string groupId, string taskId,
+        public async Task<IActionResult> AssignTask(string groupId, string taskId,
             [FromBody] AssignTaskRequest request)
         {
             if (!await IsGroupAdmin(groupId, HttpContext.User.Identity.Name))
@@ -1411,6 +1442,16 @@ namespace MaxOrg.Controllers
             return Ok();
         }
 
+        /*
+        [HttpPost("{groupId}/tasks/my-tasks")]
+        public async Task<IActionResult> GetMyAssignedTasks(string groupId)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            if (group == null) return NotFound();
+            if (!await Database.IsGroupMember(HttpContext.User.Identity.Name, groupId)) return NotFound();
+            
+        }*/
+        
         #endregion
 
         #region GitHub repo
@@ -1545,6 +1586,7 @@ namespace MaxOrg.Controllers
         #region Upload options
 
         [HttpPost("{groupId}/attachments")]
+        [RequestSizeLimit(10485760)]
         public async Task<IActionResult> UploadFile(string groupId, IFormFile file)
         {
             var root = await Database.GetRootGroup(groupId);
@@ -1819,6 +1861,73 @@ namespace MaxOrg.Controllers
 
         #endregion
 
+        #region Group posts
+
+        [HttpPost("{groupId}/posts")]
+        public async Task<IActionResult> CreatePost(string groupId, (string content, object dummy) creationData)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            if (group == null || !await Database.IsGroupMember(HttpContext.User.Identity.Name, groupId)) return NotFound();
+            group.Posts.Add(new Post
+            {
+                CreatorId = HttpContext.User.Identity.Name,
+                Content = creationData.content
+            });
+            await Database.UpdateByIdAsync<Group>(group.Id, group);
+            return Ok();
+        }
+        
+        [HttpGet("{groupId}/posts")]
+        public async Task<IActionResult> GetPosts(string groupId)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            if (group == null || !await Database.IsGroupMember(HttpContext.User.Identity.Name, groupId)) return NotFound();
+
+            var posts = await Database.CreateStatement<dynamic>($@"LET group = DOCUMENT('Group/{groupId}')
+FOR p in group.posts
+LET user = DOCUMENT(CONCAT('User/', p.creatorId))
+SORT p.creationDate DESC
+return {{
+        id: p.id, 
+        creator: user.username, 
+        creatorId: p.creatorId, 
+        content: p.content,
+        comments: (
+            FOR c in p.comments
+            LET usr = DOCUMENT(CONCAT('User/', c.creatorId))
+            return {{
+                id: c.id, 
+                creatorId: c.creatorId,
+                content: c.content,
+                creatorName: usr.username,
+                profilePicture: CONCAT('/api/users/', c.creatorId, '/profile.jpeg'),
+                creationDate: c.creationDate
+            }}
+        ), 
+        creationDate: p.creationDate,
+        profilePicture: CONCAT('/api/users/', p.creatorId, '/profile.jpeg')
+}}").ToListAsync();
+            return Ok(posts);
+        }
+
+        [HttpPost("{groupId}/posts/{postId}/comment")]
+        public async Task<IActionResult> CreateComment(string groupId, string postId, (string content, object dummy) content)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            if (group == null || !await Database.IsGroupMember(HttpContext.User.Identity.Name, groupId)) return NotFound();
+            var post = group.Posts.Find(p => p.Id == postId);
+            if (post == null) return NotFound();
+            post.Comments.Add(new Commentary
+            {
+                Content = content.content,
+                CreatorId = HttpContext.User.Identity.Name
+            });
+            await Database.UpdateByIdAsync<Group>(group.Id, group);
+            return Ok();
+        }
+        
+        #endregion
+        
         /// <summary>
         /// Obtiene un valor de verdadero o falso si un usuario en cuestión es administrador de un grupo definido por un
         /// identificador

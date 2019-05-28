@@ -1,0 +1,12 @@
+<div fxLayout="column" fxLayoutAlign="start center" *ngIf="user | async as user; else loading">
+  <h1>{{user?.username}}</h1>
+  <img src="{{user?.profilePicture}}" ngClass="image"
+       ngClass.xs="image-small">
+  <h4>Nombre: {{user?.realName}}</h4>
+  <h4>Cumpleaños: {{user?.birthday | date: 'dd/MM/yyyy'}}</h4>
+  <h4>Descripción: {{user?.description}}</h4>
+  <h4>Ocupación: {{user?.occupation}}</h4>
+</div>
+<ng-template #loading>
+  <mat-progress-bar mode="query"></mat-progress-bar>
+</ng-template>

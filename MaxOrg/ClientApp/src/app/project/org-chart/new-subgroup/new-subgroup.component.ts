@@ -1,7 +1,8 @@
 import {Component, Inject, ViewChild} from '@angular/core';
-import {MAT_DIALOG_DATA, MatAutocompleteSelectedEvent, MatDialogRef} from '@angular/material';
+import {MAT_DIALOG_DATA, MatAutocompleteSelectedEvent, MatDialog, MatDialogRef} from '@angular/material';
 import {User, UserService} from 'src/app/services/user.service';
 import {GroupsService} from 'src/app/services/groups.service';
+import {Observable, of} from 'rxjs';
 
 @Component({
   selector: 'app-new-subgroup',
@@ -10,33 +11,34 @@ import {GroupsService} from 'src/app/services/groups.service';
 })
 export class NewSubgroupComponent {
   groupName: string;
-  groupDescription:string="";
+  groupDescription: string = "";
   selectedUsers: string[];
-  selectedAdmin=null;
+  selectedAdmin = null;
   autocompleteUsers: User[];
-  subgroupAdminId:string;
-  parentGroupId:string;
+  subgroupAdminId: string;
+  parentGroupId: string;
 
   @ViewChild('adminInput') adminInput: HTMLInputElement;
 
   constructor(public dialogRef: MatDialogRef<NewSubgroupComponent>,
-              private userService: UserService,
-              private groupService: GroupsService,
-              @Inject(MAT_DIALOG_DATA)  parentGroupId: string) {
-    this.parentGroupId=parentGroupId;
+    private userService: UserService,
+    private groupService: GroupsService,
+    private dialog: MatDialog,
+    @Inject(MAT_DIALOG_DATA) parentGroupId: string) {
+    this.parentGroupId = parentGroupId;
     console.log(parentGroupId);
     this.selectedUsers = [];
     this.autocompleteUsers = [];
-    userService.getCurrentUser().subscribe(user=>this.selectedAdmin=user.username);
+    userService.getCurrentUser().subscribe(user => this.selectedAdmin = user.username);
   }
 
   createGroup(): void {
     let adminId;
-    this.userService.getUsersByName(this.selectedAdmin,1).subscribe(admin=>{
-      const itf = {currentGroupId:((this.parentGroupId as any).parentId as string),name:this.groupName,description:this.groupDescription,members:this.selectedUsers,subgroupAdminId:admin[0].key};
+    this.userService.getUsersByName(this.selectedAdmin, 1).subscribe(admin => {
+      const itf = { currentGroupId: ((this.parentGroupId as any).parentId as string), name: this.groupName, description: this.groupDescription, members: this.selectedUsers, subgroupAdminId: admin[0].key };
       const returnPromise = this.groupService.createGroup(itf);
-      returnPromise.subscribe(r=>console.log(r));
-      this.dialogRef.close(returnPromise);
+      returnPromise.subscribe(r => this.dialogRef.close(returnPromise));
+
     })
 
 
@@ -84,7 +86,38 @@ export class NewSubgroupComponent {
       return;
     }
 
-    this.selectedAdmin=username;
+    this.selectedAdmin = username;
     console.log(this.selectedAdmin);
   }
+  addDescription() {
+    const dialogRef = this.dialog.open(addDescription, {
+      data: { description: this.groupDescription, groupId:this.parentGroupId }
+    });
+    dialogRef.afterClosed().subscribe(description => {
+      if (description)
+        this.groupDescription = description;
+      console.log(this.groupDescription);
+    });
+  }
 }
+@Component({
+  template: '<app-markdown-editor (saveClicked)="dialogRef.close($event)"' +
+    'title="Añadir descripción"' +
+    'okButtonText="AÑADIR DESCRIPCIÓN"' +
+    '[defaultText]="description"' +
+    '[groupId]="groupId"' +
+    '(onCancel)="dialogRef.close(null)">' +
+    '</app-markdown-editor>'
+})
+export class addDescription {
+  description:Observable<string>;
+  groupId:string;
+  constructor(public dialogRef: MatDialogRef<addDescription>,
+      @Inject(MAT_DIALOG_DATA) data:any) {
+        console.log(data);
+        this.description= of(data.description);
+        this.groupId= data.groupId.parentId;
+        console.log(this.groupId);
+       }
+}
+

@@ -4,14 +4,16 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using ArangoDB.Client;
+using MaxOrg.Models.Tasks;
 using MaxOrg.Models.Users;
+using MaxOrg.Services.Email;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Octokit;
-using Notification = MaxOrg.Models.Notification;
+using Notification = MaxOrg.Models.Notifications.Notification;
 using User = MaxOrg.Models.Users.User;
 
 namespace MaxOrg.Controllers
@@ -24,9 +26,12 @@ namespace MaxOrg.Controllers
         private IConfiguration Configuration { get; }
         private CloudBlobContainer Container { get; }
         private IArangoDatabase Database { get; }
-        
-        public UsersController(IConfiguration configuration, CloudBlobContainer container, IArangoDatabase database)
+        private IEmailSender EmailSender { get; }
+
+        public UsersController(IConfiguration configuration, CloudBlobContainer container, IArangoDatabase database,
+            IEmailSender sender)
         {
+            EmailSender = sender;
             Database = database;
             Container = container;
             Configuration = configuration;
@@ -105,7 +110,7 @@ namespace MaxOrg.Controllers
                 .Where(u => u.Key == HttpContext.User.Identity.Name)
                 .Select(u => u)
                 .FirstOrDefaultAsync();
-                
+
             return Ok(new
             {
                 user.Username,
@@ -119,7 +124,7 @@ namespace MaxOrg.Controllers
                 ProfilePicture = $"{Configuration["AppSettings:DefaultURL"]}/api/users/{user.Key}/profile.jpeg"
             });
         }
-        
+
         /// <summary>
         /// Crea un nuevo usuario
         /// </summary>
@@ -158,6 +163,12 @@ namespace MaxOrg.Controllers
             var userToInsert = new User(user);
             userToInsert.Password = PasswordHasher.HashPassword(userToInsert, saltAsString + user.Password);
             userToInsert.Salt = saltAsString;
+            if (!await EmailSender.SendEmailAsync(user.Email, "Bienvenido a MaxOrg", $@"MaxOrg es una plataforma
+ que agilizará tus proyectos de sofware<br>Tu cuenta es: {user.Username}, podrás acceder a la plataforma desde 
+https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de utilidad :)</h2>"))
+            {
+                return NotFound($"Email doesn't exist");
+            }
 
             var createdUser = await db.InsertAsync<User>(userToInsert);
             return Created("api/users/" + createdUser.Key, new
@@ -178,7 +189,7 @@ namespace MaxOrg.Controllers
                         where u.Key == userId
                         select new
                         {
-                            u.Username, 
+                            u.Username,
                             u.RealName,
                             u.Email,
                             u.Description,
@@ -214,7 +225,7 @@ namespace MaxOrg.Controllers
             {
                 return NotFound();
             }
-            
+
             var sasConstraints = new SharedAccessBlobPolicy
             {
                 SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5),
@@ -290,8 +301,22 @@ namespace MaxOrg.Controllers
             }
         }
 
-        #region Notifications
+        [Authorize]
+        [HttpGet("pending-tasks")]
+        public async Task<IActionResult> GetLoggedUserPendingTasks()
+        {
+            var pendingTasks = await Database.CreateStatement<PendingTask>($@"FOR at in ToDoTasks
+FILTER at.userAssignId == '{HttpContext.User.Identity.Name}' AND at.progress != 100
+LET unfinishedTaskInfo = (FOR g in 1..1 OUTBOUND at._id
+ GRAPH 'GroupTasksGraph'
+ return {{groupName: g.name, groupId: g._key, task: at, owner: DOCUMENT(CONCAT('User/', g.groupOwner)).username}})
+return unfinishedTaskInfo[0]").ToListAsync();
+            return Ok(pendingTasks);
+        }
         
+
+        #region Notifications
+
         [Authorize]
         [HttpGet("notifications")]
         public async Task<IActionResult> GetUserNotifications([FromQuery] NotificationQueryOptions queryOptions)
@@ -330,8 +355,8 @@ namespace MaxOrg.Controllers
                 {
                     return NotFound();
                 }
-                
-                return Ok(new{Preferences = user.NotificationPreference});
+
+                return Ok(new {Preferences = user.NotificationPreference});
             }
         }
 
@@ -354,7 +379,7 @@ namespace MaxOrg.Controllers
                 return Ok();
             }
         }
-        
+
         [Authorize]
         [HttpPut("notifications/{notificationId}/mark-as-read")]
         public async Task<IActionResult> MarkNotificationAsRead(string notificationId)
@@ -365,7 +390,7 @@ namespace MaxOrg.Controllers
                 return NotFound();
             }
 
-            var notification =  user.Notifications.Find(n => n.Id == notificationId);
+            var notification = user.Notifications.Find(n => n.Id == notificationId);
             if (notification == null)
             {
                 return NotFound();
@@ -376,6 +401,7 @@ namespace MaxOrg.Controllers
             await UpdateUser(user);
             return Ok();
         }
+
         #endregion
 
         #region Common
@@ -398,7 +424,7 @@ namespace MaxOrg.Controllers
                 await db.UpdateByIdAsync<User>(userToUpdate.Id, userToUpdate);
             }
         }
-        
+
         #endregion
 
         #region GitHub user stuff
@@ -411,6 +437,7 @@ namespace MaxOrg.Controllers
             {
                 return BadRequest();
             }
+
             var tokenResponse = await LoginController.GetGitHubAccessToken(accessToken, Configuration);
             var githubClient = new GitHubClient(new Octokit.ProductHeaderValue("MaxOrg"));
 
@@ -423,6 +450,7 @@ namespace MaxOrg.Controllers
             {
                 return StatusCode(500);
             }
+
             githubClient.Credentials = tokenAuth;
             var githubUser = await githubClient.User.Current();
 
@@ -434,15 +462,16 @@ namespace MaxOrg.Controllers
             {
                 return BadRequest();
             }
+
             var user = await Database.Collection("User").DocumentAsync<User>(HttpContext.User.Identity.Name);
             user.GithubToken = tokenResponse.AccessToken;
             user.GithubId = githubUser.Id;
 
             await Database.UpdateByIdAsync<User>(user.Id, user);
-            
+
             return Ok();
         }
-        
+
         [Authorize]
         [HttpGet("repos")]
         public async Task<IActionResult> GetUserRepos()
@@ -452,9 +481,9 @@ namespace MaxOrg.Controllers
             {
                 return NotFound();
             }
-            
+
             var client = new GitHubClient(new ProductHeaderValue("maxorg"));
-            
+
             var tokenAuth = new Credentials(user.GithubToken);
             client.Credentials = tokenAuth;
 

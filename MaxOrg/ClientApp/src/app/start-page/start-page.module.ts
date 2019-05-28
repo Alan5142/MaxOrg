@@ -48,6 +48,7 @@ import {NotFoundComponent} from './not-found/not-found.component';
 import {CommonComponentsModule} from "../common-components/common-components.module";
 import {ImageCropperModule} from "ngx-img-cropper";
 import {GoogleLoginComponent} from './google-login/google-login.component';
+import {NgxHmCarouselModule} from "ngx-hm-carousel";
 
 @NgModule({
   providers: [],
@@ -111,7 +112,8 @@ import {GoogleLoginComponent} from './google-login/google-login.component';
     MatGridListModule,
     MatSlideToggleModule,
     CommonComponentsModule,
-    ImageCropperModule
+    ImageCropperModule,
+    NgxHmCarouselModule
   ],
   bootstrap: [StartPageComponent]
 })

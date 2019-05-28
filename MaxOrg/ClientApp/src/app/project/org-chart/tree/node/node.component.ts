@@ -11,16 +11,16 @@ import { GroupCardComponent } from '../../group-card/group-card.component';
 export class NodeComponent implements OnInit {
   @Input() nodeData;
   @Input() userId;
+  @Input() isAdmin;
   isMember:boolean=false;
   constructor(public dialog: MatDialog) {
 
    }
-
    openDialog(group): void {
     const dialogRef = this.dialog.open(GroupCardComponent, {
       width: '50%',
       minWidth: '300px',
-      data: {group}
+      data: {group:group,isAdmin:this.isAdmin}
     });
   }
   ngOnInit() {

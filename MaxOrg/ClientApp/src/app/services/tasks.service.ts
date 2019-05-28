@@ -10,6 +10,7 @@ export interface CreateTaskRequest{
   referenceRequirement?:string;
   referenceTask?:string;
   contributionPercentage?:string;
+  userAssignId?:string;
 }
 export interface Task{
   key:string;
@@ -35,18 +36,25 @@ export class TasksService {
     headers = headers.append('Content-Type', 'application/json');
     headers = headers.append('Authorization', 'Bearer ' + localStorage.getItem('token'));
     const url = environment.apiUrl + 'groups/' + groupId + '/tasks';
-    return this.http.post(url, task, {headers: headers}).pipe(map<any, boolean>(response => {
-      return response;
-    }));
+    return this.http.post(url, task, {headers: headers});
   }
-
+  modifyGroupTask(groupId,newTask){
+    const url = environment.apiUrl + 'groups/' + groupId + '/tasks/'+newTask.id;
+    console.log(url);
+    console.log(newTask);
+    return this.http.put(url,newTask).subscribe(r=>console.log(r));
+  }
   getGroupTasks(groupId: string){
     const url= environment.apiUrl + 'groups/' + groupId + '/tasks';
     
-    return this.http.get(url);
-    
+    return this.http.get(url);  
   
   }
+  getTasksStats(groupId){
+    const url= environment.apiUrl + 'groups/' + groupId + '/tasks/statistics';
+    return this.http.get(url);
+  }
+
   formatDate(dateToFormat:any){
     let date=new Date(Date.parse(dateToFormat));
     return (date.getDate()>9?"":"0")+date.getDate()+"/"+(date.getMonth()>8?"":"0")+(date.getMonth()+1)+"/"+date.getFullYear();

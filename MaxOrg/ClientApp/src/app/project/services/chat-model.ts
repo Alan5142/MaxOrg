@@ -7,11 +7,12 @@ export enum MessageType {
 
 
 export interface Message {
-  remitent: string;
+  sender: string;
   date: Date;
   type: MessageType;
   data: string;
   attachmentName?: string;
+  senderId: string;
 }
 
 export interface ChatModel {

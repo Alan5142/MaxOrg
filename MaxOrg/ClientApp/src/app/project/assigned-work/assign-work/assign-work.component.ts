@@ -1,8 +1,8 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { TasksService, Task, CreateTaskRequest } from 'src/app/services/tasks.service';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
-import { FormControl } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import {Component, Inject, OnInit} from '@angular/core';
+import {CreateTaskRequest, TasksService} from 'src/app/services/tasks.service';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {FormControl} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'app-assign-work',
@@ -15,7 +15,8 @@ export class AssignWorkComponent implements OnInit {
   id: string;
   isUser:boolean;
   requirementId: string;
-  url;
+  percent;
+  projectId;
   date = (new FormControl(new Date())).value;
 
   constructor(public dialogRef: MatDialogRef<any>, private taskService: TasksService,
@@ -24,7 +25,7 @@ export class AssignWorkComponent implements OnInit {
     this.id = params.id;
     this.isUser=params.isUser;
     this.requirementId = localStorage.getItem("taskRequirement");
-    this.url = localStorage.getItem("url");
+    this.projectId = localStorage.getItem("projectId");
 
   }
 
@@ -33,18 +34,30 @@ export class AssignWorkComponent implements OnInit {
       this.references = true;
     }
     localStorage.removeItem("taskTarget");
-    localStorage.removeItem("url");
+    localStorage.removeItem("projectId");
 
 
   }
   createTask(taskName: HTMLInputElement, taskDescription: HTMLInputElement) {
-    if (this.references)
-      this.task = {
-        name: taskName.value,
-        description: taskDescription.value,
-        deliveryDate: this.date,
-        referenceRequirement: this.requirementId
-      }
+    console.log(this.percent);
+    this.task=null;
+    if (this.references){
+    if(Number.isInteger(this.percent)&&this.percent>0&&this.percent<=100)
+    this.task = {
+      name: taskName.value,
+      description: taskDescription.value,
+      deliveryDate: this.date,
+      referenceRequirement: this.requirementId,
+      contributionPercentage: this.percent.toString()
+    }
+    else if(this.percent==null)
+    this.task = {
+      name: taskName.value,
+      description: taskDescription.value,
+      deliveryDate: this.date,
+      referenceRequirement: this.requirementId
+    }
+  }
     else
       this.task = {
         name: taskName.value,
@@ -52,9 +65,14 @@ export class AssignWorkComponent implements OnInit {
         deliveryDate: this.date
       }
     console.log(this.task);
-    if(!this.isUser)
-      this.dialogRef.close(this.taskService.createGroupTask(this.id, this.task));
-    
+    if(!this.isUser){
+      console.log(this.id);
+      this.dialogRef.close(this.taskService.createGroupTask(this.id,this.task));
+    }else{
+      this.task.userAssignId=this.id;
+      this.dialogRef.close(this.taskService.createGroupTask(this.projectId,this.task));
+    }
+
   }
   unreference() {
     this.references = false;
@@ -62,7 +80,7 @@ export class AssignWorkComponent implements OnInit {
   }
   reference() {
     localStorage.setItem("taskTarget", this.id);
-    this.router.navigate([this.url]);
+    this.router.navigate(['/project/'+this.projectId+'/requirements']);
     this.dialogRef.close();
   }
 }

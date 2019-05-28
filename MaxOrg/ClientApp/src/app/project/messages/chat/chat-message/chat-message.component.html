@@ -3,7 +3,7 @@
      class="speech-bubble mat-elevation-z4" style="color: black">
   <div style="top: -15px; font-weight: bold; margin: 10px 0px -5px 5px; text-align: left;"
        *ngIf="messageData && !selfMessage">
-    <p>{{sender}}</p>
+    <p class="no-select" matRipple [routerLink]="['../user', messageData?.senderId]">{{sender}}</p>
   </div>
 
   <div #messageContainer style="margin: 5px 10px 20px 10px">

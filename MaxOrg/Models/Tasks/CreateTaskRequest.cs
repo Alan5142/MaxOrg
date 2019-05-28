@@ -12,7 +12,7 @@ namespace MaxOrg.Models.Tasks
         public string DeliveryDate { get; set; }
         public string ReferenceRequirement { get; set; } = null;
         public string ReferenceTask { get; set; } = null;
-
+        public string UserAssignId { get; set; } = null;
         public short? ContributionPercentage { get; set; }
     }
 }

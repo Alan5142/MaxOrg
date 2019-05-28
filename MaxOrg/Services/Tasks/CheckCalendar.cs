@@ -4,8 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using ArangoDB.Client;
 using MaxOrg.Hubs;
-using MaxOrg.Models;
 using MaxOrg.Models.Group;
+using MaxOrg.Models.Login;
+using MaxOrg.Models.Notifications;
 using MaxOrg.Models.Users;
 using Microsoft.AspNetCore.SignalR;
 
@@ -13,7 +14,7 @@ namespace MaxOrg.Services.Tasks
 {
     public class CheckCalendar : IScheduledTask
     {
-        public string Schedule => "0 * * * *";
+        public string Schedule => "0 0 * * *";
 
         private IArangoDatabase Database { get; }
         private IHubContext<NotificationHub> NotificationHub { get; }

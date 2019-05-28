@@ -1,25 +1,75 @@
+<select (change)="getPosts($event.target.value)">
+  <option *ngFor="let group of groupsList" [value]="group.id">{{group.name}}</option>
+</select>
+<!-- <mat-form-field>
+  <mat-label>Mostrar posts del grupo</mat-label>
+  <select matNativeControl  (change)="print(0)">
+    <option *ngFor="let group of groupsList" [value]="group">{{group.name}}</option>
+  </select>
+</mat-form-field> -->
 <div fxLayout="column" fxLayoutGap="60px" ngClass="post-container" ngClass.lt-md="post-container-mobile">
   <div>
     <form fxLayout="column">
+      <mat-progress-bar *ngIf="value !== 0" mode="determinate" [value]="value"></mat-progress-bar>
       <mat-form-field appearance="outline" fxFlex>
-        <textarea cdkAutosizeMaxRows="5" cdkTextareaAutosize matInput></textarea>
+        <textarea (focusin)="cdr.detectChanges()"
+                  (focusout)="cdr.detectChanges()"
+                  (keyup)="cdr.detectChanges()"
+                  #newPost cdkAutosizeMaxRows="5"
+                  cdkTextareaAutosize matInput></textarea>
         <mat-label>Post</mat-label>
         <mat-hint>Puedes utilizar markdown y HTML</mat-hint>
       </mat-form-field>
-      <button (click)="testNotification()" color="primary" mat-flat-button>Publicar</button>
+      <button (click)="fileInput.click()" mat-icon-button>
+        <mat-icon>attach_file</mat-icon>
+      </button>
+      <button [disabled]="newPost.value.trim() === ''" (click)="createPost(newPost.value); newPost.value = ''"
+              color="primary"
+              mat-flat-button>Publicar
+      </button>
+      <input (change)="uploadFileToServer($event)" #fileInput type="file" hidden>
     </form>
   </div>
 
-  <mat-card>
-    <mat-card-header>
-      <div class="example-header-image" mat-card-avatar matRipple></div>
-      <mat-card-title class="no-select" matRipple>[Nombre de usuario]</mat-card-title>
+  <mat-card *ngFor="let post of posts">
+    <mat-card-header [routerLink]="['../user', post.creatorId]">
+      <div class="example-header-image" mat-card-avatar matRipple
+           [ngStyle]="{'background-image': 'url(' + post.profilePicture + ')'}"></div>
+      <mat-card-title class="no-select" matRipple>{{post?.creator}}</mat-card-title>
     </mat-card-header>
-    <img alt="Photo of a Shiba Inu" mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg">
-    <mat-card-content>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis dolorem harum voluptatibus repellendus atque voluptas vel eveniet pariatur! Dolorem architecto quam consequatur reiciendis facere necessitatibus sequi soluta ad doloremque accusantium.
-      </p>
+    <mat-card-content style="margin-top: 24px">
+      <div [innerHtml]="generateSafeHtml(post.content)">
+      </div>
+      <div class="width-100 height-100"
+           style="margin-left: -6px; margin-right: -6px; margin-bottom: 0px"
+           [ngClass]="{
+            'comment-section-background-dark': themeService.isDarkTheme | async,
+            'comment-section-background': !(themeService.isDarkTheme | async)}">
+        <div style="margin-left: 32px; margin-right: 32px; margin-top: 16px">
+          <mat-form-field class="width-100">
+            <textarea (focusin)="cdr.detectChanges()" (focusout)="cdr.detectChanges()" #commentContent matInput
+                      cdkTextareaAutosize cdkAutosizeMaxRows="1"
+                      cdkAutosizeMinRows="1"></textarea>
+            <mat-label>Comentario</mat-label>
+          </mat-form-field>
+          <button [disabled]="commentContent.value.trim() === ''" mat-flat-button class="width-100"
+                  (click)="makeComment(post.id, commentContent.value); commentContent.value = ''">PUBLICAR COMENTARIO
+          </button>
+          <div fxLayout="column">
+            <div *ngFor="let comment of post.comments" style="margin-bottom: 16px; margin-top: 16px">
+              <div fxLayout="row" class="no-select" [routerLink]="['../user', post.creatorId]">
+                <img [src]="comment.profilePicture"
+                     matRipple
+                     style="max-width: 3em; max-height: 3em; border-radius: 50%">
+                <h4 matRipple style="margin-top: 5px">{{comment.creatorName}}</h4>
+              </div>
+              <div style="margin-left: 46px; margin-right: 32px; margin-top: -16px">
+                {{comment.content}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </mat-card-content>
   </mat-card>
 

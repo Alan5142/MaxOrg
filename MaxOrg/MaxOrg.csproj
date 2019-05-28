@@ -17,6 +17,7 @@
     <PackageReference Include="ArangoDB.Client" Version="0.7.70" />
     <PackageReference Include="FluentFTP" Version="24.0.0" />
     <PackageReference Include="M6T.Core.TupleModelBinder" Version="1.0.0" />
+    <PackageReference Include="MailKit" Version="2.1.5.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.2.0" />
@@ -37,7 +38,6 @@
 
   <ItemGroup>
     <Folder Include="Database\" />
-    <Folder Include="Models\Login" />
   </ItemGroup>
 
   <ItemGroup>

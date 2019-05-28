@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ArangoDB.Client;
 using MaxOrg.Models.Calendar;
 using MaxOrg.Models.Kanban;
+using MaxOrg.Models.Posts;
 
 namespace MaxOrg.Models.Group
 {
@@ -85,5 +86,7 @@ namespace MaxOrg.Models.Group
         /// Indica el proyecto anterior a este proyecto, solo disponible si "IsRoot" = true
         /// </summary>
         public string PreviousProject { get; set; } = null;
+        
+        public List<Post> Posts { get; set; } = new List<Post>();
     }
 }

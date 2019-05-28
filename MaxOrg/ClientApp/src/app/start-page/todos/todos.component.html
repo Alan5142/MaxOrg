@@ -6,16 +6,20 @@
   <div fxFlex="100%" fxLayout="row">
     <div fxFlex.gt-md="25%" fxFlex.lt-md="0%"></div>
     <div fxFlex="100%" fxLayout="column">
-      <mat-expansion-panel *ngFor="let project of projects">
+      <mat-expansion-panel *ngFor="let task of myTasks | async">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            {{project}}
+            {{task.owner}}/{{task.groupName}}
           </mat-panel-title>
           <mat-panel-description>
-            Grupo1
+            {{task.task.name}}
+            <div fxFlex></div>
+            <button mat-flat-button mat-icon-button color="primary" [routerLink]="['/project', task.groupId, 'assigned-work']"><mat-icon>forward</mat-icon></button>
           </mat-panel-description>
         </mat-expansion-panel-header>
-        <p>lorem ipsum bla bla</p>
+        <div fxLayout="row">
+          <p>{{task.task.description}}</p>
+        </div>
       </mat-expansion-panel>
     </div>
     <div fxFlex.gt-md="25%" fxFlex.lt-md="0%"></div>

@@ -18,6 +18,7 @@ import {CalendarComponent} from './calendar/calendar.component';
 import {TestsComponent} from './tests/tests.component';
 import {ReportsComponent} from './tests/reports/reports.component';
 import {RecordComponent} from './tests/record/record.component';
+import {UserViewComponent} from "./user-view/user-view.component";
 
 const routes: Routes = [
   {
@@ -44,6 +45,7 @@ const routes: Routes = [
           {path: '', component: RecordComponent},
           {path: 'reports/:testId', component: ReportsComponent}
         ]},
+      {path: 'user/:userId', component: UserViewComponent},
       {path: '**', redirectTo: 'not-found'}
     ]
   }

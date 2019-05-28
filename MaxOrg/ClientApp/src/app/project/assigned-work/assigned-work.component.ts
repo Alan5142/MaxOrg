@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TasksService, Task } from 'src/app/services/tasks.service';
 import { map } from 'rxjs/operators';
 import { UserService } from 'src/app/services/user.service';
+import { EditTaskComponent } from './edit-task/edit-task.component';
 
 @Component({
   selector: 'app-assigned-work',
@@ -29,33 +30,33 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
   membergroups=[];
   userId;
   taskTarget;
-  url;
+  projectId;
   users = [];
-  admin=false;
+  admin=true;
   constructor(public snackBar: MatSnackBar, public mediaObserver: MediaObserver, public dialog: MatDialog,
     public route: ActivatedRoute, public projectService: ProjectsService, private taskService: TasksService) {
     this.userId = localStorage.getItem('userId');
     this.taskTarget = localStorage.getItem("taskTarget");
     this.route.parent.params.subscribe(params => {
-      this.url = "/project/" + params['id'] + "/requirements";
+      this.projectId = params['id'];
       this.projectService.getProject(params['id']).subscribe(project => {
         this.groups.push(project);
-        if (this.groups[0].groupOwner == this.userId)
-          this.adminGroups.push(project);
-        else
-          this.groups[0].subgroups.forEach(group => {
-            this.getAdminGroups(group);
-          });
+        if(this.groups[0].groupOwner==this.userId){
+          this.users=this.groups[0].members;}
+        this.groups[0].subgroups.forEach(group => {
+          this.getAdminGroups(group);
+        });
         this.flat(this.adminGroups,this.adminGroupsFlat);
         this.getMembers(this.adminGroupsFlat);
+        if(this.users.length==0)
+          this.admin=false;
         this.usersDisplay = new MatTableDataSource(this.users);
         this.flat(this.groups,this.groupsFlat);
         this.getMemberGroups(this.groupsFlat);
+        console.log(this.taskService.getGroupTasks(this.projectId).subscribe(r=>console.log(r)));
         console.log(this.membergroups);
         console.log(this.adminGroupsFlat);
         console.log(this.users);
-        if(this.adminGroupsFlat.length>0)
-          this.admin=true;
         this.usersDisplay.sort = this.sort;
         this.usersDisplay.paginator = this.paginator;
       })
@@ -133,8 +134,8 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
   }
 
   openAssignTask(id: string, isUser:boolean, index?: number) {
-    localStorage.setItem("url", this.url);
-    console.log(this.url);
+    localStorage.setItem("projectId", this.projectId);
+    console.log(this.projectId);
     const dialogRef = this.dialog.open(AssignWorkComponent, {
       width: '50%',
       maxWidth: '500px',
@@ -143,12 +144,15 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
     });
     dialogRef.afterClosed().subscribe(r => {
       if (r) {
+        r.subscribe(r=>console.log(r));
         if(!isUser)
+          r.subscribe(r=>{
+            console.log(r);
           this.adminGroupsFlat[index].tasks =
-          this.adminGroupsFlat[index].tasks.pipe(map<Task[], any>(tasks => { return tasks; }))
+          this.adminGroupsFlat[index].tasks.pipe(map<Task[], any>(tasks => { return tasks; }))});
         this.snackBar.open("Tarea agregada", "cerrar");
       }
-    });
+    },error=>this.snackBar.open("La tarea no se pudo agregar","cerrar"));
   }
   applyFilter(filterValue: string) {
     this.usersDisplay.filter = filterValue.trim().toLowerCase();
@@ -156,5 +160,17 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
       this.usersDisplay.paginator.firstPage();
     }
   }
-
+  openEditTask(task,groupId){
+    console.log(task);
+    const dialogRef=this.dialog.open(EditTaskComponent,{
+      data:{task:task,groupId:groupId},
+      width:"350px"
+    });
+    dialogRef.afterClosed().subscribe(progress=>{
+      if(progress){
+        task.progress=progress;
+        this.snackBar.open("progreso añadido","cerrar");
+      }
+    },error=>this.snackBar.open("no se pudo añadir progreso","cerrar"));
+  }
 }
