@@ -37,7 +37,8 @@
                                   mode="determinate"></mat-progress-spinner>
             <!-- <h2 *ngIf="!mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h2> -->
             <button mat-button (click)="percent_ratio.tasks=!percent_ratio.tasks"><h4>
-              {{percent_ratio.tasks ? (tasksInfo.finished + '/' + tasksInfo.total) : ((tasksInfo.finished * 100 / tasksInfo.total | number:'1.0-0') + '%')}}
+              {{percent_ratio.tasks ? (tasksInfo.finished + '/' + tasksInfo.total) : 
+              (tasksInfo.total>0?((tasksInfo.finished * 100 / tasksInfo.total | number:'1.0-0') + '%'):'N/A')}}
             </h4></button>
             <!-- <h1 *ngIf="mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h1> -->
           </div>
@@ -59,7 +60,8 @@
                                   mode="determinate"></mat-progress-spinner>
             <!-- <h2 *ngIf="!mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h2> -->
             <button mat-button (click)="percent_ratio.functionalRequirements=!percent_ratio.functionalRequirements"><h4>
-              {{percent_ratio.functionalRequirements ? (reqsInfo.fReqFinished + '/' + reqsInfo.fReqTotal) : ((reqsInfo.fReqFinished * 100 / reqsInfo.fReqTotal | number:'1.0-0') + '%')}}
+              {{percent_ratio.functionalRequirements ? (reqsInfo.fReqFinished + '/' + reqsInfo.fReqTotal) : 
+              (reqsInfo.fReqTotal>0?((reqsInfo.fReqFinished * 100 / reqsInfo.fReqTotal | number:'1.0-0') + '%'):'N/A')}}
             </h4></button>
             <!-- <h1 *ngIf="mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h1> -->
           </div>
@@ -82,7 +84,8 @@
             <!-- <h2 *ngIf="!mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h2> -->
             <button mat-button
                     (click)="percent_ratio.nonFunctionalRequirements=!percent_ratio.nonFunctionalRequirements"><h4>
-              {{percent_ratio.nonFunctionalRequirements ? (reqsInfo.nfReqFinished + '/' + reqsInfo.nfReqTotal) : ((reqsInfo.nfReqFinished * 100 / reqsInfo.nfReqTotal | number:'1.0-0') + '%')}}
+              {{percent_ratio.nonFunctionalRequirements ? (reqsInfo.nfReqFinished + '/' + reqsInfo.nfReqTotal) : 
+              (reqsInfo.nfReqTotal>0?((reqsInfo.nfReqFinished * 100 / reqsInfo.nfReqTotal | number:'1.0-0') + '%'):'N/A')}}
             </h4></button>
             <!-- <h1 *ngIf="mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h1> -->
           </div>
