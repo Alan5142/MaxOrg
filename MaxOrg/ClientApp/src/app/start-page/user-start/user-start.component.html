@@ -42,6 +42,14 @@
       <mat-card-header style="background-color: #484848;">
         <mat-card-title i18n style="color: white; margin: 10px">Actividad reciente</mat-card-title>
       </mat-card-header>
+      <mat-card-content style="overflow-y: hidden" class="height-100">
+        <mat-list style="overflow-y: auto; height: 345px;">
+          <mat-list-item *ngFor="let notification of notifications | async">
+            {{notification.triggerDate | timeAgo}}: {{notification.message}}
+            <mat-divider></mat-divider>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
     </mat-card>
   </div>
 

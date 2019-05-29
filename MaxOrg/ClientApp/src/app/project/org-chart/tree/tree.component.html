@@ -1,6 +1,6 @@
 <div class="tree">
   <ul>
-    <li *ngIf="isAdmin">
+    <li *ngIf="isAdmin && !(readOnly.readOnly | async)">
       <button mat-fab (click)="openDialog(parentId)">+</button>
     </li>
     <li *ngFor="let node of treeData">

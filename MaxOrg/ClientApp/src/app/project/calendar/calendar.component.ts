@@ -1,5 +1,5 @@
 import {Component, OnInit, TemplateRef, ViewChild, ViewEncapsulation} from '@angular/core';
-import {addDays, addHours, endOfDay, endOfMonth, isSameDay, isSameMonth, startOfDay, subDays} from 'date-fns';
+import {endOfDay, isSameDay, isSameMonth, startOfDay} from 'date-fns';
 import {Subject} from 'rxjs';
 import {
   CalendarDateFormatter,
@@ -10,10 +10,11 @@ import {
 } from 'angular-calendar';
 import {CustomDateFormatter} from "./custom-date-formatter.provider";
 import {ThemeService} from "../../services/theme.service";
-import {MatPaginator, MatSnackBar, MatSort, MatTable, MatTableDataSource} from "@angular/material";
+import {MatPaginator, MatSnackBar, MatSort, MatTableDataSource} from "@angular/material";
 import {DateEvent} from "../../services/calendar/event";
 import {CalendarService} from "../../services/calendar/calendar.service";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
+import {ReadOnlyService} from "../services/read-only.service";
 
 @Component({
   selector: 'app-calendar',
@@ -85,7 +86,9 @@ export class CalendarComponent implements OnInit {
   constructor(public themeService: ThemeService,
               private calendarService: CalendarService,
               activatedRoute: ActivatedRoute,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              public readOnly: ReadOnlyService,
+              public router: Router) {
     this.dataSource = new MatTableDataSource(this.events);
     activatedRoute.parent.params.subscribe(params => {
       this.groupId = params['id'];

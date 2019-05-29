@@ -11,10 +11,10 @@
     <button mat-icon-button *ngIf="!mediaObserver.isActive('gt-md')" (click)="reload.emit($event)">
       <mat-icon>cached</mat-icon>
     </button>
-    <button mat-icon-button *ngIf="canEdit !== null && canEdit" (click)="createSection.emit($event)">
+    <button mat-icon-button *ngIf="canEdit !== null && canEdit && !(readOnly.readOnly | async)" (click)="createSection.emit($event)">
       <mat-icon>add</mat-icon>
     </button>
-    <button mat-icon-button (click)="members.emit($event)">
+    <button *ngIf="!(readOnly.readOnly | async)" mat-icon-button (click)="members.emit($event)">
       <mat-icon>group</mat-icon>
     </button>
   </div>

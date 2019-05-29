@@ -13,7 +13,8 @@
         </mat-card-header>
       </mat-card>
     </mat-grid-tile>
-    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 1 : 4" [rowspan]="2" class="no-select">
+    <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 1 : 4" [rowspan]="2" class="no-select"
+                   *ngIf="!(readOnly.readOnly | async)">
       <mat-card class="board-card mat-elevation-z3">
         <mat-card-header>
           <mat-card-title>

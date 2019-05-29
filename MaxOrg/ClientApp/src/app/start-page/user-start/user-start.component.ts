@@ -2,11 +2,11 @@ import {Component, OnInit} from '@angular/core';
 import {MatDialog, MatSnackBar} from '@angular/material';
 import {NewProjectComponent} from '../new-project/new-project.component';
 import {MediaObserver} from '@angular/flex-layout';
-import {User, UserService} from '../../services/user.service';
+import {Notification as UserNotification, User, UserService} from '../../services/user.service';
 import {Project, ProjectsService} from '../../services/projects.service';
 import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
-import {map, share, shareReplay} from 'rxjs/operators';
+import {map, shareReplay} from 'rxjs/operators';
 import {NotificationService} from '../../services/notification.service';
 
 @Component({
@@ -18,6 +18,7 @@ export class UserStartComponent implements OnInit {
   user: Observable<User>;
   projectsView: Observable<Project[]>;
   projects: Observable<Project[]>;
+  notifications: Observable<UserNotification[]> = null;
 
   constructor(public dialog: MatDialog,
               public mediaObserver: MediaObserver,
@@ -26,6 +27,7 @@ export class UserStartComponent implements OnInit {
               private router: Router,
               private snackBar: MatSnackBar,
               private notificationService: NotificationService) {
+    this.notifications = this.userService.getUserNotifications().pipe(shareReplay(1));
     notificationService.connect();
     this.user = this.userService.getCurrentUser();
     this.projects = this.projectsService.getProjects().pipe(shareReplay(1));

@@ -1,5 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {MediaObserver} from '@angular/flex-layout';
+import {ReadOnlyService} from "../../services/read-only.service";
 
 @Component({
   selector: 'app-kanban-toolbar',
@@ -14,7 +15,8 @@ export class KanbanToolbarComponent implements OnInit {
 
   @Input() canEdit = false;
 
-  constructor(public mediaObserver: MediaObserver) {
+  constructor(public mediaObserver: MediaObserver,
+              private readOnly: ReadOnlyService) {
   }
 
   ngOnInit() {

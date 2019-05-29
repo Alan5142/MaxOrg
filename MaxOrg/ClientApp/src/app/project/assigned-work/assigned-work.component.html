@@ -10,40 +10,40 @@
               <mat-icon matPrefix>search</mat-icon>
             </mat-form-field>
           </form>
-        
+
           <div style="overflow-x: auto;">
             <div>
               <table [dataSource]="usersDisplay" class="mat-elevation-z8 width-100" mat-table matSort>
-        
+
                 <ng-container matColumnDef="username">
                   <th *matHeaderCellDef mat-header-cell mat-sort-header>Nombre de usuario</th>
                   <td *matCellDef="let user" mat-cell> {{user.username}}</td>
                 </ng-container>
-        
+
                 <ng-container matColumnDef="actions">
                   <th *matHeaderCellDef mat-header-cell></th>
                   <td *matCellDef="let user" mat-cell>
-                    <button (click)="openAssignTask(user.key,true)" color="primary" mat-icon-button>
+                    <button *ngIf="!(readOnly.readOnly | async)" (click)="openAssignTask(user.key,true)" color="primary" mat-icon-button>
                       <mat-icon>assignment</mat-icon>
                     </button>
-                    <button (click)="deleteTask()"  mat-icon-button>
+                    <button *ngIf="!(readOnly.readOnly | async)" (click)="deleteTask()"  mat-icon-button>
                       <mat-icon>launch</mat-icon>
                     </button>
                   </td>
                 </ng-container>
-        
-        
+
+
                 <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
                 <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
               </table>
             </div>
           </div>
-        
-        
+
+
           <mat-paginator [pageSizeOptions]="[5, 10]"
                          [pageSize]="5"
                          [showFirstLastButtons]="true">
-        
+
           </mat-paginator>
         </div>
       <div Class="groups" ngClass.gt-md="group-members-container">
@@ -74,7 +74,7 @@
             </mat-accordion>
 
             <div class="width-100" fxLayout="row" fxLayoutAlign="end center">
-              <button (click)="openAssignTask(group.id,false,index)" color="primary" mat-flat-button mat-icon-button>
+              <button *ngIf="!(readOnly.readOnly | async)"  (click)="openAssignTask(group.id,false,index)" color="primary" mat-flat-button mat-icon-button>
                 <mat-icon>add</mat-icon>
               </button>
             </div>
@@ -89,7 +89,7 @@
 
             <h4>Grupos</h4>
             <mat-accordion>
-              
+
               <mat-expansion-panel>
                 <mat-expansion-panel-header>
                   <mat-panel-title class="text-bold">
@@ -110,14 +110,14 @@
                         <mat-progress-bar mode="determinate" value="{{task.progress}}"></mat-progress-bar>
                       </p>
                     </div>
-                    <button mat-icon-button *ngIf="task.progress<100">
+                    <button mat-icon-button *ngIf="task.progress < 100 && !(readOnly.readOnly | async)">
                       <mat-icon (click)="openEditTask(task,membergroups[0].id)">edit</mat-icon>%
                     </button>
                   </mat-expansion-panel>
                 </mat-accordion>
-    
+
               </mat-expansion-panel>
-              
+
               <mat-expansion-panel *ngFor="let group of membergroups; let index=index;">
                 <mat-expansion-panel-header *ngIf="((group.tasks | async)?.length>0&&index>0)">
                   <mat-panel-title class="text-bold">
@@ -143,11 +143,11 @@
                     </button>
                   </mat-expansion-panel>
                 </mat-accordion>
-    
+
               </mat-expansion-panel>
             </mat-accordion>
           </div>
-    
+
     </mat-tab>
 
 

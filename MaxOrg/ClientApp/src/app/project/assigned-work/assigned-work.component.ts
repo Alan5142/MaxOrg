@@ -1,13 +1,21 @@
-import { AfterViewInit, Component, OnInit, ViewChildren, ViewChild } from '@angular/core';
-import { MediaObserver } from '@angular/flex-layout';
-import { MatDialog, MatTab, MatTabGroup, MatSnackBar, MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
-import { AssignWorkComponent } from './assign-work/assign-work.component';
-import { ProjectsService } from 'src/app/services/projects.service';
-import { ActivatedRoute } from '@angular/router';
-import { TasksService, Task } from 'src/app/services/tasks.service';
-import { map } from 'rxjs/operators';
-import { UserService } from 'src/app/services/user.service';
-import { EditTaskComponent } from './edit-task/edit-task.component';
+import {AfterViewInit, Component, OnInit, ViewChild, ViewChildren} from '@angular/core';
+import {MediaObserver} from '@angular/flex-layout';
+import {
+  MatDialog,
+  MatPaginator,
+  MatSnackBar,
+  MatSort,
+  MatTab,
+  MatTabGroup,
+  MatTableDataSource
+} from '@angular/material';
+import {AssignWorkComponent} from './assign-work/assign-work.component';
+import {ProjectsService} from 'src/app/services/projects.service';
+import {ActivatedRoute} from '@angular/router';
+import {Task, TasksService} from 'src/app/services/tasks.service';
+import {map} from 'rxjs/operators';
+import {EditTaskComponent} from './edit-task/edit-task.component';
+import {ReadOnlyService} from "../services/read-only.service";
 
 @Component({
   selector: 'app-assigned-work',
@@ -33,7 +41,10 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
   projectId;
   users = [];
   admin=true;
-  constructor(public snackBar: MatSnackBar, public mediaObserver: MediaObserver, public dialog: MatDialog,
+  constructor(public snackBar: MatSnackBar,
+              public mediaObserver: MediaObserver,
+              public readOnly: ReadOnlyService,
+              public dialog: MatDialog,
     public route: ActivatedRoute, public projectService: ProjectsService, private taskService: TasksService) {
     this.userId = localStorage.getItem('userId');
     this.taskTarget = localStorage.getItem("taskTarget");
@@ -64,7 +75,7 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
 
   }
   ngOnInit() {
-    
+
   }
   getMemberGroups(groups){
     groups.forEach(group => {
@@ -100,7 +111,7 @@ export class AssignedWorkComponent implements OnInit, AfterViewInit {
         if (!repeat){
           this.users.push(member);
           if(member.key==this.taskTarget)
-            this.openAssignTask(this.taskTarget,true);  
+            this.openAssignTask(this.taskTarget,true);
         }
       });
     });

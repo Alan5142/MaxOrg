@@ -12,6 +12,7 @@ import {HttpEventType, HttpResponse} from "@angular/common/http";
 import {GroupsService} from "../../services/groups.service";
 import {ProjectsService} from 'src/app/services/projects.service';
 import {UserService} from "../../services/user.service";
+import {ReadOnlyService} from "../services/read-only.service";
 
 @Component({
   selector: 'app-project-index',
@@ -35,7 +36,8 @@ export class PostsComponent implements OnInit {
               private sanitizer: DomSanitizer,
               private groupsService: GroupsService,
               private projectService: ProjectsService,
-              private userService: UserService) {
+              private userService: UserService,
+              public readOnly: ReadOnlyService) {
     this.userService.getCurrentUser().subscribe(u => {
       this.userId = u.key;
     });

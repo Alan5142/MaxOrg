@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MediaObserver} from '@angular/flex-layout';
-import {MatDialog, MatSnackBar} from '@angular/material';
+import {MatDialog, MatSlideToggleChange, MatSnackBar} from '@angular/material';
 import {ChangeDescriptionComponent} from './change-description/change-description.component';
 import {ActivatedRoute} from '@angular/router';
 import {LinkToGithubComponent} from "./link-to-github/link-to-github.component";
@@ -15,6 +15,9 @@ import {ProjectsService, Requirement, RequirementType} from 'src/app/services/pr
 import {Task, TasksService} from 'src/app/services/tasks.service';
 import {ChartDataSets, ChartOptions} from "chart.js";
 import {BaseChartDirective, Color, Label} from "ng2-charts";
+import {ReadOnlyService} from "../services/read-only.service";
+import {NewDerivedProjectComponent} from "./new-derived-project/new-derived-project.component";
+import {AddMembersComponent} from "./add-members/add-members.component";
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -91,7 +94,8 @@ export class AdminDashboardComponent implements OnInit {
               private groupService: GroupsService,
               private testsService: TestsService,
               private projectService: ProjectsService,
-              private taskService: TasksService) {
+              private taskService: TasksService,
+              public readOnlyService: ReadOnlyService) {
     route.parent.params.subscribe(params => {
       this.groupId = params['id'];
       this.groupInfo = groupService.getAdminInfo(this.groupId).pipe(shareReplay(1));
@@ -240,6 +244,58 @@ export class AdminDashboardComponent implements OnInit {
       this.snackBar.open('Información editada con éxito', 'OK', {duration: 2000});
     }, () => {
       this.snackBar.open('No se pudo editar la información', 'OK', {duration: 2000});
+    });
+  }
+
+  setReadOnly($event: MatSlideToggleChange) {
+    const result = confirm(`¿Seguro que quieres ${$event.source.checked ? 'establecer el modo de solo lectura' : 'volver a activar el proyecto'}?`);
+    if (result) {
+      this.projectService.setReadOnly(this.groupId).subscribe(() => {
+        this.readOnlyService.setValue($event.source.checked);
+      }, () => {
+        $event.source.checked = !$event.source.checked;
+      })
+    } else {
+      $event.source.checked = !$event.source.checked;
+    }
+  }
+
+  createDerivedProject(): void {
+    const dialogRef = this.dialog.open(NewDerivedProjectComponent, {
+      width: '50%',
+      minWidth: '300px',
+      data: {projectId: this.groupId}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const observable = result as Observable<boolean>;
+        observable.subscribe(success => {
+          this.snackBar.open('Creado con exito', 'Ok', {duration: 2500});
+        }, error => {
+          console.log(error);
+          this.snackBar.open('No se pudo crear :(', 'Ok', {duration: 2500});
+        });
+      }
+    });
+  }
+
+  addMembers() {
+    const dialogRef = this.dialog.open(AddMembersComponent, {
+      width: '50%',
+      minWidth: '300px',
+      data: {groupId: this.groupId}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const observable = result as Observable<boolean>;
+        observable.subscribe(success => {
+          this.snackBar.open('Agregados con exito', 'Ok', {duration: 2500});
+        }, error => {
+          console.log(error);
+          this.snackBar.open('No se pudieron agregar :(', 'Ok', {duration: 2500});
+        });
+      }
     });
   }
 }

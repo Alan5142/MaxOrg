@@ -8,7 +8,7 @@
   </select>
 </mat-form-field> -->
 <div fxLayout="column" fxLayoutGap="60px" ngClass="post-container" ngClass.lt-md="post-container-mobile">
-  <div>
+  <div *ngIf="!(readOnly.readOnly | async)">
     <form fxLayout="column">
       <mat-progress-bar *ngIf="value !== 0" mode="determinate" [value]="value"></mat-progress-bar>
       <mat-form-field appearance="outline" fxFlex>

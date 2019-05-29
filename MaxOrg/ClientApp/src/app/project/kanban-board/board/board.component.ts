@@ -15,6 +15,7 @@ import {MediaObserver} from "@angular/flex-layout";
 import {ModifyMembersComponent} from "../modify-members/modify-members.component";
 import {UserService} from "../../../services/user.service";
 import {GroupsService} from "../../../services/groups.service";
+import {ReadOnlyService} from "../../services/read-only.service";
 
 @Component({
   selector: 'app-board',
@@ -36,7 +37,8 @@ export class BoardComponent implements OnInit, OnDestroy {
               private dialog: MatDialog,
               private userService: UserService,
               private groupService: GroupsService,
-              private mediaObserver: MediaObserver) {
+              private mediaObserver: MediaObserver,
+              public readOnly: ReadOnlyService) {
   }
 
   onTaskDrop(event: CdkDragDrop<any[]>) {

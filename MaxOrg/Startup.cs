@@ -240,6 +240,7 @@ namespace MaxOrg
                 routes.MapHub<NotificationHub>("/notification-hub");
                 routes.MapHub<KanbanHub>("/kanban-hub");
                 routes.MapHub<ChatHub>("/chat-hub");
+                routes.MapHub<ReadOnlyProjectHub>("/project-read-only");
             });
 
             app.UseMvc(routes =>

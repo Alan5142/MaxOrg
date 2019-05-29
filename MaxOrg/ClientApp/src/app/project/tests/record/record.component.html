@@ -4,7 +4,7 @@
        fxLayout="column"
        fxLayoutGap="16px">
     <div fxLayout="row">
-      <button *ngIf="!$tests.isAdmin" mat-flat-button color="primary" (click)="queueTest()">ENCOLAR TEST</button>
+      <button *ngIf="!$tests.isAdmin && !(readOnly.readOnly | async)" mat-flat-button color="primary" (click)="queueTest()">ENCOLAR TEST</button>
       <div fxFlex></div>
     </div>
 
@@ -25,7 +25,7 @@
           </h3>
           <h3 *ngIf="data.failed !== null" class="text-center"
               style="color: #e53935">{{data.failed}} {{data.failed === 1 ? 'test fallo en el proceso' : 'tests fallaron en el proceso'}}</h3>
-          <button *ngIf="!$tests.isAdmin && data.failed !== null" (click)="openCreateReportDialog(data.id)" mat-flat-button
+          <button *ngIf="!$tests.isAdmin && data.failed !== null && !(readOnly.readOnly | async)" (click)="openCreateReportDialog(data.id)" mat-flat-button
                   color="primary">
             CREAR REPORTE
           </button>
@@ -42,5 +42,3 @@
     </div>
   </div>
 </div>
-
-

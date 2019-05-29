@@ -5,6 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {merge, Observable} from 'rxjs';
 import {shareReplay} from "rxjs/operators";
 import {MatSnackBar} from "@angular/material";
+import {ReadOnlyService} from "../../services/read-only.service";
 
 @Component({
   selector: 'app-kanban-index',
@@ -20,7 +21,8 @@ export class KanbanIndexComponent implements OnInit {
               private route: ActivatedRoute,
               private snackBar: MatSnackBar,
               public mediaObserver: MediaObserver,
-              private kanbanService: KanbanCardsService) {
+              private kanbanService: KanbanCardsService,
+              public readOnly: ReadOnlyService) {
     route.parent.parent.params.subscribe(params => {
       this.projectId = params['id'];
       this.boards = this.kanbanService.getBoardsOfGroup(this.projectId).pipe(shareReplay(1));

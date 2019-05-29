@@ -1,12 +1,12 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ProjectsService, Requirement, RequirementType} from "../../services/projects.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {merge, Observable} from "rxjs";
 import {map, shareReplay} from "rxjs/operators";
-import {MatDialog, MatSnackBar, MatSort, MatTableDataSource, Sort, SortDirection} from "@angular/material";
+import {MatDialog, MatSnackBar, Sort} from "@angular/material";
 import {EditRequirementComponent} from "./edit-requirement/edit-requirement.component";
 import {RemoveRequirementComponent} from "./remove-requirement/remove-requirement.component";
-import { Route } from '@angular/compiler/src/core';
+import {ReadOnlyService} from "../services/read-only.service";
 
 @Component({
   selector: 'app-requirements',
@@ -26,7 +26,8 @@ export class RequirementsComponent implements OnInit {
               private snackBar: MatSnackBar,
               private dialog: MatDialog,
               activatedRouter: ActivatedRoute,
-              private router:Router) {
+              private router:Router,
+              public readOnly: ReadOnlyService) {
     activatedRouter.parent.params.subscribe(params => {
       this.projectId = params['id'];
       this.requirements = this.projectService.getProjectRequirements(this.projectId).pipe(shareReplay(1));

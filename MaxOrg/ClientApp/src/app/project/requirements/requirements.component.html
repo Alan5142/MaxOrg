@@ -2,7 +2,7 @@
 <div fxLayout="row" fxLayout.lt-md="column" class="requirements-container">
   <div fxFlex="50">
     <h3>Funcionales</h3>
-    <form>
+    <form *ngIf="!(readOnly.readOnly | async)">
       <mat-form-field>
         <textarea matInput #functionalRequirement placeholder="Requerimiento" cdkTextareaAutosize></textarea>
       </mat-form-field>
@@ -70,7 +70,7 @@
   </div>
   <div fxFlex="50">
     <h3>No funcionales</h3>
-    <form>
+    <form *ngIf="!(readOnly.readOnly | async)">
       <mat-form-field>
         <textarea matInput #nonFunctionalRequirement placeholder="Requerimiento" cdkTextareaAutosize></textarea>
       </mat-form-field>

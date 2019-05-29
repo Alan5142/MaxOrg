@@ -53,7 +53,6 @@ import {HAMMER_GESTURE_CONFIG} from '@angular/platform-browser';
 import {AssignWorkComponent} from './assigned-work/assign-work/assign-work.component';
 import {AdminDashboardComponent} from './admin-dashboard/admin-dashboard.component';
 import {LayoutModule} from '@angular/cdk/layout';
-import {Ng2GoogleChartsModule} from 'ng2-google-charts';
 import {KanbanToolbarComponent} from './kanban-board/kanban-toolbar/kanban-toolbar.component';
 import {BoardComponent} from './kanban-board/board/board.component';
 import {KanbanIndexComponent} from './kanban-board/kanban-index/kanban-index.component';
@@ -107,6 +106,8 @@ import {MarkdownEditorComponent} from './markdown-editor/markdown-editor.compone
 import {EditTaskComponent} from './assigned-work/edit-task/edit-task.component';
 import {ChartsModule} from "ng2-charts";
 import {UserViewComponent} from './user-view/user-view.component';
+import {NewDerivedProjectComponent} from './admin-dashboard/new-derived-project/new-derived-project.component';
+import {AddMembersComponent} from './admin-dashboard/add-members/add-members.component';
 
 registerLocaleData(localeEs);
 @NgModule({
@@ -134,7 +135,9 @@ registerLocaleData(localeEs);
     LinkToGithubComponent,
     EventComponent,
     DayEventsComponent,
-    MarkdownEditorComponent
+    MarkdownEditorComponent,
+    NewDerivedProjectComponent,
+    AddMembersComponent
   ],
   imports: [
     CommonModule,
@@ -169,7 +172,6 @@ registerLocaleData(localeEs);
     MatSortModule,
     MatGridListModule,
     LayoutModule,
-    Ng2GoogleChartsModule,
     MatProgressSpinnerModule,
     MatSlideToggleModule,
     MatSelectModule,
@@ -243,7 +245,9 @@ registerLocaleData(localeEs);
     MarkdownEditorComponent,
     addDescription,
     EditTaskComponent,
-    UserViewComponent
+    UserViewComponent,
+    NewDerivedProjectComponent,
+    AddMembersComponent
   ],
   bootstrap: [
     ProjectComponent

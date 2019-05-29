@@ -37,8 +37,8 @@
                                   mode="determinate"></mat-progress-spinner>
             <!-- <h2 *ngIf="!mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h2> -->
             <button mat-button (click)="percent_ratio.tasks=!percent_ratio.tasks"><h4>
-              {{percent_ratio.tasks ? (tasksInfo.finished + '/' + tasksInfo.total) : 
-              (tasksInfo.total>0?((tasksInfo.finished * 100 / tasksInfo.total | number:'1.0-0') + '%'):'N/A')}}
+              {{percent_ratio.tasks ? (tasksInfo.finished + '/' + tasksInfo.total) :
+              (tasksInfo.total > 0 ? ((tasksInfo.finished * 100 / tasksInfo.total | number:'1.0-0') + '%') : 'N/A')}}
             </h4></button>
             <!-- <h1 *ngIf="mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h1> -->
           </div>
@@ -60,8 +60,8 @@
                                   mode="determinate"></mat-progress-spinner>
             <!-- <h2 *ngIf="!mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h2> -->
             <button mat-button (click)="percent_ratio.functionalRequirements=!percent_ratio.functionalRequirements"><h4>
-              {{percent_ratio.functionalRequirements ? (reqsInfo.fReqFinished + '/' + reqsInfo.fReqTotal) : 
-              (reqsInfo.fReqTotal>0?((reqsInfo.fReqFinished * 100 / reqsInfo.fReqTotal | number:'1.0-0') + '%'):'N/A')}}
+              {{percent_ratio.functionalRequirements ? (reqsInfo.fReqFinished + '/' + reqsInfo.fReqTotal) :
+              (reqsInfo.fReqTotal > 0 ? ((reqsInfo.fReqFinished * 100 / reqsInfo.fReqTotal | number:'1.0-0') + '%') : 'N/A')}}
             </h4></button>
             <!-- <h1 *ngIf="mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h1> -->
           </div>
@@ -84,45 +84,15 @@
             <!-- <h2 *ngIf="!mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h2> -->
             <button mat-button
                     (click)="percent_ratio.nonFunctionalRequirements=!percent_ratio.nonFunctionalRequirements"><h4>
-              {{percent_ratio.nonFunctionalRequirements ? (reqsInfo.nfReqFinished + '/' + reqsInfo.nfReqTotal) : 
-              (reqsInfo.nfReqTotal>0?((reqsInfo.nfReqFinished * 100 / reqsInfo.nfReqTotal | number:'1.0-0') + '%'):'N/A')}}
+              {{percent_ratio.nonFunctionalRequirements ? (reqsInfo.nfReqFinished + '/' + reqsInfo.nfReqTotal) :
+              (reqsInfo.nfReqTotal > 0 ? ((reqsInfo.nfReqFinished * 100 / reqsInfo.nfReqTotal | number:'1.0-0') + '%') : 'N/A')}}
             </h4></button>
             <!-- <h1 *ngIf="mediaObserver.isActive('lt-md')">{{tasksInfo.finished*100/tasksInfo.total | number:'1.0-0'}}%</h1> -->
           </div>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>
-    <!--
-        <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
-          <mat-card class="dashboard-card mat-elevation-z3">
-            <mat-card-header>
-              <mat-card-title>
-                Tareas completadas
-              </mat-card-title>
-            </mat-card-header>
-            <mat-card-content class="dashboard-card-content">
-              <div>
-                <h1>{{tasksInfo.finished}}</h1>
-              </div>
-            </mat-card-content>
-          </mat-card>
-        </mat-grid-tile>
 
-        <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
-          <mat-card class="dashboard-card mat-elevation-z3">
-            <mat-card-header>
-              <mat-card-title>
-                Tareas faltantes
-              </mat-card-title>
-            </mat-card-header>
-            <mat-card-content class="dashboard-card-content">
-              <div>
-                <h1>{{tasksInfo.halfProgress+tasksInfo.noProgress}}</h1>
-              </div>
-            </mat-card-content>
-          </mat-card>
-        </mat-grid-tile>
-     -->
     <mat-grid-tile [colspan]="mediaObserver.isActive('lt-md') ? 3 : 1" [rowspan]="1">
       <mat-card class="dashboard-card mat-elevation-z3">
         <mat-card-header>
@@ -167,10 +137,25 @@
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
-          <div fxLayout="row" fxLayout.lt-md="column">
+          <div fxFlexAlign="start" *ngIf="(readOnlyService.readOnly | async)">
+            <mat-slide-toggle (change)="setReadOnly($event)"
+                              fxFlexAlign="start"
+                              [checked]="readOnlyService.readOnly | async"
+                              #readOnly color="primary" style="width: min-content;"
+                              name="readOnly">Solo lectura
+            </mat-slide-toggle>
+            <button (click)="createDerivedProject()" mat-flat-button class="width-100" color="primary">CREAR PROYECTO
+              DERIVADO
+            </button>
+          </div>
+          <div fxLayout="row" fxLayout.lt-md="column" *ngIf="!(readOnlyService.readOnly | async)">
             <form class="options-container" fxFlex="50" fxLayout="column">
               <div fxFlexAlign="start">
-                <mat-slide-toggle #readOnly color="primary" style="width: min-content;" name="readOnly">Solo lectura
+                <mat-slide-toggle (change)="setReadOnly($event)"
+                                  #readOnly color="primary"
+                                  style="width: min-content;"
+                                  [checked]="readOnlyService.readOnly | async"
+                                  name="readOnly">Solo lectura
                 </mat-slide-toggle>
               </div>
               <p class="text-left">Cambiar nombre</p>
@@ -179,14 +164,7 @@
                        [value]="(groupInfo | async)?.name">
                 <mat-hint>Longitud máxima de 30 caracteres</mat-hint>
               </mat-form-field>
-              <p class="text-left">Agregar usuarios</p>
-              <mat-form-field>
-                <textarea cdkTextareaAutosize matInput placeholder="Nombre de usuario"></textarea>
-              </mat-form-field>
-              <p class="text-left">Eliminar usuarios</p>
-              <mat-form-field>
-                <textarea cdkTextareaAutosize matInput placeholder="Nombre de usuario"></textarea>
-              </mat-form-field>
+              <button color="primary" class="width-100" mat-flat-button (click)="addMembers()">AGREGAR MIEMBROS</button>
               <button (click)="changeDescription()" color="accent" mat-flat-button>CAMBIAR DESCRIPCIÓN</button>
               <button color="primary" type="submit" mat-flat-button
                       (click)="editInfo(readOnly.checked, projectName.value)">GUARDAR CAMBIOS
@@ -217,6 +195,10 @@
                         [disabled]="devOpsOrgName.value.trim() === '' || devOpsProjectName.value.trim() === ''"
                         (click)="changeDevOpsInfo(devOpsOrgName.value, devOpsProjectName.value)">CAMBIAR INFORMACIÓN
                 </button>
+              </div>
+              <div *ngIf="$groupInfo.previousProject">
+                <h2>Este proyecto es una continuación a: {{$groupInfo.previousProjectName}}</h2>
+                <button mat-flat-button color="primary" [routerLink]="['/project', $groupInfo.previousProject]">REVISAR ANTECESOR</button>
               </div>
             </form>
           </div>

@@ -25,7 +25,7 @@
 
     <div fxFlex="2" fxFlex.gt-md="1"></div>
 
-    <button mat-icon-button routerLink="messages">
+    <button mat-icon-button routerLink="messages" *ngIf="!(readOnly.readOnly | async)">
       <mat-icon matListIcon>message</mat-icon>
     </button>
 
@@ -42,7 +42,7 @@
                [mode]="mediaObserver.isActive('lt-md') ? 'over' : 'side'"
                [opened]="!mediaObserver.isActive('lt-md')" #sidenav>
     <mat-nav-list class="no-select" (click)="sidenav.toggle(!mediaObserver.isActive('lt-md'))">
-      <h2 style="padding-left: 20px">{{(projectInfo | async)?.name}}</h2>
+      <h2 style="padding-left: 20px">{{(projectInfo | async)?.name}} {{(readOnly.readOnly | async) ? '[Archivado]' : ''}}</h2>
 
       <mat-divider></mat-divider>
       <mat-list-item routerLink="./">
