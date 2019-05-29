@@ -93,9 +93,9 @@
           Ver en github
         </mat-list-item>
       </a>
-      <mat-divider></mat-divider>
-      <h3 mat-subheader>Tests</h3>
-      <mat-list-item routerLink="tests">
+      <mat-divider *ngIf="(projectInfo | async)?.devOps"></mat-divider>
+      <h3 mat-subheader *ngIf="(projectInfo | async)?.devOps">Tests</h3>
+      <mat-list-item routerLink="tests" *ngIf="(projectInfo | async)?.devOps">
         <mat-icon matListIcon svgIcon="flask"></mat-icon>
         Tests
       </mat-list-item>

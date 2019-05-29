@@ -315,7 +315,8 @@ namespace MaxOrg.Controllers
                 @group.CreationDate,
                 @group.Description,
                 members,
-                repoUrl
+                repoUrl,
+                DevOps = @group.DevOpsOrgName != null
             });
         }
 

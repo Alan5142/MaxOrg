@@ -12,10 +12,7 @@
     <form fxLayout="column">
       <mat-progress-bar *ngIf="value !== 0" mode="determinate" [value]="value"></mat-progress-bar>
       <mat-form-field appearance="outline" fxFlex>
-        <textarea (focusin)="cdr.detectChanges()"
-                  (focusout)="cdr.detectChanges()"
-                  (keyup)="cdr.detectChanges()"
-                  #newPost cdkAutosizeMaxRows="5"
+        <textarea #newPost cdkAutosizeMaxRows="5"
                   cdkTextareaAutosize matInput></textarea>
         <mat-label>Post</mat-label>
         <mat-hint>Puedes utilizar markdown y HTML</mat-hint>
@@ -31,14 +28,14 @@
     </form>
   </div>
 
-  <mat-card *ngFor="let post of posts">
+  <mat-card *ngFor="let post of posts; trackBy: postTrack">
     <mat-card-header [routerLink]="['../user', post.creatorId]">
       <div class="example-header-image" mat-card-avatar matRipple
            [ngStyle]="{'background-image': 'url(' + post.profilePicture + ')'}"></div>
       <mat-card-title class="no-select" matRipple>{{post?.creator}}</mat-card-title>
     </mat-card-header>
     <mat-card-content style="margin-top: 24px">
-      <div [innerHtml]="generateSafeHtml(post.content)">
+      <div [innerHtml]="post?.content">
       </div>
       <div class="width-100 height-100"
            style="margin-left: -6px; margin-right: -6px; margin-bottom: 0px"
@@ -47,7 +44,7 @@
             'comment-section-background': !(themeService.isDarkTheme | async)}">
         <div style="margin-left: 32px; margin-right: 32px; margin-top: 16px">
           <mat-form-field class="width-100">
-            <textarea (focusin)="cdr.detectChanges()" (focusout)="cdr.detectChanges()" #commentContent matInput
+            <textarea #commentContent matInput
                       cdkTextareaAutosize cdkAutosizeMaxRows="1"
                       cdkAutosizeMinRows="1"></textarea>
             <mat-label>Comentario</mat-label>

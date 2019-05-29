@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {ThemeService} from "../../services/theme.service";
 import {PostsService} from "../../posts.service";
 import {ActivatedRoute} from "@angular/router";
@@ -10,13 +10,14 @@ import * as marked from 'marked/marked.min';
 import * as sanitizeHtml from 'sanitize-html/dist/sanitize-html';
 import {HttpEventType, HttpResponse} from "@angular/common/http";
 import {GroupsService} from "../../services/groups.service";
-import { ProjectsService } from 'src/app/services/projects.service';
+import {ProjectsService} from 'src/app/services/projects.service';
+import {UserService} from "../../services/user.service";
 
 @Component({
   selector: 'app-project-index',
   templateUrl: './posts.component.html',
   styleUrls: ['./posts.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.Default
 })
 export class PostsComponent implements OnInit {
   private groupId: string;
@@ -34,24 +35,29 @@ export class PostsComponent implements OnInit {
               private sanitizer: DomSanitizer,
               private groupsService: GroupsService,
               private projectService: ProjectsService,
-              public cdr: ChangeDetectorRef) {
-    this.cdr.detach();
+              private userService: UserService) {
+    this.userService.getCurrentUser().subscribe(u => {
+      this.userId = u.key;
+    });
     this.userId=localStorage.getItem("userId");
     this.route.parent.params.subscribe(params => {
       this.groupId = params['id'];
-      this.projectService.getProject(this.groupId).subscribe(project=>{
+      this.projectService.getProject(this.groupId).subscribe(project => {
         this.getUserGroups(project);
         console.log(this.groupsList);
         this.getPosts(this.groupId);
       });
     });
   }
+
   getPosts(groupId){
     console.log(groupId);
     this.groupId=groupId;
     this.postsService.getPosts(this.groupId).pipe(shareReplay(1)).subscribe(posts => {
-      this.posts = posts;
-      this.cdr.detectChanges();
+      this.posts = (posts as Array<any>).map(p => {
+        p.content = this.generateSafeHtml(p.content);
+        return p;
+      });
     });
   }
   selectValue;
@@ -80,12 +86,8 @@ export class PostsComponent implements OnInit {
   createPost(value: string) {
     this.postsService.createPost(this.groupId, value).subscribe(() => {
       this.snackbar.open('Creado con éxito', 'Ok', {duration: 2000});
-      this.postsService.getPosts(this.groupId).pipe(shareReplay(1)).subscribe(posts => {
-        this.posts = posts;
-        this.cdr.detectChanges();
-      });
+      this.getPosts(this.groupId);
     }, err => {
-      this.cdr.detectChanges();
       this.snackbar.open('No se pudo crear', 'Ok', {duration: 2000});
     });
   }
@@ -226,10 +228,7 @@ export class PostsComponent implements OnInit {
 
   makeComment(id: string, value: string) {
     this.postsService.makeComment(this.groupId, id, value).subscribe(() => {
-      this.postsService.getPosts(this.groupId).pipe(shareReplay(1)).subscribe(posts => {
-        this.posts = posts;
-        this.cdr.detectChanges();
-      });
+      this.getPosts(this.groupId);
     }, () => {
       this.snackbar.open('No se pudo crear el comentario', 'Ok', {duration: 2000});
     });
@@ -245,7 +244,6 @@ export class PostsComponent implements OnInit {
 
     const observable = this.groupsService.uploadAttachment(this.groupId, $event.target.files[0]).subscribe(result => {
       if (result.type === HttpEventType.UploadProgress) {
-        this.cdr.detectChanges();
         this.value = Math.round(100 * result.loaded / result.total);
       } else if (result instanceof HttpResponse) {
         const file = $event.target.files[0] as File;
@@ -257,10 +255,13 @@ export class PostsComponent implements OnInit {
           this.newPost.nativeElement.value += `<br><br><a target="_blank" href="${result.body.url}" style="text-decoration: none; color: inherit; font-size: 2em"><i class="material-icons">file_copy</i>${file.name}</a>`
         }
         this.value = 0;
-        this.cdr.detectChanges();
       }
     }, error => {
       this.snackbar.open('No se pudo subir', 'OK', {duration: 2000});
     });
+  }
+
+  postTrack(index, post) {
+    return post ? post.id : undefined;
   }
 }

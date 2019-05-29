@@ -12,6 +12,7 @@ export interface GroupInfo {
   creationDate: Date;
   members: User[];
   repoUrl: string;
+  devOps: boolean;
 }
 
 export interface CreateGroupData {
