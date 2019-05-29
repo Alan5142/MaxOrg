@@ -8,14 +8,11 @@
   </select>
 </mat-form-field> -->
 <div fxLayout="column" fxLayoutGap="60px" ngClass="post-container" ngClass.lt-md="post-container-mobile">
-  <div>
+  <div *ngIf="!(readOnly.readOnly | async)">
     <form fxLayout="column">
       <mat-progress-bar *ngIf="value !== 0" mode="determinate" [value]="value"></mat-progress-bar>
       <mat-form-field appearance="outline" fxFlex>
-        <textarea (focusin)="cdr.detectChanges()"
-                  (focusout)="cdr.detectChanges()"
-                  (keyup)="cdr.detectChanges()"
-                  #newPost cdkAutosizeMaxRows="5"
+        <textarea #newPost cdkAutosizeMaxRows="5"
                   cdkTextareaAutosize matInput></textarea>
         <mat-label>Post</mat-label>
         <mat-hint>Puedes utilizar markdown y HTML</mat-hint>
@@ -31,14 +28,14 @@
     </form>
   </div>
 
-  <mat-card *ngFor="let post of posts">
+  <mat-card *ngFor="let post of posts; trackBy: postTrack">
     <mat-card-header [routerLink]="['../user', post.creatorId]">
       <div class="example-header-image" mat-card-avatar matRipple
            [ngStyle]="{'background-image': 'url(' + post.profilePicture + ')'}"></div>
       <mat-card-title class="no-select" matRipple>{{post?.creator}}</mat-card-title>
     </mat-card-header>
     <mat-card-content style="margin-top: 24px">
-      <div [innerHtml]="generateSafeHtml(post.content)">
+      <div [innerHtml]="post?.content">
       </div>
       <div class="width-100 height-100"
            style="margin-left: -6px; margin-right: -6px; margin-bottom: 0px"
@@ -46,25 +43,18 @@
             'comment-section-background-dark': themeService.isDarkTheme | async,
             'comment-section-background': !(themeService.isDarkTheme | async)}">
         <div style="margin-left: 32px; margin-right: 32px; margin-top: 16px">
-          <mat-form-field class="width-100">
-            <textarea (focusin)="cdr.detectChanges()" (focusout)="cdr.detectChanges()" #commentContent matInput
-                      cdkTextareaAutosize cdkAutosizeMaxRows="1"
-                      cdkAutosizeMinRows="1"></textarea>
-            <mat-label>Comentario</mat-label>
-          </mat-form-field>
-          <button [disabled]="commentContent.value.trim() === ''" mat-flat-button class="width-100"
-                  (click)="makeComment(post.id, commentContent.value); commentContent.value = ''">PUBLICAR COMENTARIO
+          <button *ngIf="!(readOnly.readOnly | async)" mat-flat-button class="width-100" color="primary"
+                  (click)="makeComment(post.id);">ESCRIBIR COMENTARIO
           </button>
           <div fxLayout="column">
             <div *ngFor="let comment of post.comments" style="margin-bottom: 16px; margin-top: 16px">
-              <div fxLayout="row" class="no-select" [routerLink]="['../user', post.creatorId]">
+              <div fxLayout="row" class="no-select" [routerLink]="['../user', comment.creatorId]">
                 <img [src]="comment.profilePicture"
                      matRipple
                      style="max-width: 3em; max-height: 3em; border-radius: 50%">
-                <h4 matRipple style="margin-top: 5px">{{comment.creatorName}}</h4>
+                <h4 matRipple style="margin-top: 5px">{{comment?.creatorName}}</h4>
               </div>
-              <div style="margin-left: 46px; margin-right: 32px; margin-top: -16px">
-                {{comment.content}}
+              <div style="margin-left: 46px; margin-right: 32px; margin-top: -16px" [innerHtml]="comment.safeHtml">
               </div>
             </div>
           </div>

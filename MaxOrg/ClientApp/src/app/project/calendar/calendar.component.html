@@ -85,7 +85,8 @@
         <th mat-header-cell *matHeaderCellDef> Titulo</th>
         <td mat-cell *matCellDef="let element">
           <mat-form-field>
-            <input matInput type="text" [disabled]="!element.canEdit" [(ngModel)]="element.title" (keyup)="refresh.next()">
+            <input matInput type="text" [disabled]="!element.canEdit || (readOnly.readOnly | async)"
+                   [(ngModel)]="element.title" (keyup)="refresh.next()">
           </mat-form-field>
         </td>
         <td mat-footer-cell *matFooterCellDef> Titulo</td>
@@ -97,7 +98,7 @@
           <mat-form-field>
             <mat-select (keyup)="refresh.next()"
                         [(ngModel)]="element.color"
-                        [disabled]="!element.canEdit"
+                        [disabled]="!element.canEdit || (readOnly.readOnly | async)"
                         placeholder="Prioridad">
               <mat-option [value]="colors.low">Baja</mat-option>
               <mat-option [value]="colors.medium">Media</mat-option>
@@ -113,7 +114,7 @@
         <td mat-cell *matCellDef="let element">
           <mat-form-field>
             <input matInput
-                   [disabled]="!element.canEdit"
+                   [disabled]="!element.canEdit || (readOnly.readOnly | async)"
                    [matDatepicker]="picker" placeholder="Escoge una fecha" [(ngModel)]="element.start"
                    (dateChange)="refresh.next()"
                    (keyup)="refresh.next()">
@@ -131,7 +132,7 @@
             <input matInput [matDatepicker]="picker"
                    placeholder="Escoge una fecha"
                    [(ngModel)]="element.end"
-                   [disabled]="!element.canEdit"
+                   [disabled]="!element.canEdit || (readOnly.readOnly | async)"
                    (dateChange)="refresh.next()"
                    (keyup)="refresh.next()">
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -144,12 +145,13 @@
       <ng-container matColumnDef="delete">
         <th mat-header-cell *matHeaderCellDef>Eliminar</th>
         <td mat-cell *matCellDef="let element">
-          <button mat-icon-button color="warn" [disabled]="!element.canEdit" (click)="deleteEvent(element)">
+          <button *ngIf="!(readOnly.readOnly | async)" mat-icon-button color="warn"
+                  [disabled]="!element.canEdit || (readOnly.readOnly | async)" (click)="deleteEvent(element)">
             <mat-icon>delete_forever</mat-icon>
           </button>
         </td>
         <td mat-footer-cell *matFooterCellDef>
-          <button mat-flat-button mat-icon-button color="accent"
+          <button *ngIf="!(readOnly.readOnly | async)" mat-flat-button mat-icon-button color="accent"
                   (click)="addEvent();">
             <mat-icon>add</mat-icon>
           </button>
@@ -159,7 +161,9 @@
       <ng-container matColumnDef="save">
         <th mat-header-cell *matHeaderCellDef>Editar</th>
         <td mat-cell *matCellDef="let element">
-          <button mat-icon-button color="accent" [disabled]="!element.canEdit" (click)="modifyEvent(element)">
+          <button *ngIf="!(readOnly.readOnly | async)" mat-icon-button color="accent"
+                  [disabled]="!element.canEdit || (readOnly.readOnly | async)"
+                  (click)="modifyEvent(element)">
             <mat-icon>save</mat-icon>
           </button>
         </td>

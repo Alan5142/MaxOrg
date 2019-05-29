@@ -14,7 +14,7 @@
   </ng-template>
 </mat-menu>
 <div *ngIf="groups | async;else loading">
-  <div cdkDropListGroup [cdkDropListGroupDisabled]="!(board | async)?.canEdit" class="board">
+  <div cdkDropListGroup [cdkDropListGroupDisabled]="!(board | async)?.canEdit || (readOnly.readOnly | async)" class="board">
     <div class="card-list mat-elevation-z5 card-holder"
          *ngFor="let group of groups | async">
       <div cdkDragHandle fxLayout="row">
@@ -24,13 +24,13 @@
         <button style="top: -15px;"
                 mat-icon-button
                 fxFlexAlign="baseline"
-                *ngIf="(board | async)?.canEdit"
+                *ngIf="(board | async)?.canEdit && !(readOnly.readOnly | async)"
                 (click)="addCardToSection(group.id)">
           <mat-icon>add</mat-icon>
         </button>
         <button style="top: -15px;" mat-icon-button fxFlexAlign="baseline" [matMenuTriggerData]="{group: group}"
                 [matMenuTriggerFor]="sectionMenu"
-                *ngIf="(board | async)?.canEdit">
+                *ngIf="(board | async)?.canEdit && !(readOnly.readOnly | async)">
           <mat-icon>more_horiz</mat-icon>
         </button>
       </div>

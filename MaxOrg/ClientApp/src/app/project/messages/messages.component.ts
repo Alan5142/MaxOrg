@@ -1,30 +1,34 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {MediaObserver} from '@angular/flex-layout';
-import {ActivatedRoute} from '@angular/router';
-import {merge, Observable} from "rxjs";
+import {ActivatedRoute, Router} from '@angular/router';
+import {merge, Observable, Subscription} from "rxjs";
 import {GetUserChatsResponse} from "../services/chat-model";
 import {ChatService} from "../services/chat.service";
 import {shareReplay} from "rxjs/operators";
 import {MatDialog, MatSnackBar} from "@angular/material";
 import {CreateChatGroupComponent} from "./create-chat-group/create-chat-group.component";
 import {ProjectsService} from "../../services/projects.service";
+import {ReadOnlyService} from "../services/read-only.service";
 
 @Component({
   selector: 'app-messages',
   templateUrl: './messages.component.html',
   styleUrls: ['./messages.component.scss']
 })
-export class MessagesComponent implements OnInit {
+export class MessagesComponent implements OnInit, OnDestroy {
   chatId: string = null;
   chats: Observable<GetUserChatsResponse>;
   groupId: string;
+  subscription: Subscription;
 
   constructor(private route: ActivatedRoute,
               public mediaObserver: MediaObserver,
               private dialog: MatDialog,
               private snackbar: MatSnackBar,
               private projectService: ProjectsService,
-              private chatService: ChatService) {
+              private chatService: ChatService,
+              private readOnly: ReadOnlyService,
+              private router: Router) {
     this.chatId = null;
     this.route.queryParamMap
       .subscribe(params => {
@@ -37,6 +41,11 @@ export class MessagesComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.subscription = this.readOnly.readOnly.subscribe(v => {
+      if (v) {
+        this.router.navigate(['/project', this.groupId]);
+      }
+    })
   }
 
   createGroup() {
@@ -61,5 +70,9 @@ export class MessagesComponent implements OnInit {
       });
     });
 
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }

@@ -12,6 +12,8 @@ export interface GroupInfo {
   creationDate: Date;
   members: User[];
   repoUrl: string;
+  finished: boolean;
+  devOps: boolean;
 }
 
 export interface CreateGroupData {
@@ -107,5 +109,9 @@ export class GroupsService {
 
   getAdminInfo(groupId: string): Observable<any> {
     return this.http.get(`/api/groups/${groupId}/admin-info`);
+  }
+
+  addMembersToGroup(groupId: string, newMembers: string[]) {
+    return this.http.post(`/api/groups/${groupId}/members`, newMembers);
   }
 }

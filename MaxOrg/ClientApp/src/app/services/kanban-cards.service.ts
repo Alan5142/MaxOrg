@@ -123,6 +123,6 @@ export class KanbanCardsService {
   }
 
   addMembersToKanban(groupId: string, boardId: string, newMembers: KanbanGroupMember[]) {
-    return this.http.post(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/members`, {newMembers: newMembers});
+    return this.http.post(`${environment.apiUrl}groups/${groupId}/boards/${boardId}/members`, {membersToEdit: newMembers});
   }
 }

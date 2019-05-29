@@ -23,15 +23,16 @@ export class AppComponent {
     if (navigator.serviceWorker === undefined) {
       return;
     }
+    update.available.subscribe(updateAvailable => {
+      const snack = this.snackBar.open('Hay una actualización disponible', 'Recargar', {duration: 15000});
+      snack
+        .onAction()
+        .subscribe(() => {
+          window.location.reload();
+        });
+    }, err => {
+    });
     navigator.serviceWorker.ready.then(registration => {
-      update.available.subscribe(updateAvailable => {
-        const snack = this.snackBar.open('Hay una actualización disponible', 'Recargar', {duration: 15000});
-        snack
-          .onAction()
-          .subscribe(() => {
-            window.location.reload();
-          });
-      })
     })
   }
 }

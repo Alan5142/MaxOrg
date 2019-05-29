@@ -6,6 +6,7 @@ import {merge, Observable} from "rxjs";
 import {ActivatedRoute} from "@angular/router";
 import {shareReplay} from "rxjs/operators";
 import {CreateTestDialogComponent} from "../create-test/create-test-dialog/create-test-dialog.component";
+import {ReadOnlyService} from "../../services/read-only.service";
 
 @Component({
   selector: 'app-record',
@@ -22,7 +23,8 @@ export class RecordComponent implements OnInit {
 
   constructor(public dialog: MatDialog,
               private testsService: TestsService,
-              private activatedRoute: ActivatedRoute) {
+              private activatedRoute: ActivatedRoute,
+              public readOnly: ReadOnlyService) {
     while (this.data.length < 20) {
       this.data.push(this.generateTestData());
     }

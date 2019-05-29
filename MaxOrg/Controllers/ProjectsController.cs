@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ArangoDB.Client;
 using MaxOrg.Hubs;
+using MaxOrg.Hubs.Clients;
 using MaxOrg.Models.Calendar;
 using MaxOrg.Models.Group;
 using MaxOrg.Models.Kanban;
@@ -11,6 +12,7 @@ using MaxOrg.Models.Notifications;
 using MaxOrg.Models.Projects;
 using MaxOrg.Models.Requirements;
 using MaxOrg.Models.Users;
+using MaxOrg.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -37,6 +39,8 @@ namespace MaxOrg.Controllers
         /// dada por ASP.NET Core.
         /// </summary>
         private IHubContext<NotificationHub> NotificationHub { get; }
+        
+        private IHubContext<ReadOnlyProjectHub, IReadOnlyClient> ReadOnlyGroupHub { get; }
 
         /// <summary>
         /// Instancia transitoria de una conexión a la base de datos, es generada por ASP.NET Core por cada llamada a un método del controlador
@@ -54,8 +58,12 @@ namespace MaxOrg.Controllers
         /// </summary>
         /// <param name="notificationHub"></param>
         /// <param name="database"></param>
-        public ProjectsController(IHubContext<NotificationHub> notificationHub, IArangoDatabase database)
+        /// <param name="projectReadOnlyHub"></param>
+        public ProjectsController(IHubContext<NotificationHub> notificationHub, 
+            IArangoDatabase database,
+            IHubContext<ReadOnlyProjectHub, IReadOnlyClient> projectReadOnlyHub)
         {
+            ReadOnlyGroupHub = projectReadOnlyHub;
             Database = database;
             NotificationHub = notificationHub;
         }
@@ -300,15 +308,16 @@ namespace MaxOrg.Controllers
         }
 
         [HttpPut("{projectId}/finish")]
-        public async Task<IActionResult> ConcludeProject(string projectId)
+        public async Task<IActionResult> FinishProject(string projectId)
         {
             var group = await Database.Collection("Group").DocumentAsync<Group>(projectId);
-            if (group == null || !group.IsRoot)
+            if (group == null || !group.IsRoot || !await Database.IsAdmin(HttpContext.User.Identity.Name, projectId))
             {
-                return StatusCode(403);
+                return StatusCode(404);
             }
 
-            group.Finished = true;
+            group.Finished = !group.Finished;
+            await ReadOnlyGroupHub.Clients.Group($"GroupReadOnly/{projectId}").SetReadOnlyValue(group.Finished);
             await Database.UpdateByIdAsync<Group>(group.Id, group);
             return Ok();
         }

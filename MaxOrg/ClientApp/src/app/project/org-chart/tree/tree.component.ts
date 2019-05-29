@@ -1,7 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { NewSubgroupComponent } from '../new-subgroup/new-subgroup.component';
-import { MatDialog, MatSnackBar } from '@angular/material';
-import { Router, ActivatedRoute } from '@angular/router';
+import {Component, Input, OnInit} from '@angular/core';
+import {NewSubgroupComponent} from '../new-subgroup/new-subgroup.component';
+import {MatDialog, MatSnackBar} from '@angular/material';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ReadOnlyService} from "../../services/read-only.service";
 
 @Component({
   selector: 'app-tree',
@@ -15,7 +16,11 @@ export class TreeComponent implements OnInit {
   @Input() userId;
   @Input() adminId: string = null;
   @Input() isAdmin: boolean = false;
-  constructor(public dialog: MatDialog, public snackBar: MatSnackBar, public router: Router, public route: ActivatedRoute) {
+  constructor(public dialog: MatDialog,
+              public snackBar: MatSnackBar,
+              public router: Router,
+              public route: ActivatedRoute,
+              public readOnly: ReadOnlyService) {
 
   }
 

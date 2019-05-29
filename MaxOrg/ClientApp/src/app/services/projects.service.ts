@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable, of} from 'rxjs';
+import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {map} from 'rxjs/operators';
 
@@ -15,6 +15,7 @@ export interface Project {
 export interface CreateProjectData {
   name: string;
   members: string[];
+  previousProject?: string;
 }
 
 export interface ProjectResponse {
@@ -118,5 +119,9 @@ export class ProjectsService {
 
   getAllUsersOfProject(projectOrGroupId: string): Observable<any> {
     return this.http.get<any>(`${environment.apiUrl}projects/${projectOrGroupId}/members`);
+  }
+
+  setReadOnly(projectId: string): Observable<void> {
+    return this.http.put<void>(`/api/projects/${projectId}/finish`, {});
   }
 }

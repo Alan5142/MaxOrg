@@ -170,15 +170,6 @@ namespace MaxOrg.Controllers
                     {
                         IsAdmin = false,
                         JoinDate = currentDate,
-                        Group = createdGroup.Id,
-                        User = user.Id,
-                        AddedBy = subgroupAdmin.Key
-                    };
-                    await groupGraph.InsertEdgeAsync<UsersInGroup>(userToAdd);
-                    userToAdd = new UsersInGroup
-                    {
-                        IsAdmin = false,
-                        JoinDate = currentDate,
                         Group = root.Id,
                         User = user.Id,
                         AddedBy = subgroupAdmin.Key
@@ -295,17 +286,26 @@ namespace MaxOrg.Controllers
 
             string repoUrl = null;
             var root = await Database.GetRootGroup(groupId);
-            if (root.LinkedRepositoryName.HasValue)
-            {
-                var admin = await Database.DocumentAsync<User>(root.GroupOwner);
-                var client = new GitHubClient(new ProductHeaderValue("maxorg"));
+            if (!root.LinkedRepositoryName.HasValue)
+                return Ok(new
+                {
+                    @group.Name,
+                    @group.Key,
+                    @group.GroupOwner,
+                    @group.CreationDate,
+                    @group.Description,
+                    members,
+                    repoUrl,
+                    DevOps = @group.DevOpsOrgName != null
+                });
+            var admin = await Database.DocumentAsync<User>(root.GroupOwner);
+            var client = new GitHubClient(new ProductHeaderValue("maxorg"));
 
-                var tokenAuth = new Credentials(admin.GithubToken);
-                client.Credentials = tokenAuth;
+            var tokenAuth = new Credentials(admin.GithubToken);
+            client.Credentials = tokenAuth;
 
-                var repo = await client.Repository.Get(root.LinkedRepositoryName.Value);
-                repoUrl = repo.HtmlUrl;
-            }
+            var repo = await client.Repository.Get(root.LinkedRepositoryName.Value);
+            repoUrl = repo.HtmlUrl;
 
             return Ok(new
             {
@@ -315,7 +315,9 @@ namespace MaxOrg.Controllers
                 @group.CreationDate,
                 @group.Description,
                 members,
-                repoUrl
+                repoUrl,
+                root.Finished,
+                DevOps = root.DevOpsOrgName != null
             });
         }
 
@@ -346,6 +348,38 @@ namespace MaxOrg.Controllers
             return Ok(new {Members = members});
         }
 
+        [HttpPost("{groupId}/members")]
+        public async Task<IActionResult> AddMembersToGroup(string groupId, List<string> userIds)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            if (group == null || !await Database.IsAdmin(HttpContext.User.Identity.Name, groupId)) return NotFound();
+            var groupGraph = Database.Graph("GroupUsersGraph");
+            foreach (var user in userIds)
+            {
+                var userT = await Database.Query<User>().Where(u => u.Username == user).Select(u => u).FirstOrDefaultAsync();
+                if(userT == null) continue;
+                var userToAdd = new UsersInGroup
+                {
+                    IsAdmin = false,
+                    JoinDate = DateTime.UtcNow,
+                    Group = group.Id,
+                    User = userT.Id,
+                    AddedBy = HttpContext.User.Identity.Name
+                };
+                try
+                {
+                    await groupGraph.InsertEdgeAsync<UsersInGroup>(userToAdd);
+                }
+                catch (Exception e)
+                {
+                    // ya existe
+                }
+            }
+
+            await Database.UpdateByIdAsync<Group>(group.Id, group);
+            return Ok();
+        }
+        
         #region Calendar events
 
         [HttpGet("{groupId}/calendar")]
@@ -458,6 +492,45 @@ namespace MaxOrg.Controllers
             rootGroup.Events.Remove(ev);
             await Database.UpdateByIdAsync<Group>(rootGroup.Id, rootGroup);
             return Ok();
+        }
+        
+        [HttpGet("{groupId}/admin-info")]
+        public async Task<IActionResult> AdminDashboardInfo(string groupId)
+        {
+            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            var root = await Database.GetRootGroup(groupId);
+
+            if (!await Database.IsAdmin(HttpContext.User.Identity.Name, groupId))
+            {
+                return Unauthorized();
+            }
+
+            var members = Database.CreateStatement<int>($@"return LENGTH(FOR c in 1..1 INBOUND 'Group/{groupId}'
+ GRAPH 'GroupUsersGraph'
+ return c)").ToList().FirstOr(0);
+
+            var blobList = await BlobContainer.ListBlobsSegmentedAsync($"project/{root.Key}/attachments", true,
+                BlobListingDetails.All,
+                int.MaxValue, null, new BlobRequestOptions(), new OperationContext());
+
+            var size = blobList.Results.OfType<CloudBlockBlob>().Sum(blob => blob.Properties.Length);
+
+            return Ok(new
+            {
+                Members = members,
+                group.IsRoot,
+                IsLinkedToDevOps = group.DevOpsRefreshToken != null,
+                group.Finished,
+                group.Name,
+                size,
+                group.PreviousProject,
+                PreviousProjectName = group.PreviousProject != null ? Database.Collection("Group").Document<Group>(group.PreviousProject).Name : (string)null
+            });
         }
 
         #endregion
@@ -1106,43 +1179,6 @@ namespace MaxOrg.Controllers
             return Ok();
         }
 
-        [HttpGet("{groupId}/admin-info")]
-        public async Task<IActionResult> AdminDashboardInfo(string groupId)
-        {
-            var group = await Database.Collection("Group").DocumentAsync<Group>(groupId);
-            if (group == null)
-            {
-                return NotFound();
-            }
-
-            var root = await Database.GetRootGroup(groupId);
-
-            if (!await Database.IsAdmin(HttpContext.User.Identity.Name, groupId))
-            {
-                return Unauthorized();
-            }
-
-            var members = Database.CreateStatement<int>($@"return LENGTH(FOR c in 1..1 INBOUND 'Group/{groupId}'
- GRAPH 'GroupUsersGraph'
- return c)").ToList().FirstOr(0);
-
-            var blobList = await BlobContainer.ListBlobsSegmentedAsync($"project/{root.Key}/attachments", true,
-                BlobListingDetails.All,
-                int.MaxValue, null, new BlobRequestOptions(), new OperationContext());
-
-            var size = blobList.Results.OfType<CloudBlockBlob>().Sum(blob => blob.Properties.Length);
-
-            return Ok(new
-            {
-                Members = members,
-                group.IsRoot,
-                IsLinkedToDevOps = group.DevOpsRefreshToken != null,
-                group.Finished,
-                group.Name,
-                size
-            });
-        }
-
         #endregion
 
         #region To do tasks
@@ -1287,7 +1323,7 @@ FOR v in 1 INBOUND 'Group/{groupId}'
             var i = 0;
             for (var date = DateTime.UtcNow.Date.AddDays(-6); date <= DateTime.UtcNow.Date; date = date.AddDays(1))
             {
-                if (tasks.Count == 0 || tasks[i].Date > date || date > tasks[i].Date)
+                if (tasks.Count == 0 || i >= tasks.Count || tasks[i].Date > date || date > tasks[i].Date)
                 {
                     resultingTasks.Add(new Statistic
                     {
