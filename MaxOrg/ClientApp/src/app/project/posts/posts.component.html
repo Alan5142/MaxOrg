@@ -43,7 +43,7 @@
             'comment-section-background-dark': themeService.isDarkTheme | async,
             'comment-section-background': !(themeService.isDarkTheme | async)}">
         <div style="margin-left: 32px; margin-right: 32px; margin-top: 16px">
-          <button  mat-flat-button class="width-100" color="primary"
+          <button *ngIf="!(readOnly.readOnly | async)" mat-flat-button class="width-100" color="primary"
                   (click)="makeComment(post.id);">ESCRIBIR COMENTARIO
           </button>
           <div fxLayout="column">
