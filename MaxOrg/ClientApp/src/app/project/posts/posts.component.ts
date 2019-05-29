@@ -59,6 +59,15 @@ export class PostsComponent implements OnInit {
     this.postsService.getPosts(this.groupId).pipe(shareReplay(1)).subscribe(posts => {
       this.posts = (posts as Array<any>).map(p => {
         p.content = this.generateSafeHtml(p.content);
+        p.comments = (p.comments as Array<any>).map(c => {
+          return {
+            creatorId: c.creatorId,
+            profilePicture: c.profilePicture,
+            creatorName: c.creatorName,
+            content: c.content,
+            safeHtml: this.generateCommentSafeHtml(c.content)
+          };
+        });
         return p;
       });
     });
@@ -142,6 +151,128 @@ export class PostsComponent implements OnInit {
         'td',
         'th',
         'tr',
+        'caption',
+        'span',
+        'img',
+        'pre',
+        'code',
+        'video',
+        'source'
+      ],
+      allowedAttributes: {
+        'a': ['href', 'target', 'rel', 'style', 'class'],
+        'img': ['src'],
+        'span': ['class'],
+        'code': ['class'],
+        'pre': ['class', 'data-start', '*'],
+        'video': ['preload', 'height', 'controls', 'style'],
+        'source': ['src', 'type'],
+        'i': ['class'],
+        '*': ['href', 'align', 'alt', 'center', 'bgcolor', 'style']
+      },
+      transformTags: {
+        'a': (tagName, attribs) => {
+          // Always open links in a new window
+          if (attribs) {
+            attribs.target = '_blank';
+            attribs.rel = 'noopener noreferrer';
+          }
+          if (attribs.href.startsWith('/api/groups')) {
+            attribs.href += `?access_token=${localStorage.getItem('token')}`;
+            attribs.style = "text-decoration: none; color: inherit; font-size: 2em";
+          }
+          return {tagName, attribs};
+        },
+        'pre': (tagName, attribs) => {
+          if (attribs.class === undefined) {
+            attribs.class = 'language- line-numbers';
+          } else {
+            attribs.class += 'language- line-numbers';
+          }
+          attribs['data-start'] = "1";
+
+          return {tagName, attribs}
+        },
+        'img': (tagName, attribs) => {
+          if (attribs.src.startsWith('/api/groups')) {
+            attribs.src += `?access_token=${localStorage.getItem('token')}`;
+          }
+          attribs.style = 'width: 100%; max-width: 500px; height: auto';
+          return {tagName, attribs};
+        },
+        'source': (tagName, attribs) => {
+          if (attribs.src.startsWith('/api/groups')) {
+            attribs.src += `?access_token=${localStorage.getItem('token')}`;
+          }
+          return {tagName, attribs};
+        },
+        'video': (tagName, attribs) => {
+          attribs.style = 'width: 100%; max-width: 500px; height: auto';
+          return {tagName, attribs};
+        },
+
+      },
+      allowedStyles: {
+        '*': {
+          // Match HEX and RGB
+          'color': [/^\#(0x)?[0-9a-f]+$/i, /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/, /^(inherit$)/],
+          'text-align': [/^left$/, /^right$/, /^center$/],
+          // Match any number with px, em, or %
+          'font-size': [/^\d+(?:px|em|%)$/],
+          'text-decoration': [/^none$/]
+        },
+        'img': {
+          'width': [/^\d+(?:px|em|%)$/],
+          'height': [/^\d+(?:px|em|%)$/],
+          'max-width': [/^\d+(?:px|em|%)$/],
+          'max-height': [/^\d+(?:px|em|%)$/]
+        },
+        'video': {
+          'width': [/^\d+(?:px|em|%)$/],
+          'height': [/^\d+(?:px|em|%)$/],
+          'max-width': [/^\d+(?:px|em|%)$/],
+          'max-height': [/^\d+(?:px|em|%)$/]
+        }
+      }
+    });
+    return this.sanitizer.bypassSecurityTrustHtml(cleanHtml);
+  }
+
+  generateCommentSafeHtml(content: string): SafeHtml {
+    marked.setOptions({
+      renderer: new marked.Renderer(),
+      highlight: (code, lang) => {
+        return this.highlighter.highlightCode(code, lang);
+      },
+      /*highlight: function(code) {
+        return require('highlight.js').highlightAuto(code).value;
+      },*/
+      pedantic: false,
+      gfm: true,
+      tables: true,
+      breaks: false,
+      sanitize: false,
+      smartLists: true,
+      smartypants: false,
+      xhtml: false
+    });
+    const html = marked(content);
+    const cleanHtml = sanitizeHtml(html, {
+      allowedTags: [
+        'a',
+        'b',
+        'p',
+        'i',
+        'em',
+        'strong',
+        'blockquote',
+        'small',
+        'div',
+        'br',
+        'hr',
+        'li',
+        'ol',
+        'ul',
         'caption',
         'span',
         'img',

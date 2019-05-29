@@ -40,7 +40,10 @@ export class MarkdownEditorComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.defaultText.subscribe(dt => this.text = dt);}
+    if (this.defaultText !== undefined && this.defaultText !== null) {
+      this.defaultText.subscribe(dt => this.text = dt);
+    }
+  }
 
   uploadFile() {
     this.file.nativeElement.click();

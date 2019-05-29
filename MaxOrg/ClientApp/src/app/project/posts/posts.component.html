@@ -43,24 +43,18 @@
             'comment-section-background-dark': themeService.isDarkTheme | async,
             'comment-section-background': !(themeService.isDarkTheme | async)}">
         <div style="margin-left: 32px; margin-right: 32px; margin-top: 16px">
-          <mat-form-field class="width-100">
-            <textarea #commentContent matInput
-                      cdkTextareaAutosize cdkAutosizeMaxRows="1"
-                      cdkAutosizeMinRows="1"></textarea>
-            <mat-label>Comentario</mat-label>
-          </mat-form-field> -->
           <button  mat-flat-button class="width-100" color="primary"
                   (click)="makeComment(post.id);">ESCRIBIR COMENTARIO
           </button>
           <div fxLayout="column">
             <div *ngFor="let comment of post.comments" style="margin-bottom: 16px; margin-top: 16px">
-              <div fxLayout="row" class="no-select" [routerLink]="['../user', post.creatorId]">
+              <div fxLayout="row" class="no-select" [routerLink]="['../user', comment.creatorId]">
                 <img [src]="comment.profilePicture"
                      matRipple
                      style="max-width: 3em; max-height: 3em; border-radius: 50%">
-                <h4 matRipple style="margin-top: 5px">{{comment.creatorName}}</h4>
+                <h4 matRipple style="margin-top: 5px">{{comment?.creatorName}}</h4>
               </div>
-              <div style="margin-left: 46px; margin-right: 32px; margin-top: -16px" [innerHtml]="generateSafeHtml(comment.content)">
+              <div style="margin-left: 46px; margin-right: 32px; margin-top: -16px" [innerHtml]="comment.safeHtml">
               </div>
             </div>
           </div>

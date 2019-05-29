@@ -32,7 +32,7 @@ namespace MaxOrg.Services.Tasks
                 var groups = await Database
                     .CreateStatement<Group>(
                         @"FOR g in Group
-FILTER g.isRoot && g.events != [] && g.events != null
+FILTER g.isRoot && g.events != [] && g.events != null && g.finished == false
 return {_key: g._key, _id: g._id, name: g.name, events: g.events}").ToListAsync();
 
                 foreach (var group in groups)
