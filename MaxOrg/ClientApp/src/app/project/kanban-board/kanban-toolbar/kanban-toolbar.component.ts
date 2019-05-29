@@ -16,7 +16,7 @@ export class KanbanToolbarComponent implements OnInit {
   @Input() canEdit = false;
 
   constructor(public mediaObserver: MediaObserver,
-              private readOnly: ReadOnlyService) {
+              public readOnly: ReadOnlyService) {
   }
 
   ngOnInit() {

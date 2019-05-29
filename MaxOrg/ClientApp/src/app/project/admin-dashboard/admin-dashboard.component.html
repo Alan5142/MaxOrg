@@ -164,11 +164,12 @@
                        [value]="(groupInfo | async)?.name">
                 <mat-hint>Longitud máxima de 30 caracteres</mat-hint>
               </mat-form-field>
+              <button color="primary" type="submit" mat-flat-button
+                      (click)="editInfo(readOnly.checked, projectName.value)">
+                CAMBIAR NOMBRE
+              </button>
               <button color="primary" class="width-100" mat-flat-button (click)="addMembers()">AGREGAR MIEMBROS</button>
               <button (click)="changeDescription()" color="accent" mat-flat-button>CAMBIAR DESCRIPCIÓN</button>
-              <button color="primary" type="submit" mat-flat-button
-                      (click)="editInfo(readOnly.checked, projectName.value)">GUARDAR CAMBIOS
-              </button>
             </form>
 
             <form class="options-container" fxFlex="50" fxLayout="column" *ngIf="(groupInfo | async) as $groupInfo">
