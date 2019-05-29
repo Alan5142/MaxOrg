@@ -48,9 +48,9 @@
                       cdkTextareaAutosize cdkAutosizeMaxRows="1"
                       cdkAutosizeMinRows="1"></textarea>
             <mat-label>Comentario</mat-label>
-          </mat-form-field>
-          <button [disabled]="commentContent.value.trim() === ''" mat-flat-button class="width-100"
-                  (click)="makeComment(post.id, commentContent.value); commentContent.value = ''">PUBLICAR COMENTARIO
+          </mat-form-field> -->
+          <button  mat-flat-button class="width-100" color="primary"
+                  (click)="makeComment(post.id);">ESCRIBIR COMENTARIO
           </button>
           <div fxLayout="column">
             <div *ngFor="let comment of post.comments" style="margin-bottom: 16px; margin-top: 16px">
@@ -60,8 +60,7 @@
                      style="max-width: 3em; max-height: 3em; border-radius: 50%">
                 <h4 matRipple style="margin-top: 5px">{{comment.creatorName}}</h4>
               </div>
-              <div style="margin-left: 46px; margin-right: 32px; margin-top: -16px">
-                {{comment.content}}
+              <div style="margin-left: 46px; margin-right: 32px; margin-top: -16px" [innerHtml]="generateSafeHtml(comment.content)">
               </div>
             </div>
           </div>

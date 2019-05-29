@@ -1,8 +1,8 @@
-import {ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, Inject} from '@angular/core';
 import {ThemeService} from "../../services/theme.service";
 import {PostsService} from "../../posts.service";
 import {ActivatedRoute} from "@angular/router";
-import {MatSnackBar} from "@angular/material";
+import {MatSnackBar, MatDialogRef, MAT_DIALOG_DATA, MatDialog} from "@angular/material";
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
 import {HighlightService} from "../../services/highlight.service";
 import {shareReplay} from "rxjs/operators";
@@ -37,7 +37,8 @@ export class PostsComponent implements OnInit {
               private groupsService: GroupsService,
               private projectService: ProjectsService,
               private userService: UserService,
-              public readOnly: ReadOnlyService) {
+              public readOnly: ReadOnlyService,
+              public dialog: MatDialog) {
     this.userService.getCurrentUser().subscribe(u => {
       this.userId = u.key;
     });
@@ -228,11 +229,16 @@ export class PostsComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustHtml(cleanHtml);
   }
 
-  makeComment(id: string, value: string) {
-    this.postsService.makeComment(this.groupId, id, value).subscribe(() => {
-      this.getPosts(this.groupId);
-    }, () => {
-      this.snackbar.open('No se pudo crear el comentario', 'Ok', {duration: 2000});
+  makeComment(id: string) {
+    const dialogRef=this.dialog.open(WriteComment,{data:this.groupId});
+    dialogRef.afterClosed().subscribe(value=>{
+      if(value){
+        this.postsService.makeComment(this.groupId, id, value).subscribe(() => {
+          this.getPosts(this.groupId);
+        }, () => {
+          this.snackbar.open('No se pudo crear el comentario', 'Ok', {duration: 2000});
+        });
+      }
     });
   }
 
@@ -266,4 +272,20 @@ export class PostsComponent implements OnInit {
   postTrack(index, post) {
     return post ? post.id : undefined;
   }
+}
+@Component({
+  template: '<app-markdown-editor (saveClicked)="dialogRef.close($event)"' +
+    'title="Escribir Comentario"' +
+    'okButtonText="COMENTAR"' +
+    '[groupId]="groupId"' +
+    '(onCancel)="dialogRef.close(null)">' +
+    '</app-markdown-editor>'
+})
+export class WriteComment {
+  groupId:string;
+  constructor(public dialogRef: MatDialogRef<WriteComment>,
+      @Inject(MAT_DIALOG_DATA) groupId:string) {
+        this.groupId= groupId;
+        console.log(this.groupId);
+       }
 }
