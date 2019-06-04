@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
@@ -78,11 +77,12 @@ namespace MaxOrg
                 {
                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
                 });
+            
+            var storage = CloudStorageAccount.Parse(Configuration["AppSettings:AzureFiles:ConnectionString"]);
+            var blobClient = storage.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference("maxorgconfig");
 
-            var dataProtectionProvider = DataProtectionProvider.Create(new DirectoryInfo(@"keys"));
-            var baseProtector = dataProtectionProvider.CreateProtector("MaxOrg.NewPassword");
-            var timeLimitedProtector = baseProtector.ToTimeLimitedDataProtector();
-            services.AddSingleton<ITimeLimitedDataProtector>(timeLimitedProtector);
+            services.AddDataProtection().PersistKeysToAzureBlobStorage(container.GetBlockBlobReference("maxorgkey"));
             services.AddScoped<IPasswordHasher<User>, ArgonPasswordHasher<User>>();
             
             services.AddAntiforgery(

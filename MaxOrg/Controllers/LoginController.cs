@@ -38,9 +38,9 @@ namespace MaxOrg.Controllers
         private ITimeLimitedDataProtector DataProtector { get; }
 
         public LoginController(IConfiguration configuration, IArangoDatabase database, HttpClient httpClient,
-            CloudBlobContainer container, IPasswordHasher<User> passwordHasher, IEmailSender emailSender, ITimeLimitedDataProtector protector)
+            CloudBlobContainer container, IPasswordHasher<User> passwordHasher, IEmailSender emailSender, IDataProtectionProvider protector)
         {
-            DataProtector = protector;
+            DataProtector = protector.CreateProtector("MaxOrg.NewPassword").ToTimeLimitedDataProtector();
             EmailSender = emailSender;
             Container = container;
             HttpClient = httpClient;
@@ -151,7 +151,6 @@ namespace MaxOrg.Controllers
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine(e.Message);
                 return BadRequest();
             }
 
