@@ -49,6 +49,8 @@ import {CommonComponentsModule} from "../common-components/common-components.mod
 import {ImageCropperModule} from "ngx-img-cropper";
 import {GoogleLoginComponent} from './google-login/google-login.component';
 import {NgxHmCarouselModule} from "ngx-hm-carousel";
+import {ForgottenPasswordComponent} from './forgotten-password/forgotten-password.component';
+import {RequestPasswordChangeComponent} from './navbar/request-password-change/request-password-change.component';
 
 @NgModule({
   providers: [],
@@ -57,7 +59,8 @@ import {NgxHmCarouselModule} from "ngx-hm-carousel";
     NavbarDialogComponent,
     StartPageComponent,
     MyAccountPickImageComponent,
-    NewProjectComponent
+    NewProjectComponent,
+    RequestPasswordChangeComponent
   ],
   declarations: [
     NavbarComponent,
@@ -72,7 +75,9 @@ import {NgxHmCarouselModule} from "ngx-hm-carousel";
     RegisterComponent,
     GithubLoginComponent,
     NotFoundComponent,
-    GoogleLoginComponent
+    GoogleLoginComponent,
+    ForgottenPasswordComponent,
+    RequestPasswordChangeComponent
   ],
   imports: [
     CommonModule,

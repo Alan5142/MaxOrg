@@ -15,15 +15,16 @@
             <input [(ngModel)]="data.password" matInput name="password" type="password">
           </mat-form-field>
           <div fxLayoutAlign="center center">
-            <button (click)="login()" color="primary" mat-flat-button type="submit">Iniciar sesión</button>
+            <button (click)="login()" color="primary" mat-flat-button type="submit">INICIAR SESIÓN</button>
           </div>
+          <button style="margin-top: 16px" (click)="requestNewPassword()" color="primary" mat-flat-button>OLVIDE MI CONTRASEÑA</button>
         </form>
       </div>
 
       <h5 fxLayoutAlign="center" i18n>¿No dispones de cuenta?</h5>
 
       <div fxLayoutAlign="center center">
-        <button (click)="goToRegister()" color="primary" i18n mat-flat-button>Registrarse</button>
+        <button (click)="goToRegister()" color="primary" i18n mat-flat-button>REGISTRARSE</button>
       </div>
 
     </div>

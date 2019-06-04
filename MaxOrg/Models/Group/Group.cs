@@ -56,10 +56,24 @@ namespace MaxOrg.Models.Group
         /// </summary>
         public string DevOpsRefreshToken { get; set; } = null;
 
+        /// <summary>
+        /// Token existente en DevOps, tiene una fecha de expiración de 3600 segundos, una vez que expira se solicita un nuevo token
+        /// </summary>
         public string DevOpsToken { get; set; } = null;
+
+        /// <summary>
+        /// Fecha en la que expirará un token
+        /// </summary>
         public DateTime? DevOpsExpirationTime { get; set; } = null;
 
+        /// <summary>
+        /// Nombre de la organización en Azure DevOps
+        /// </summary>
         public string DevOpsOrgName { get; set; } = null;
+
+        /// <summary>
+        /// Nombre del proyecto en Azure DevOps
+        /// </summary>
         public string DevOpsProjectName { get; set; } = null;
 
         /// <summary>

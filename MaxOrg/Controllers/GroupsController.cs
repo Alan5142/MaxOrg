@@ -178,7 +178,7 @@ namespace MaxOrg.Controllers
                     {
                         await groupGraph.InsertEdgeAsync<UsersInGroup>(userToAdd);
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         // ignored
                     }
@@ -370,7 +370,7 @@ namespace MaxOrg.Controllers
                 {
                     await groupGraph.InsertEdgeAsync<UsersInGroup>(userToAdd);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // ya existe
                 }

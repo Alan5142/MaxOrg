@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
@@ -8,13 +9,17 @@ using ArangoDB.Client;
 using M6T.Core.TupleModelBinder;
 using MaxOrg.Hubs;
 using MaxOrg.Models.Email;
+using MaxOrg.Models.Users;
 using MaxOrg.Services.Email;
 using MaxOrg.Services.Tasks;
+using MaxOrg.Utility.PasswordHasher;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
@@ -74,6 +79,12 @@ namespace MaxOrg
                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
                 });
 
+            var dataProtectionProvider = DataProtectionProvider.Create(new DirectoryInfo(@"keys"));
+            var baseProtector = dataProtectionProvider.CreateProtector("MaxOrg.NewPassword");
+            var timeLimitedProtector = baseProtector.ToTimeLimitedDataProtector();
+            services.AddSingleton<ITimeLimitedDataProtector>(timeLimitedProtector);
+            services.AddScoped<IPasswordHasher<User>, ArgonPasswordHasher<User>>();
+            
             services.AddAntiforgery(
                 options =>
                 {

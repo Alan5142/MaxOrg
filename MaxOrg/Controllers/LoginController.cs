@@ -10,7 +10,9 @@ using System.Threading.Tasks;
 using ArangoDB.Client;
 using MaxOrg.Models.Login;
 using MaxOrg.Models.Users;
+using MaxOrg.Services.Email;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -27,20 +29,24 @@ namespace MaxOrg.Controllers
     public class LoginController : ControllerBase
     {
         private IConfiguration Configuration { get; }
-        private readonly PasswordHasher<Models.Users.User> m_passwordHasher;
+        private readonly IPasswordHasher<Models.Users.User> m_passwordHasher;
         private static readonly HttpClient client = new HttpClient();
         private IArangoDatabase Database { get; }
         private HttpClient HttpClient { get; }
         private CloudBlobContainer Container { get; }
+        private IEmailSender EmailSender { get; }
+        private ITimeLimitedDataProtector DataProtector { get; }
 
         public LoginController(IConfiguration configuration, IArangoDatabase database, HttpClient httpClient,
-            CloudBlobContainer container)
+            CloudBlobContainer container, IPasswordHasher<User> passwordHasher, IEmailSender emailSender, ITimeLimitedDataProtector protector)
         {
+            DataProtector = protector;
+            EmailSender = emailSender;
             Container = container;
             HttpClient = httpClient;
             Database = database;
             Configuration = configuration;
-            m_passwordHasher = new PasswordHasher<Models.Users.User>();
+            m_passwordHasher = passwordHasher;
         }
 
         [HttpPost]
@@ -59,10 +65,18 @@ namespace MaxOrg.Controllers
 
             if (user == null) return NotFound(new {message = "Incorrect username or password"});
 
-            if (m_passwordHasher.VerifyHashedPassword(user, user.Password,
-                    user.Salt + userLoginData.Password) != PasswordVerificationResult.Success)
+            var passwordValue =
+                m_passwordHasher.VerifyHashedPassword(user, user.Password, user.Salt + userLoginData.Password);
+
+            switch (passwordValue)
             {
-                return BadRequest(new {message = "Username or password are incorrect"});
+                case PasswordVerificationResult.Failed:
+                    return BadRequest(new {message = "Username or password are incorrect"});
+                case PasswordVerificationResult.SuccessRehashNeeded:
+                    user.Password = m_passwordHasher.HashPassword(user, userLoginData.Password);
+                    user.Salt = "";
+                    await Database.UpdateByIdAsync<User>(user.Id, user);
+                    break;
             }
 
             var (token, refreshToken) = await GenerateRefreshAndJwtToken(user);
@@ -74,6 +88,73 @@ namespace MaxOrg.Controllers
                 RefreshToken = refreshToken.Token
             };
             return Ok(response);
+        }
+
+        [HttpPost("validate-forgotten-password")]
+        public IActionResult ValidateNewPasswordToken([FromBody](string payload, object dummy) payload)
+        {
+            if (payload.payload == null) return BadRequest();
+            try
+            {
+                DataProtector.Unprotect(payload.payload);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> CreatePassword([FromBody] (string newPassword, string payload) data)
+        {
+            var (newPassword, payload) = data;
+            try
+            {
+                var userId = DataProtector.Unprotect(payload);
+                var user = await Database.Collection("User").DocumentAsync<User>(userId);
+                if (user == null) return BadRequest();
+                user.Password = m_passwordHasher.HashPassword(user, newPassword);
+                await Database.UpdateByIdAsync<User>(user.Id, user);
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+         
+        [HttpPost("forgotten-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgottenPassword([FromBody] (string username, string email) userData)
+        {
+            var (username, email) = userData;
+            if (string.IsNullOrEmpty(username) && string.IsNullOrEmpty(email)) return BadRequest();
+            
+
+            try
+            {
+                User user;
+                if (!string.IsNullOrEmpty(username) && string.IsNullOrEmpty(email))
+                    user = await Database.Query<User>().Where(u => u.Username == username).SingleAsync();
+                else if (string.IsNullOrEmpty(username))
+                    user = await Database.Query<User>().Where(u => u.Email == email).SingleAsync();
+                else
+                    throw new Exception();
+                var payload = DataProtector.Protect(user.Key, TimeSpan.FromMinutes(10));
+                var message = $@"<p>Para recuperar tu contraseña da click: 
+<a href='{Configuration["AppSettings:DefaultURL"]}/start/forgotten-password?payload={payload}'>aquí</a></p>
+<br>
+<strong>Ten en cuenta que expirará en 10 minutos</strong>";
+                await EmailSender.SendEmailAsync(user.Email, "Recuperar contraseña", message);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
         }
 
         [HttpPost("refresh-token")]

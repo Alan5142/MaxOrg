@@ -6,6 +6,7 @@ import {Notification as UserNotification, UserService} from '../../services/user
 import {environment} from '../../../environments/environment';
 import {Observable} from "rxjs";
 import {AuthService, GoogleLoginProvider} from "angularx-social-login";
+import {RequestPasswordChangeComponent} from "./request-password-change/request-password-change.component";
 
 export interface DialogData {
   username: string;
@@ -66,7 +67,8 @@ export class NavbarDialogComponent {
     private http: HttpClient,
     private router: Router,
     private userService: UserService,
-    private authService: AuthService) {
+    private authService: AuthService,
+    private dialog: MatDialog) {
   }
 
   login(): void {
@@ -116,6 +118,12 @@ export class NavbarDialogComponent {
 
   isNotChromeMobile() {
     return !/^(?=.*\bChrome\b)(?=.*\bAndroid\b).*$/i.test(navigator.userAgent);
+  }
+
+  requestNewPassword() {
+    this.dialog.open(RequestPasswordChangeComponent).afterClosed().subscribe(() => {
+      this.dialogRef.close();
+    })
   }
 }
 
