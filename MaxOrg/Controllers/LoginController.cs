@@ -149,8 +149,9 @@ namespace MaxOrg.Controllers
 <strong>Ten en cuenta que expirará en 10 minutos</strong>";
                 await EmailSender.SendEmailAsync(user.Email, "Recuperar contraseña", message);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.Error.WriteLine(e.Message);
                 return BadRequest();
             }
 
