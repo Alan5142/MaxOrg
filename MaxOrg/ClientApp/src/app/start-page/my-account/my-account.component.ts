@@ -150,11 +150,6 @@ export class MyAccountPickImageComponent {
   constructor(private bottomSheetRef: MatBottomSheetRef<MyAccountPickImageComponent>) {
   }
 
-  openLink(event: MouseEvent): void {
-    this.bottomSheetRef.dismiss();
-    event.preventDefault();
-  }
-
   openFile(event: MouseEvent): void {
     document.getElementById('fileToUpload').click();
     event.preventDefault();
