@@ -48,7 +48,6 @@ export class UserStartComponent implements OnInit {
           this.projectsView = this.projects;
           this.snackBar.open('Creado con exito', 'Ok', {duration: 2500});
         }, error => {
-          console.log(error);
           this.snackBar.open('No se pudo crear :(', 'Ok', {duration: 2500});
         });
       }

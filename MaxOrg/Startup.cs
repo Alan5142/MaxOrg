@@ -8,13 +8,17 @@ using ArangoDB.Client;
 using M6T.Core.TupleModelBinder;
 using MaxOrg.Hubs;
 using MaxOrg.Models.Email;
+using MaxOrg.Models.Users;
 using MaxOrg.Services.Email;
 using MaxOrg.Services.Tasks;
+using MaxOrg.Utility.PasswordHasher;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
@@ -73,7 +77,14 @@ namespace MaxOrg
                 {
                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
                 });
+            
+            var storage = CloudStorageAccount.Parse(Configuration["AppSettings:AzureFiles:ConnectionString"]);
+            var blobClient = storage.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference("maxorgconfig");
 
+            services.AddDataProtection().PersistKeysToAzureBlobStorage(container.GetBlockBlobReference("maxorgkey"));
+            services.AddScoped<IPasswordHasher<User>, ArgonPasswordHasher<User>>();
+            
             services.AddAntiforgery(
                 options =>
                 {

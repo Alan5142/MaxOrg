@@ -11,11 +11,14 @@ import {IsNotLoggedInGuard} from '../services/guards/is-not-logged-in.guard';
 import {GithubLoginComponent} from './github-login/github-login.component';
 import {NotFoundComponent} from './not-found/not-found.component';
 import {GoogleLoginComponent} from "./google-login/google-login.component";
+import {ForgottenPasswordComponent} from "./forgotten-password/forgotten-password.component";
+import {ForgottenPasswordGuard} from "./forgotten-password/guards/forgotten-password.guard";
 
 const routes: Routes = [
   {
     path: '', component: StartPageComponent, children: [
       {path: '', component: IndexComponent, canActivate: [IsNotLoggedInGuard]},
+      {path: 'forgotten-password', component: ForgottenPasswordComponent, canActivate: [IsNotLoggedInGuard, ForgottenPasswordGuard]},
       {path: 'register', component: RegisterComponent, canActivate: [IsNotLoggedInGuard]},
       {path: 'google-login', component: GoogleLoginComponent, canActivate: [IsNotLoggedInGuard]},
       {path: 'github-login', component: GithubLoginComponent},

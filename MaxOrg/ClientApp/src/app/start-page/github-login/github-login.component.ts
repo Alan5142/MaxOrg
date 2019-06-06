@@ -30,10 +30,7 @@ export class GithubLoginComponent implements OnInit {
   }
 
   usernameExists(userService: UserService): AsyncValidatorFn {
-    console.log('username exists');
     return async (control: AbstractControl): Promise<ValidationErrors> => {
-      console.log('Value: ' + control.value);
-      console.log(await userService.existsUser(control.value));
       return await userService.existsUser(control.value) ? {'usernameexists': {value: true}} : null;
     };
   }
@@ -93,7 +90,6 @@ export class GithubLoginComponent implements OnInit {
           this.profilePicture = result.picture;
           this.userId = result.userId;
         }, error => {
-          console.log(error);
           this.router.navigate(['/']);
         });
       }

@@ -29,7 +29,6 @@ export class RecordComponent implements OnInit {
       this.data.push(this.generateTestData());
     }
     this.activatedRoute.parent.parent.params.subscribe(params => {
-      console.log(params);
       this.groupId = params['id'];
       this.tests = testsService.getTests(this.groupId).pipe(shareReplay(1));
     });

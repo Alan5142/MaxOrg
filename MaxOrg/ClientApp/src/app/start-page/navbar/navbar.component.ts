@@ -1,11 +1,10 @@
-import {Component, Inject, OnInit, ViewEncapsulation} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar} from '@angular/material';
-import {HttpClient} from '@angular/common/http';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {MatDialog, MatDialogRef, MatSnackBar} from '@angular/material';
 import {Router} from '@angular/router';
 import {Notification as UserNotification, UserService} from '../../services/user.service';
 import {environment} from '../../../environments/environment';
-import {Observable} from "rxjs";
 import {AuthService, GoogleLoginProvider} from "angularx-social-login";
+import {RequestPasswordChangeComponent} from "./request-password-change/request-password-change.component";
 
 export interface DialogData {
   username: string;
@@ -20,16 +19,11 @@ export interface DialogData {
 })
 
 export class NavbarComponent implements OnInit {
-  notifications: Observable<UserNotification[]>;
-  username: string;
-  password: string;
-
   constructor(private dialog: MatDialog,
               public userService: UserService,
               private router: Router,
               private snackBar: MatSnackBar,
               public authService: AuthService) {
-    this.notifications = userService.getUserNotifications();
   }
 
   ngOnInit() {
@@ -37,8 +31,7 @@ export class NavbarComponent implements OnInit {
 
   displayLoginDialog(): void {
     const dialogRef = this.dialog.open(NavbarDialogComponent, {
-      minWidth: '330px',
-      data: {username: this.username, password: this.password}
+      minWidth: '330px'
     });
   }
 
@@ -58,19 +51,19 @@ export class NavbarComponent implements OnInit {
   templateUrl: 'navbar.dialog.html'
 })
 export class NavbarDialogComponent {
-  private clientId: string = '495753764174-kr5o676hqpcqlpb40a7m2a92v7614hst.apps.googleusercontent.com';
+  username: string;
+  password: string;
 
   constructor(
     public dialogRef: MatDialogRef<NavbarDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    private http: HttpClient,
     private router: Router,
     private userService: UserService,
-    private authService: AuthService) {
+    private authService: AuthService,
+    private dialog: MatDialog) {
   }
 
   login(): void {
-    this.userService.login({username: this.data.username, password: this.data.password}).subscribe(loginSucceed => {
+    this.userService.login({username: this.username, password: this.password}).subscribe(() => {
       this.router.navigate(['/start/index']);
       this.dialogRef.close();
     }, error => {
@@ -84,13 +77,11 @@ export class NavbarDialogComponent {
   }
 
   githubLogin(): void {
-    window.location.href = 'https://github.com/login/oauth/authorize?client_id=' + environment.githubAuth.clientId;
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${environment.githubAuth.clientId}&scope=repo`;
   }
 
   googleLogin() {
-    this.authService.signOut(true).then(() => {}).catch(() => {
-    });
-    console.log(GoogleLoginProvider.PROVIDER_ID);
+    this.authService.signOut(true).catch(() => { });
     this.authService.signIn(GoogleLoginProvider.PROVIDER_ID).then(ok => {
       this.userService.googleLogin(ok.id).subscribe(userData => {
           localStorage.setItem('token', userData.token);
@@ -110,12 +101,17 @@ export class NavbarDialogComponent {
           this.dialogRef.close();
         });
     }).catch(error => {
-      console.log(error);
     });
   }
 
   isNotChromeMobile() {
     return !/^(?=.*\bChrome\b)(?=.*\bAndroid\b).*$/i.test(navigator.userAgent);
+  }
+
+  requestNewPassword() {
+    this.dialog.open(RequestPasswordChangeComponent).afterClosed().subscribe(() => {
+      this.dialogRef.close();
+    })
   }
 }
 

@@ -26,7 +26,6 @@ export class NewSubgroupComponent {
     private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) parentGroupId: string) {
     this.parentGroupId = parentGroupId;
-    console.log(parentGroupId);
     this.selectedUsers = [];
     this.autocompleteUsers = [];
     userService.getCurrentUser().subscribe(user => this.selectedAdmin = user.username);
@@ -87,7 +86,6 @@ export class NewSubgroupComponent {
     }
 
     this.selectedAdmin = username;
-    console.log(this.selectedAdmin);
   }
   addDescription() {
     const dialogRef = this.dialog.open(addDescription, {
@@ -96,7 +94,6 @@ export class NewSubgroupComponent {
     dialogRef.afterClosed().subscribe(description => {
       if (description)
         this.groupDescription = description;
-      console.log(this.groupDescription);
     });
   }
 }
@@ -114,10 +111,8 @@ export class addDescription {
   groupId:string;
   constructor(public dialogRef: MatDialogRef<addDescription>,
       @Inject(MAT_DIALOG_DATA) data:any) {
-        console.log(data);
         this.description= of(data.description);
         this.groupId= data.groupId.parentId;
-        console.log(this.groupId);
        }
 }
 

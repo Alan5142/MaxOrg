@@ -40,6 +40,7 @@
     "date-fns": "^1.30.1",
     "hammerjs": "^2.0.8",
     "marked": "^0.6.2",
+    "mdn-polyfills": "^5.17.0",
     "moment": "^2.24.0",
     "ng2-charts": "^2.2.3",
     "ngx-hm-carousel": "^1.6.5-bata.1",
@@ -48,6 +49,7 @@
     "prismjs": "^1.16.0",
     "rxjs": "^6.5.1",
     "sanitize-html": "^1.20.1",
+    "web-animations-js": "^2.3.1",
     "zone.js": "^0.8.29"
   },
   "devDependencies": {

@@ -50,7 +50,6 @@ export class NotificationService {
       };
 
       this.userService.getCurrentUser().subscribe(user => {
-        console.log(user.notificationPreference);
         switch (user.notificationPreference) {
           case NotificationPreference.allowEverything:
             triggerNotification();

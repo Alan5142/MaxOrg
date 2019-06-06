@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using ArangoDB.Client;
 using MaxOrg.Models.Tasks;
@@ -22,20 +21,20 @@ namespace MaxOrg.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private PasswordHasher<User> PasswordHasher { get; }
+        private IPasswordHasher<User> PasswordHasher { get; }
         private IConfiguration Configuration { get; }
         private CloudBlobContainer Container { get; }
         private IArangoDatabase Database { get; }
         private IEmailSender EmailSender { get; }
 
         public UsersController(IConfiguration configuration, CloudBlobContainer container, IArangoDatabase database,
-            IEmailSender sender)
+            IEmailSender sender, IPasswordHasher<User> passwordHasher)
         {
             EmailSender = sender;
             Database = database;
             Container = container;
             Configuration = configuration;
-            PasswordHasher = new PasswordHasher<User>();
+            PasswordHasher = passwordHasher;
         }
 
         /// <summary>
@@ -155,14 +154,8 @@ namespace MaxOrg.Controllers
                 return Conflict(new {message = $"Email {user.Email} already exists"});
             }
 
-            var random = new RNGCryptoServiceProvider();
-            var salt = new byte[32];
-            random.GetBytes(salt);
-            var saltAsString = Convert.ToBase64String(salt);
-
             var userToInsert = new User(user);
-            userToInsert.Password = PasswordHasher.HashPassword(userToInsert, saltAsString + user.Password);
-            userToInsert.Salt = saltAsString;
+            userToInsert.Password = PasswordHasher.HashPassword(userToInsert, user.Password);
             if (!await EmailSender.SendEmailAsync(user.Email, "Bienvenido a MaxOrg", $@"MaxOrg es una plataforma
  que agilizará tus proyectos de sofware<br>Tu cuenta es: {user.Username}, podrás acceder a la plataforma desde 
 https://maxorg.azurewebsites.net<br><h2>Esperamos que la plataforma te sea de utilidad :)</h2>"))
@@ -455,7 +448,7 @@ return unfinishedTaskInfo[0]").ToListAsync();
             var githubUser = await githubClient.User.Current();
 
             var existsUser = await Database.Query<User>()
-                .Where(u => u.GithubId == githubUser.Id)
+                .Where(u => u.GithubId == githubUser.Id && u.Username != null)
                 .Select(u => u)
                 .FirstOrDefaultAsync();
             if (existsUser != null)

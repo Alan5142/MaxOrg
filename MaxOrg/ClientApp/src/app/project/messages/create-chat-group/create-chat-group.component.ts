@@ -70,7 +70,6 @@ export class CreateChatGroupComponent implements OnInit {
   }
 
   selected($event: MatAutocompleteSelectedEvent) {
-    console.log('autocomplete event');
     this.memberInput.nativeElement.value = '';
     this.membersControl.setValue(null);
     const index = (this.data.members as Array<any>).findIndex(u => u.username === $event.option.value.trim());

@@ -1,8 +1,17 @@
 import {Component, OnInit} from '@angular/core';
 import {User, UserService} from '../../services/user.service';
-import {AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
+import {
+  AbstractControl,
+  AsyncValidatorFn,
+  FormBuilder,
+  FormGroup,
+  ValidationErrors,
+  ValidatorFn,
+  Validators
+} from '@angular/forms';
 import {MediaObserver} from '@angular/flex-layout';
 import {Router} from '@angular/router';
+import {MatSnackBar} from "@angular/material";
 
 @Component({
   selector: 'app-register',
@@ -12,10 +21,12 @@ import {Router} from '@angular/router';
 export class RegisterComponent implements OnInit {
   requiredInformation: FormGroup;
   optionalInformation: FormGroup;
-  userService: UserService;
 
-  constructor(userService: UserService, private _formBuilder: FormBuilder, public mediaObserver: MediaObserver, private _router: Router) {
-    this.userService = userService;
+  constructor(private userService: UserService,
+              private _formBuilder: FormBuilder,
+              public mediaObserver: MediaObserver,
+              private _router: Router,
+              private snackbar: MatSnackBar) {
   }
 
   controlValuesEqual(otherControl: AbstractControl): ValidatorFn {
@@ -80,10 +91,10 @@ export class RegisterComponent implements OnInit {
         this.userService.login({
           username: userToRegister.username,
           password: userToRegister.password
-        }).subscribe(loginSucceded => {
-          if (loginSucceded) {
-            this._router.navigate(['/']);
-          }
+        }).subscribe(() => {
+          this._router.navigate(['/']);
+        }, error => {
+          this.snackbar.open('No se pudo crear la cuenta', 'Ok', {duration: 2000});
         });
       }
     });

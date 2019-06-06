@@ -15,24 +15,25 @@ export class AppComponent {
               private userService: UserService,
               private update: SwUpdate,
               private snackBar: MatSnackBar) {
-    Notification.requestPermission().then((result) => {
-      if (result === "denied") {
-        alert('Puedes activar las notificaciones en la configuración de tu navegador');
-      }
-    });
-    if (navigator.serviceWorker === undefined) {
-      return;
-    }
-    update.available.subscribe(updateAvailable => {
-      const snack = this.snackBar.open('Hay una actualización disponible', 'Recargar', {duration: 15000});
-      snack
-        .onAction()
-        .subscribe(() => {
-          window.location.reload();
+    try {
+      if (navigator.serviceWorker !== undefined) {
+        update.available.subscribe(updateAvailable => {
+          const snack = this.snackBar.open('Hay una actualización disponible', 'Recargar', {duration: 15000});
+          snack
+            .onAction()
+            .subscribe(() => {
+              window.location.reload();
+            });
+        }, err => {
         });
-    }, err => {
-    });
-    navigator.serviceWorker.ready.then(registration => {
-    })
+      }
+      Notification.requestPermission().then((result) => {
+        if (result === "denied") {
+          alert('Puedes activar las notificaciones en la configuración de tu navegador');
+        }
+      }).catch(error => alert(error));
+    } catch (e) {
+
+    }
   }
 }

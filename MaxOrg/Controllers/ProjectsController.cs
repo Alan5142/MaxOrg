@@ -296,7 +296,7 @@ namespace MaxOrg.Controllers
 
             return Ok(new
             {
-                Members = users.Select(u => new
+                Members = users.Where(u => u != null).Select(u => new
                 {
                     u.Key,
                     u.Description,

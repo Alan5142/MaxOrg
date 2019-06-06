@@ -31,7 +31,6 @@ export class CreateTestDialogComponent implements OnInit {
   }
 
   createTest() {
-    console.log(this.createTestForm);
     this.testsService
       .createTest(this.data.id, this.createTestForm.get('buildDefinition').value, this.createTestForm.get('name').value)
       .subscribe(() => {

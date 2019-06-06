@@ -187,7 +187,6 @@ export class SpeedDialFabComponent implements OnInit, OnDestroy {
   }
 
   public onToggleFab() {
-    console.log('can click: ' + this._canClick);
     this.fabToggleClick.emit();
     if (!this._canClick) {
       return;

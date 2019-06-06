@@ -93,7 +93,6 @@ export class CalendarComponent implements OnInit {
     activatedRoute.parent.params.subscribe(params => {
       this.groupId = params['id'];
       this.calendarService.getProjectEvents(this.groupId).subscribe(events => {
-        console.log(events);
         this.updateData();
       });
     });

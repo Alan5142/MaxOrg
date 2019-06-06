@@ -49,7 +49,7 @@ namespace MaxOrg.Services.Email
                     return true;
                 }
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 return false;
             }

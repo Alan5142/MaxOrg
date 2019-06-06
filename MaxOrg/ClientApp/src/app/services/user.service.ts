@@ -3,7 +3,7 @@ import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {Observable} from 'rxjs';
 import {LoginResponse, RegisterResponse, User} from './user.service';
-import {map} from 'rxjs/operators';
+import {catchError, map} from 'rxjs/operators';
 import {Router} from '@angular/router';
 import {JwtHelperService} from "@auth0/angular-jwt";
 
@@ -155,8 +155,8 @@ export class UserService {
     return response.length !== 0;
   }
 
-  login(data: LoginInformation): Observable<boolean> {
-    return this.http.post<LoginResponse>(environment.apiUrl + 'login', data).pipe(map<LoginResponse, boolean>(value => {
+  login(data: LoginInformation): Observable<void> {
+    return this.http.post<LoginResponse>(environment.apiUrl + 'login', data).pipe(map<LoginResponse, void>(value => {
       if (value.token !== undefined) {
         this.getUser(value.userId).subscribe(user => {
           this.userLoggedIn = user;
@@ -164,9 +164,6 @@ export class UserService {
         localStorage.setItem('token', value.token);
         localStorage.setItem('refresh', value.refreshToken);
         localStorage.setItem('userId', value.userId);
-        return true;
-      } else {
-        return false;
       }
     }));
   }
@@ -221,5 +218,29 @@ export class UserService {
 
   get pendingTasks(): Observable<any> {
     return this.http.get('/api/users/pending-tasks');
+  }
+
+  forgottenPassword(email?: string, username?: string): Observable<void> {
+    return this.http.post<void>('/api/login/forgotten-password', {
+      email: email,
+      username: username
+    });
+  }
+
+  isForgottenPasswordPayloadValid(payload: string, callback: () => void): Observable<boolean> {
+    return this.http.post<boolean>('/api/login/validate-forgotten-password', {payload: payload})
+      .pipe(map<any, boolean>(() => true),
+        catchError(err => new Observable<boolean>(subscriber => {
+          subscriber.next(false);
+          callback();
+          subscriber.complete();
+        })));
+  }
+
+  changePassword(newPassword: string, payload: string): Observable<void> {
+    return this.http.post<void>('/api/login/change-password', {
+      newPassword: newPassword,
+      payload: payload
+    });
   }
 }
