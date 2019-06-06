@@ -21,7 +21,7 @@ export class IndexComponent implements OnInit {
     {url: '/images/logos/org-chart.png', title: 'Divida y vencerá, MaxOrg le permite organizar grupos en forma jerárquica'},
     {url: '/images/logos/stats.png', title: 'Obtenga estádisticas y porcentaje de tareas terminadas'},
     {url: '/images/logos/tests.png', title: 'Realice pruebas automaticas a su código y escriba reportes de las mismas'},
-    {url: '/images/logos/chat.jpeg', title: 'Converse con los integrantes de su equipo'},
+    {url: '/images/logos/chat.jpeg', title: 'Dialogue con los integrantes de su equipo'},
   ];
 
   constructor() {

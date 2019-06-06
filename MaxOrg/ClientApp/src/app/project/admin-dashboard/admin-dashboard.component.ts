@@ -121,7 +121,6 @@ export class AdminDashboardComponent implements OnInit {
             this.tasksInfo.noProgress++;
           this.tasksInfo.total++;
         });
-        console.log(this.tasksInfo);
       });
       this.getTasksInfo(group.subgroups);
     });
@@ -202,7 +201,6 @@ export class AdminDashboardComponent implements OnInit {
           maxWidth: '400px'
         });
         dialogRef.afterClosed().subscribe(r => {
-          console.log(r);
           if (r === null || r === undefined) {
             return;
           }
@@ -273,7 +271,6 @@ export class AdminDashboardComponent implements OnInit {
         observable.subscribe(success => {
           this.snackBar.open('Creado con exito', 'Ok', {duration: 2500});
         }, error => {
-          console.log(error);
           this.snackBar.open('No se pudo crear :(', 'Ok', {duration: 2500});
         });
       }
@@ -292,7 +289,6 @@ export class AdminDashboardComponent implements OnInit {
         observable.subscribe(success => {
           this.snackBar.open('Agregados con exito', 'Ok', {duration: 2500});
         }, error => {
-          console.log(error);
           this.snackBar.open('No se pudieron agregar :(', 'Ok', {duration: 2500});
         });
       }

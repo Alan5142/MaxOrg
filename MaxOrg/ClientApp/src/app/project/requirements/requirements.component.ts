@@ -37,8 +37,6 @@ export class RequirementsComponent implements OnInit {
         functValues.forEach(requirement=>{
           projectService.getRequirementProgress(this.projectId,requirement.id).subscribe((progress:number)=>{
             requirement.progress=progress;
-            console.log(requirement.id);
-            console.log(requirement.progress);
           })
         });
         return functValues;

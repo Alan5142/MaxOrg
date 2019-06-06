@@ -1,8 +1,8 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef, MatDialog} from '@angular/material';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
-import { ChangeDescriptionComponent } from '../../admin-dashboard/change-description/change-description.component';
-import { HighlightService } from 'src/app/services/highlight.service';
+import {ChangeDescriptionComponent} from '../../admin-dashboard/change-description/change-description.component';
+import {HighlightService} from 'src/app/services/highlight.service';
 
 declare var require: any;
 
@@ -166,7 +166,6 @@ export class GroupCardComponent implements OnInit {
     this.dialogRef.close();
   }
   changeDescription(){
-    console.log(this.data);
     let dialogRef=this.dialog.open(ChangeDescriptionComponent,{
       data:{groupId:this.data.group.id}
     });

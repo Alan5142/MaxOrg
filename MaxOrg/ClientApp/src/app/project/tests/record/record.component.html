@@ -19,7 +19,7 @@
                                 [value]="data.succeeded / (data.succeeded + data.failed) * 100"></mat-progress-spinner>
           <h3 *ngIf="data.failed === null">Ten paciencia, se esta ejecutando</h3>
           <h3 *ngIf="data.failed !== null"
-              class="text-center">{{data.succeeded + data.failed}} {{(data.succeded + data.failed) > 2 ? 'tests, de los cuales' : 'test, del cual'}}</h3>
+              class="text-center">{{data.succeeded + data.failed}} {{data.succeeded + data.failed !== 1 ? 'tests, de los cuales' : 'test, el cual'}}</h3>
           <h3 *ngIf="data.failed !== null" class="text-center" style="color: #41c300">
             {{data.succeeded}} {{data.succeeded === 1 ? 'test fue completado con exito' : 'fueron completados con exito'}}
           </h3>

@@ -23,7 +23,6 @@ export class ChatService {
     this.onConnected = from(this.hubConnection.start());
     this.onConnected.subscribe(ok => {
       this.hubConnection.on('receiveMessage', (message: Message) => {
-        console.log(message);
         this.messageObserver.next(message);
       });
     });

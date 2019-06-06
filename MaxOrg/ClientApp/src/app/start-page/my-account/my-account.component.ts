@@ -2,9 +2,8 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatBottomSheet, MatBottomSheetRef, MatSlideToggleChange, MatSnackBar} from '@angular/material';
 import {NotificationPreference, User, UserService} from '../../services/user.service';
 import {Observable} from "rxjs";
-import {shareReplay} from "rxjs/operators";
 import {AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators} from "@angular/forms";
-import {ImageCropperComponent, CropperSettings} from 'ngx-img-cropper';
+import {CropperSettings, ImageCropperComponent} from 'ngx-img-cropper';
 import {MediaObserver} from "@angular/flex-layout";
 import {environment} from "../../../environments/environment";
 import {ThemeService} from "../../services/theme.service";
@@ -139,7 +138,7 @@ export class MyAccountComponent implements OnInit {
   }
 
   githubLink() {
-    window.location.href = `https://github.com/login/oauth/authorize?client_id=${environment.githubAuth.clientId}`;
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${environment.githubAuth.clientId}&scope=repo`;
   }
 }
 

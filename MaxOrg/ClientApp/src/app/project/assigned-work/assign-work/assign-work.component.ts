@@ -39,7 +39,6 @@ export class AssignWorkComponent implements OnInit {
 
   }
   createTask(taskName: HTMLInputElement, taskDescription: HTMLInputElement) {
-    console.log(this.percent);
     this.task=null;
     if (this.references){
     if(Number.isInteger(this.percent)&&this.percent>0&&this.percent<=100)
@@ -63,10 +62,8 @@ export class AssignWorkComponent implements OnInit {
         name: taskName.value,
         description: taskDescription.value,
         deliveryDate: this.date
-      }
-    console.log(this.task);
+      };
     if(!this.isUser){
-      console.log(this.id);
       this.dialogRef.close(this.taskService.createGroupTask(this.id,this.task));
     }else{
       this.task.userAssignId=this.id;

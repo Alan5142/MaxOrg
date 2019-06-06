@@ -155,8 +155,8 @@ export class UserService {
     return response.length !== 0;
   }
 
-  login(data: LoginInformation): Observable<boolean> {
-    return this.http.post<LoginResponse>(environment.apiUrl + 'login', data).pipe(map<LoginResponse, boolean>(value => {
+  login(data: LoginInformation): Observable<void> {
+    return this.http.post<LoginResponse>(environment.apiUrl + 'login', data).pipe(map<LoginResponse, void>(value => {
       if (value.token !== undefined) {
         this.getUser(value.userId).subscribe(user => {
           this.userLoggedIn = user;
@@ -164,9 +164,6 @@ export class UserService {
         localStorage.setItem('token', value.token);
         localStorage.setItem('refresh', value.refreshToken);
         localStorage.setItem('userId', value.userId);
-        return true;
-      } else {
-        return false;
       }
     }));
   }

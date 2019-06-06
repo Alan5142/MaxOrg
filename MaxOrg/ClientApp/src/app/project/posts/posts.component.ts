@@ -1,8 +1,8 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, Inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {ThemeService} from "../../services/theme.service";
 import {PostsService} from "../../posts.service";
 import {ActivatedRoute} from "@angular/router";
-import {MatSnackBar, MatDialogRef, MAT_DIALOG_DATA, MatDialog} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
 import {HighlightService} from "../../services/highlight.service";
 import {shareReplay} from "rxjs/operators";
@@ -47,14 +47,12 @@ export class PostsComponent implements OnInit {
       this.groupId = params['id'];
       this.projectService.getProject(this.groupId).subscribe(project => {
         this.getUserGroups(project);
-        console.log(this.groupsList);
         this.getPosts(this.groupId);
       });
     });
   }
 
   getPosts(groupId){
-    console.log(groupId);
     this.groupId=groupId;
     this.postsService.getPosts(this.groupId).pipe(shareReplay(1)).subscribe(posts => {
       this.posts = (posts as Array<any>).map(p => {
@@ -417,6 +415,5 @@ export class WriteComment {
   constructor(public dialogRef: MatDialogRef<WriteComment>,
       @Inject(MAT_DIALOG_DATA) groupId:string) {
         this.groupId= groupId;
-        console.log(this.groupId);
        }
 }

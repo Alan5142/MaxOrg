@@ -108,7 +108,6 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   getKanbanGroups(): Observable<KanbanGroup[]> {
     return this.board.pipe(map<KanbanBoard, KanbanGroup[]>(result => {
-      console.log(result);
       return result.kanbanGroups;
     }));
   }
@@ -165,7 +164,6 @@ export class BoardComponent implements OnInit, OnDestroy {
         .subscribe(() => this.snackBar.open('Editado con exito', 'OK', {duration: 2000}),
           error => {
             this.snackBar.open('No se pudo editar', 'OK', {duration: 2000});
-            console.log(error);
           });
     });
   }
@@ -188,7 +186,6 @@ export class BoardComponent implements OnInit, OnDestroy {
   deleteSection(group: KanbanGroup) {
     const dialog = this.dialog.open(DeleteSectionComponent);
     dialog.afterClosed().subscribe(result => {
-      console.log(result);
       if (result.delete) {
         this.kanbanService.deleteSection(this.projectId, this.boardId, group.id).subscribe(() => {
           this.updateData();
@@ -201,8 +198,6 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   showDetailedInfo(task: KanbanCard, group: KanbanGroup) {
-    console.log('open');
-
     const dialog = this.dialog.open(CardDetailedComponent, {
       data: {
         task: task,
@@ -243,12 +238,10 @@ export class BoardComponent implements OnInit, OnDestroy {
         modifyMembersDialog.afterClosed().subscribe((value) => {
           observable.unsubscribe();
           if (value !== undefined) {
-            console.log(board.members);
             this.kanbanService.addMembersToKanban(this.projectId, this.boardId, board.members).subscribe(() => {
               this.snackBar.open('Se modificaron con exito los miembros del grupo', 'OK', {duration: 2000});
               this.updateData();
             }, error => {
-              console.log(error);
               this.snackBar.open('No se pudieron modificar los miembros del grupo', 'OK', {duration: 2000});
               this.updateData();
             });

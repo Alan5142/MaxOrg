@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {
   AbstractControl,
   AsyncValidatorFn,
@@ -29,10 +29,7 @@ export class GoogleLoginComponent implements OnInit {
   }
 
   usernameExists(userService: UserService): AsyncValidatorFn {
-    console.log('username exists');
     return async (control: AbstractControl): Promise<ValidationErrors> => {
-      console.log('Value: ' + control.value);
-      console.log(await userService.existsUser(control.value));
       return await userService.existsUser(control.value) ? {'usernameexists': {value: true}} : null;
     };
   }
@@ -94,8 +91,6 @@ export class GoogleLoginComponent implements OnInit {
       profileUrl: this.profilePicture,
       userId: this.userId
     };
-
-    console.log(request);
 
     this.userService.googleRegister(request).subscribe(result => {
       localStorage.setItem('token', result.token);

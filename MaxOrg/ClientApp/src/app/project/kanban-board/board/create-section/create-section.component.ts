@@ -21,7 +21,6 @@ export class CreateSectionComponent implements OnInit {
 
   createSection() {
     this.createSectionForm.get('sectionName').markAsDirty();
-    console.log(this.createSectionForm.get('sectionName'));
     if (!this.createSectionForm.valid) {
       return;
     }

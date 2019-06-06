@@ -448,7 +448,7 @@ return unfinishedTaskInfo[0]").ToListAsync();
             var githubUser = await githubClient.User.Current();
 
             var existsUser = await Database.Query<User>()
-                .Where(u => u.GithubId == githubUser.Id)
+                .Where(u => u.GithubId == githubUser.Id && u.Username != null)
                 .Select(u => u)
                 .FirstOrDefaultAsync();
             if (existsUser != null)

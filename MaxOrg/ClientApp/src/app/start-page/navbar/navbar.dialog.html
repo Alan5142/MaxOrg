@@ -7,12 +7,12 @@
         <form fxLayout="column">
           <mat-form-field>
             <mat-label i18n>Usuario</mat-label>
-            <input [(ngModel)]="data.username" matInput name="username">
+            <input [(ngModel)]="username" matInput name="username">
           </mat-form-field>
 
           <mat-form-field>
             <mat-label i18n>Contraseña</mat-label>
-            <input [(ngModel)]="data.password" matInput name="password" type="password">
+            <input [(ngModel)]="password" matInput name="password" type="password">
           </mat-form-field>
           <div fxLayoutAlign="center center">
             <button (click)="login()" color="primary" mat-flat-button type="submit">INICIAR SESIÓN</button>
