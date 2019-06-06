@@ -172,7 +172,7 @@ namespace MaxOrg.Controllers
                 foreach (var userId in request.Members)
                 {
                     var memberUser = Database.Query<User>().Where(u => u.Key == userId).Select(u => u).FirstOrDefault();
-
+                    if (memberUser?.Key == HttpContext.User.Identity.Name) continue;
 
                     userToAdd = new ChatMembers
                     {
