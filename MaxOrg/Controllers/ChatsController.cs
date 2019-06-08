@@ -80,7 +80,7 @@ namespace MaxOrg.Controllers
             {
                 return BadRequest();
             }
-
+            
             // Buscamos al usuario
             var user = await Database.Query<User>()
                 .Where(u => u.Key == HttpContext.User.Identity.Name)

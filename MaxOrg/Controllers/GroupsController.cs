@@ -673,7 +673,7 @@ namespace MaxOrg.Controllers
             }
 
             var canEdit =
-                kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name).MemberPermissions !=
+                kanbanBoard.Members.Find(km => km.UserId == HttpContext.User.Identity.Name)?.MemberPermissions ==
                 KanbanMemberPermissions.Admin || await IsAdmin(groupId);
             if (!canEdit)
             {
